@@ -786,6 +786,24 @@ def get_columns_from_tables(tables):
   for table in tables:
     for column in table.columns:
       if column.cells[0].text not in table_columns.keys():
-        table_columns[column.cells[0].text] = [cell.text for cell in column.cells[1:]]
+        table_columns[column.cells[0].text] = [sanitize_white_spaces(cell.text) for cell in column.cells[1:]]
   
   return table_columns
+
+def sanitize_white_spaces(text):
+  """ Remove leading/trailing white spaces and replace any carriage returns with spaces. """
+
+  trailing_ws = re.compile(r'(.+) $')
+  leading_ws = re.compile(r' (.+)$')
+
+  match_trailing_ws = trailing_ws.match(text)
+  if match_trailing_ws is not None:
+    text = match_trailing_ws.group(1)
+  
+  match_leading_ws = leading_ws(text)
+  if match_leading_ws is not None:
+    text = match_leading_ws.group(1)
+
+  text = text.replace('\n',' ')
+
+  return text
