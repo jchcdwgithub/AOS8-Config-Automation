@@ -784,9 +784,8 @@ def get_columns_from_tables(tables):
   table_columns = {}
 
   for table in tables:
-    for columns in table.columns:
-      for column in columns:
-        if column.cells[0].text not in table_columns.keys():
-          table_columns[column.cells[0].text] = [cell.text for cell in column.cells[1:]]
+    for column in table.columns:
+      if column.cells[0].text not in table_columns.keys():
+        table_columns[column.cells[0].text] = [cell.text for cell in column.cells[1:]]
   
   return table_columns

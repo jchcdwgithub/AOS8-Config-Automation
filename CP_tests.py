@@ -19,12 +19,10 @@ def test_get_columns_from_tables_returns_all_columns():
                 'Part Number':['MM-VA-500','MM-VA-500','A7010','A7010'],
                 'MAC':['AA:BB:CC:DD:EE:FF','AA:BB:CC:DD:EE:FF','AA:BB:CC:DD:EE:FF','AA:BB:CC:DD:EE:FF'],
                 'Node':['mm','mm','/md/HQ/DC','/md/HQ/DC'],
-                'Device Name':['MM-HQ-01','MM-HQ-02','WC-HQ-01','WC-HQ-02'],
-                'Interface':['Gi 0/0/0', 'Gi 0/0/0', 'Gi 0/0/5', 'Gi 0/0/5'],
-                'Description':['VMSwitch Connection','VMSwitch Connection','HQ 5412 CenterU2 port K4','HQ 5412 CenterU2 port K4'],
-                'Trunk':['Trunk','Trunk','Trunk','Trunk'],
-                'Native/Access VLAN':['12','12','12','12'],
-                'Trunk Allowed VLAN':['All','All','All','All']}
+                'MM/MC':['MM-HQ-01','MM-HQ-02','WC-HQ-01','WC-HQ-02'],
+                'MGMT IP':['10.0.30.125', '10.0.30.126', '10.0.30.120', '10.0.30.122'],
+                'Cluster IP':['10.0.30.127','10.0.30.127','10.0.30.121','10.0.30.123'],
+                'AP Discovery':['N/A','N/A','10.0.30.124','10.0.30.124']}
     
     generated = CA.get_columns_from_tables(tables)
 
