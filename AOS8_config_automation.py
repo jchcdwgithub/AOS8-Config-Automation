@@ -129,6 +129,42 @@ def build_hierarchy(full_path):
 
   return node_paths
 
+def get_profile_names(profile_name_col, suffix=""):
+  """ Gets the profile names column from the provided table and return a list of names appended with the optional suffix. """
+
+  return [name.text+suffix for name in profile_name_col]
+
+def add_tx_power_to_radio_profiles(radio_profiles,tx_power_col,attribute):
+  """ Given a list of  radio profiles, add the tranmist powers from the table column provided. Attribute is a two tuple of attribute outer name
+      and attribute inner name i.e. ('eirp_min','eirp-min') """
+  
+  remove_dbm = re.compile(r'(\d{1,2})')
+  for radio_profile,tx_power in zip(radio_profiles, tx_power_col):
+    transmit_power = int(remove_dbm(tx_power.text))
+    radio_profile[attribute[0]] = {attribute[1]: transmit_power}
+
+def build_radio_transmit_power_profiles(columns):
+  """ Get the profile names, min EIRP, max EIRP from the columns provided and return an array of radio profiles. """
+
+  RF_profile_column = columns['RF Profile']
+  min24_column = columns['2.4 GHz Minimum']
+  max24_column = columns['2.4 GHz Maximum']
+  min5_column = columns['5 GHz Minimum']
+  max5_column = columns['5 GHz Maximum']
+
+  g_profile_names = get_profile_names(RF_profile_column,suffix='_radio_g_prof')
+  a_profile_names = get_profile_names(RF_profile_column,suffix='_radio_a_prof')
+
+  g_profiles = [{'profile-name':g_profile_name for g_profile_name in g_profile_names}]
+  a_profiles = [{'profile-name':a_profile_name for a_profile_name in a_profile_names}]
+
+  add_tx_power_to_radio_profiles(g_profiles,min24_column,('eirp_min','eirp-min'))
+  add_tx_power_to_radio_profiles(g_profiles,max24_column,('eirp_max','eirp-max'))
+  add_tx_power_to_radio_profiles(a_profiles,min5_column,('eirp_min','eirp-min'))
+  add_tx_power_to_radio_profiles(a_profiles,max5_column,('eirp_max','eirp-max'))
+
+  return [g_profiles,a_profiles]
+
 def get_radio_transmit_powers(table):
   """ Given a table of radio transmit powers, configure a and g radio profiles. Profile names 
       are taken from the RF profile column and appended with _g_radio_prof or _a_radio_prof. """
@@ -741,3 +777,16 @@ def get_column_from_table(column_name,table):
     
     if index == len(table.columns):
         raise ValueError
+
+def get_columns_from_tables(tables):
+  """ Build a dictionary of column_name : column_cells from the tables provided. """
+
+  table_columns = {}
+
+  for table in tables:
+    for columns in table.columns:
+      for column in columns:
+        if column.cells[0].text not in table_columns.keys():
+          table_columns[column.cells[0].text] = [cell.text for cell in column.cells[1:]]
+  
+  return table_columns
