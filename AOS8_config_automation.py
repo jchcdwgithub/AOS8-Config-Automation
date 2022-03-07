@@ -800,7 +800,7 @@ def sanitize_white_spaces(text):
   if match_trailing_ws is not None:
     text = match_trailing_ws.group(1)
   
-  match_leading_ws = leading_ws(text)
+  match_leading_ws = leading_ws.match(text)
   if match_leading_ws is not None:
     text = match_leading_ws.group(1)
 
