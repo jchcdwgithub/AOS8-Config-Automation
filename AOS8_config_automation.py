@@ -11,6 +11,23 @@ BASE_URL = f"https://{CONTROLLER_IP}:4343/v1/"
 DEFAULT_PATH = '/mm/mynode'
 API_ROOT = 'configuration/object/'
 
+COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.profile-name","reg_domain_prof.profile-name"],
+               "System Name": ["configuration_device_filename.filename"],
+               "System MAC": ["configuration_device_filename.mac"],
+               "Part Number": ["configuration_device_filename.dev-model"],
+               "2.4 GHz Minimum": ["ap_g_radio_prof.eirp_min"],
+               "2.4 GHz Maximum": ["ap_g_radio_prof.eirp_max"],
+               "5 GHz Minimum": ["ap_a_radio_prof.eirp_min"],
+               "5 GHz Maximum": ["ap_a_radio_prof.eirp_max"],
+               "2.4 GHz Channels": ["reg_domain_prof.valid_11b_channels"],
+               "5 GHz Channels": ["reg_domain_prof.valid_11a_channels"],
+               "5 GHz Channel Width":["reg_domain_prof.valid_11a_40mhz_chan_nd","reg_domain_prof.valid_11a_80mhz_chan_nd"],
+               "SSID Profile":["ssid_prof.profile-name"],
+               "G Rates Required":["ssid_prof.g_basic_rates"],
+               "G Rates Allowed":["ssid_prof.g_tx_rates"],
+               "A Rates Required":["ssid_prof.a_basic_rates"],
+               "A Rates Allowed":["ssid_prof.a_tx_rates"]}
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 #login/logout and security tokens
@@ -128,6 +145,10 @@ def build_hierarchy(full_path):
     node_paths.append(partial_path)
 
   return node_paths
+
+def build_profiles(columns):
+  """ Build the profiles from the information provided in the columns. """
+
 
 def get_profile_names(profile_name_col, suffix=""):
   """ Gets the profile names column from the provided table and return a list of names appended with the optional suffix. """
@@ -786,9 +807,25 @@ def get_columns_from_tables(tables):
   for table in tables:
     for column in table.columns:
       if column.cells[0].text not in table_columns.keys():
-        table_columns[column.cells[0].text] = [sanitize_white_spaces(cell.text) for cell in column.cells[1:]]
+        attribute_names = COL_TO_ATTR[column.cells[0].text]
+        for attribute_name in attribute_names:
+          table_columns[attribute_name] = [sanitize_white_spaces(cell.text) for cell in column.cells[1:]]
   
   return table_columns
+
+def get_profiles_to_be_configured(columns):
+  """ Get the profiles to be configured from the table keys. The result is a dictionary of profile: [attributes]. """
+
+  profiles_to_configure = {}
+
+  for name in columns:
+    profile_name,attribute = name.split('.')
+    if profile_name in profiles_to_configure.keys():
+      profiles_to_configure[profile_name].append(attribute)
+    else:
+      profiles_to_configure[profile_name] = [attribute]
+  
+  return profiles_to_configure 
 
 def sanitize_white_spaces(text):
   """ Remove leading/trailing white spaces and replace any carriage returns with spaces. """
