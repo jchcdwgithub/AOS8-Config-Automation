@@ -3,6 +3,7 @@ import ex_tokens
 import json
 import re
 import urllib3
+import os
 from docx import Document
 from pprint import pprint
 
@@ -825,8 +826,23 @@ def get_profiles_to_be_configured(columns):
     else:
       profiles_to_configure[profile_name] = [attribute]
   
-  return profiles_to_configure 
+  return profiles_to_configure
 
+def check_that_required_attributes_are_provided(profile_name,profile_attributes,api_json_files):
+  """ The profile is a dictionary of prof_name:[attributes]. The profile will be looked up in the API JSON files and the required attributes
+      will be checked against the provided attributes. Returns a Boolean. """
+
+
+  for api_json_file in api_json_files:
+    if profile_name in api_json_file["definitions"].keys():
+      required_attributes = api_json_file["definitions"][profile_name]["required"]
+      for required_attribute in required_attributes:
+        if required_attribute not in profile_attributes:
+          print(f"You are missing a required attribute for the {profile_name} profile: {required_attribute} must be provided.")
+          return False
+
+  return True
+   
 def sanitize_white_spaces(text):
   """ Remove leading/trailing white spaces and replace any carriage returns with spaces. """
 
@@ -844,3 +860,20 @@ def sanitize_white_spaces(text):
   text = text.replace('\n',' ')
 
   return text
+
+def get_API_JSON_files():
+  """ Loads the API JSON documents. They are assumed to be in the API_JSON folder. """
+
+  API_file_names = os.listdir('./API_JSON')
+  API_JSON_files = []
+
+  for API_file_name in API_file_names:
+    with open('./API_JSON/'+API_file_name) as f:
+      lines = f.readlines()
+      joined_lines = ''
+      for line in lines:
+        joined_lines += line
+
+      API_JSON_files.append(json.loads(joined_lines))
+
+  return API_JSON_files

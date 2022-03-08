@@ -26,6 +26,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+API_JSON/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -129,5 +130,5 @@ dmypy.json
 .pyre/
 
 #local api tester
-api.py
-ex_tokens.py
+/api.py
+/ex_tokens.py

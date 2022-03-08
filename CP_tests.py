@@ -1,6 +1,8 @@
 import AOS8_config_automation as CA
 from docx import Document
 
+API_FILES = CA.get_API_JSON_files()
+
 def test_build_hierarchy_builds_all_paths():
     """ The build hierarchy function correctly returns all intermediate paths. """
 
@@ -49,3 +51,30 @@ def test_get_profiles_to_be_configured_returns_correct_dictionary():
     generated = CA.get_profiles_to_be_configured(attributes)
 
     assert expected == generated
+
+def test_check_for_required_attributes_returns_true_when_all_attributes_are_configured():
+
+    profile_name = "configuration_device_filename"
+    profile_attributes = [
+                "dev-model",
+                "config-path",
+                "mac-address",
+                "filename"
+            ]
+    
+    Result = CA.check_that_required_attributes_are_provided(profile_name,profile_attributes,API_FILES)
+
+    assert Result == True
+
+def test_check_for_required_attributes_returns_false_when_attributes_are_missing():
+
+    profile_name = 'configuration_device_filename'
+    profile_attributes = [
+                "dev-model",
+                "mac-address",
+                "filename"
+            ]
+
+    Result = CA.check_that_required_attributes_are_provided(profile_name,profile_attributes,API_FILES)
+
+    assert Result == False
