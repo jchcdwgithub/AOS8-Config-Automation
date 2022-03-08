@@ -1,5 +1,4 @@
 import requests
-from CP_tests import API_FILES
 import ex_tokens 
 import json
 import re
@@ -154,7 +153,7 @@ def build_hierarchy(full_path):
 def build_profile(profile_name, profile_attributes, attribute_columns, profiles_to_configure):
   """ Build the profile from its provided attributes and the data from the attribute_columns. """
 
-  if not check_that_required_attributes_are_provided(profile_name,profile_attributes,API_FILES):
+  if not check_that_required_attributes_are_provided(profile_name,profile_attributes,API_REF):
     exit()
   
   profiles = []
@@ -162,13 +161,110 @@ def build_profile(profile_name, profile_attributes, attribute_columns, profiles_
   for profile_attribute in profile_attributes:
     if is_nested_profile(profile_attribute):
       build_profile(profile_attribute,profiles_to_configure[profile_attribute],attribute_columns,profiles_to_configure)
-    add_attributes_to_profiles(attribute_columns[profile_attribute],profiles)
+    full_attribute_name = profile_name + '.' + profile_attribute
+    add_attributes_to_profiles(full_attribute_name,attribute_columns[full_attribute_name],profiles)
     CONFIG_HISTORY += profiles
   
   return profiles
 
-def add_attributes_to_profiles(attributes,profiles):
+def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
   """ Checks against the API that the attributes in the column are correct and adds them to the provided profiles. """
+  
+  _,attribute_name = full_attribute_name.split('.')
+
+  for attribute,profile in zip(attributes,profiles):
+
+    if not validate_attribute(full_attribute_name):
+      exit()
+
+    attribute_type = get_attribute_type(full_attribute_name)
+
+    if attribute_type == 'object':
+      if attribute_has_properties(full_attribute_name):
+        property_name = get_object_property_name(full_attribute_name)
+        profile[attribute_name] = {property_name: {attribute}}
+      else:
+        profile[attribute_name] = {}
+    elif attribute_type == 'integer':
+      attribute = extract_numbers_from_attribute(attribute)
+      for number_attribute in attribute:
+        profile[attribute_name] = int(number_attribute)
+    else:
+      profile[attribute_name] = attribute
+
+def add_string_attribute(profile_name,attribute_name,attributes,profiles):
+  """ Adds the attributes to the profiles. """
+
+  for attribute,profile in zip(attributes,profiles):
+    if is_valid(profile_name,attribute_name,attribute):
+      profile[attribute_name] = attribute
+    else:
+      exit()
+
+def is_valid(profile_name,attribute_name,attribute):
+  """ Checks the API reference to ensure that the input is valid. """
+
+  return True
+
+def attribute_has_properties(full_attribute_name):
+  """ Checks whether the attribute has a properties key. Returns True if it does. """
+
+  profile_name,attribute_name = full_attribute_name.split('.')
+
+  for ref in API_REF:
+    if profile_name in ref["definitions"]:
+      if "properties" in ref["definitions"][profile_name][attribute_name].keys():
+        return True
+      else:
+        return False
+
+def get_object_property_name(full_attribute_name):
+  """ Gets the property name of the object. """
+
+  profile_name,attribute_name = full_attribute_name.split('.')
+
+  for ref in API_REF:
+    if profile_name in ref["definitions"]:
+      return list(ref["definitions"][profile_name]["properties"][attribute_name]["properties"].keys())
+  
+  return []
+
+def is_enumerated_property(profile_name,attribute_name,property_name):
+  """ Returns true if the property is an enumerated property. """
+
+  for ref in API_REF:
+    if profile_name in ref["definitions"]:
+      return "enum" in ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name].keys()
+
+def string_is_in_enumerated_property_list(profile_name,attribute_name,property_name,string):
+  """ Validates whether the string is an allowed value for an enumerated object. """
+
+  for ref in API_REF:
+    if profile_name in ref["definitions"]:
+      return string in ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["enum"]
+
+def validate_attribute(full_attribute_name):
+  """ Checks against the API_REF that the configured attribute is acceptable i.e. between a certain number range or is not a string that's too long, etc."""
+
+def get_attribute_type(full_attribute_name):
+  """ Returns the type of the attribute as checked against the API_REF. """
+
+  profile_name,attribute_name = full_attribute_name.split('.')
+
+  for ref in API_REF:
+    if profile_name in ref['definitions']:
+      return ref['definitions'][profile_name]['properties'][attribute_name]['type']
+
+def extract_numbers_from_attribute(attribute):
+  """ For integer attributes, remove any text that might have been included i.e. units like dBm. """
+
+  numbers = re.compile(r'(\d+)')
+  extract_numbers = numbers.findall(attribute)
+  if len(extract_numbers) == 0:
+    print(f"{attribute} must be a number.")
+    exit()
+  else:
+    return extract_numbers
 
 def is_nested_profile(profile_attribute):
   """ If an attribute points to another profile then it is a nested profile. Returns True or False. """

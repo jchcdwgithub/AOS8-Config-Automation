@@ -95,3 +95,73 @@ def test_is_nested_profile_returns_false_for_other_attribute_names():
     Result = CA.is_nested_profile(attribute_name)
 
     assert Result == False
+
+def test_get_attribute_type_returns_the_correct_integer_type():
+
+    full_attribute_name = "foreign_agent_general_prof_it.interval-time"
+
+    expected = "integer"
+
+    generated = CA.get_attribute_type(full_attribute_name)
+
+    assert expected == generated
+
+def test_get_attribute_type_returns_the_correct_string_type():
+
+    full_attribute_name = "ssid_prof.profile-name"
+
+    expected = "string"
+
+    generated = CA.get_attribute_type(full_attribute_name)
+
+    assert expected == generated
+
+def test_get_object_property_name_returns_a_list_of_names():
+
+    full_attribute_name = "ap_mesh_radio_prof.mesh_a_tx_rates"
+
+    expected = ["6", "9", "12", "18", "24", "36", "48", "54"]
+
+    generated = CA.get_object_property_name(full_attribute_name)
+
+    assert expected == generated
+
+def test_is_enum_returns_true_for_enumerated_properties():
+
+    profile_name = "anqp_nwk_auth_prof"
+    attribute_name = "anqp_nwk_auth_type"
+    property_name = CA.get_object_property_name(profile_name+'.'+attribute_name)[0]
+
+    Result = CA.is_enumerated_property(profile_name,attribute_name,property_name)
+
+    assert Result == True
+
+def test_is_enum_returns_false_for_other_properties():
+
+    profile_name = "virtual_ap"
+    attribute_name = "aaa_prof"
+    property_name = "profile-name"
+
+    Result = CA.is_enumerated_property(profile_name,attribute_name,property_name)
+
+def test_string_is_in_enumerated_properties_list_returns_true_for_strings_in_list():
+
+    profile_name = "anqp_nwk_auth_prof"
+    attribute_name = "anqp_nwk_auth_type"
+    property_name = "anqp_nwk_auth_type"
+    test_string = "http-https-redirection"
+
+    Result = CA.string_is_in_enumerated_property_list(profile_name,attribute_name,property_name,test_string)
+
+    assert Result == True 
+
+def test_string_is_in_enumerated_properties_list_returns_false_for_strings_not_in_list():
+
+    profile_name = "anqp_nwk_auth_prof"
+    attribute_name = "anqp_nwk_auth_type"
+    property_name = "anqp_nwk_auth_type"
+    test_string = "aruba-central"
+
+    Result = CA.string_is_in_enumerated_property_list(profile_name,attribute_name,property_name,test_string)
+
+    assert Result == False
