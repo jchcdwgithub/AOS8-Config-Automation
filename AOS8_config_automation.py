@@ -1,9 +1,10 @@
 import requests
+from CP_tests import API_FILES
 import ex_tokens 
 import json
 import re
 import urllib3
-import os
+import setup
 from docx import Document
 from pprint import pprint
 
@@ -11,6 +12,9 @@ CONTROLLER_IP = '192.168.1.241'
 BASE_URL = f"https://{CONTROLLER_IP}:4343/v1/"
 DEFAULT_PATH = '/mm/mynode'
 API_ROOT = 'configuration/object/'
+
+API_REF = setup.get_API_JSON_files()
+CONFIG_HISTORY = []
 
 COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.profile-name","reg_domain_prof.profile-name"],
                "System Name": ["configuration_device_filename.filename"],
@@ -147,8 +151,35 @@ def build_hierarchy(full_path):
 
   return node_paths
 
-def build_profiles(columns):
-  """ Build the profiles from the information provided in the columns. """
+def build_profile(profile_name, profile_attributes, attribute_columns, profiles_to_configure):
+  """ Build the profile from its provided attributes and the data from the attribute_columns. """
+
+  if not check_that_required_attributes_are_provided(profile_name,profile_attributes,API_FILES):
+    exit()
+  
+  profiles = []
+
+  for profile_attribute in profile_attributes:
+    if is_nested_profile(profile_attribute):
+      build_profile(profile_attribute,profiles_to_configure[profile_attribute],attribute_columns,profiles_to_configure)
+    add_attributes_to_profiles(attribute_columns[profile_attribute],profiles)
+    CONFIG_HISTORY += profiles
+  
+  return profiles
+
+def add_attributes_to_profiles(attributes,profiles):
+  """ Checks against the API that the attributes in the column are correct and adds them to the provided profiles. """
+
+def is_nested_profile(profile_attribute):
+  """ If an attribute points to another profile then it is a nested profile. Returns True or False. """
+
+  nested_ending = re.compile(r'.+_prof$')
+
+  if nested_ending.match(profile_attribute) is None:
+    return False
+
+  else:
+    return True  
 
 
 def get_profile_names(profile_name_col, suffix=""):
@@ -860,20 +891,3 @@ def sanitize_white_spaces(text):
   text = text.replace('\n',' ')
 
   return text
-
-def get_API_JSON_files():
-  """ Loads the API JSON documents. They are assumed to be in the API_JSON folder. """
-
-  API_file_names = os.listdir('./API_JSON')
-  API_JSON_files = []
-
-  for API_file_name in API_file_names:
-    with open('./API_JSON/'+API_file_name) as f:
-      lines = f.readlines()
-      joined_lines = ''
-      for line in lines:
-        joined_lines += line
-
-      API_JSON_files.append(json.loads(joined_lines))
-
-  return API_JSON_files

@@ -1,7 +1,8 @@
 import AOS8_config_automation as CA
+import setup
 from docx import Document
 
-API_FILES = CA.get_API_JSON_files()
+API_FILES_TEST = setup.get_API_JSON_files()
 
 def test_build_hierarchy_builds_all_paths():
     """ The build hierarchy function correctly returns all intermediate paths. """
@@ -62,7 +63,7 @@ def test_check_for_required_attributes_returns_true_when_all_attributes_are_conf
                 "filename"
             ]
     
-    Result = CA.check_that_required_attributes_are_provided(profile_name,profile_attributes,API_FILES)
+    Result = CA.check_that_required_attributes_are_provided(profile_name,profile_attributes,API_FILES_TEST)
 
     assert Result == True
 
@@ -75,6 +76,22 @@ def test_check_for_required_attributes_returns_false_when_attributes_are_missing
                 "filename"
             ]
 
-    Result = CA.check_that_required_attributes_are_provided(profile_name,profile_attributes,API_FILES)
+    Result = CA.check_that_required_attributes_are_provided(profile_name,profile_attributes,API_FILES_TEST)
+
+    assert Result == False
+
+def test_is_nested_profile_returns_true_for_internal_profile():
+
+    attribute_name = "aaa_prof"
+
+    Result = CA.is_nested_profile(attribute_name)
+
+    assert Result == True
+
+def test_is_nested_profile_returns_false_for_other_attribute_names():
+
+    attribute_name = "eirp_max"
+
+    Result = CA.is_nested_profile(attribute_name)
 
     assert Result == False
