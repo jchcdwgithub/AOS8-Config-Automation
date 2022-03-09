@@ -34,7 +34,7 @@ COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.pro
                "A Rates Allowed":["ssid_prof.a_tx_rates"]}
 
 BOOLEAN_DICT = {'Beacon':'ba', 'Probe':'pr', 'dlow': 'Low Data', 'dhigh': 'High Data', 'Management':'mgmt',
-                'Control': 'ctrl', 'All': 'all'}
+                'Control': 'ctrl', 'All': 'all','True':True, 'False':False}
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -263,10 +263,85 @@ def add_array_attribute_to_profiles(full_attribute_name,attributes,profiles):
   """ """
 
 def add_object_attribute_to_profiles(full_attribute_name,attributes,profiles):
-  """ """
+  """ Adds the object attributes to the profiles. """
+
+  prof_name,attribute_name = full_attribute_name.split('.')
+  required_properties = get_required_properties(prof_name,attribute_name)
+
+  for attribute,profile in zip(attributes,profiles):
+    profile[attribute_name] = {}
+
+  if len(required_properties) == 0:
+    properties = get_attribute_properties(full_attribute_name)
+    if len(properties) != 0:
+      add_boolean_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+  elif len(required_properties) == 1:
+    full_attribute_name += '.' + required_properties[0]
+    attribute_type = get_attribute_type(full_attribute_name)
+    if attribute_type == 'string':
+      if is_enumerated_property(prof_name,attribute_name,required_properties[0]):
+        for attribute,profile in zip(attributes,profiles):
+          if string_is_in_enumerated_property_list(prof_name,attribute_name,required_properties[0],attribute):
+            profile[attribute_name] = {required_properties[0]: attribute}
+          else:
+            raise ValueError(f'Invalid value {attribute} for {prof_name}. Fix and retry.')
+      else:
+        add_string_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+def get_attribute_properties(full_attribute_name):
+  """ Returns a list of properties for the attribute or an empty list. """
+
+  if len(full_attribute_name.split('.')) < 3:
+    full_attribute_name += '.'
+
+  prof_name,attribute_name,property_name = full_attribute_name.split('.')
+
+  for ref in API_REF:
+    if prof_name in ref['definitions']:
+      if property_name != '':
+        try:
+          properties = [property for property in ref['definitions'][prof_name]['properties'][attribute_name]['properties'][property_name]['properties'].keys()]
+        except KeyError:
+          return []
+      else:
+        try:
+          properties = [property for property in ref['definitions'][prof_name]['properties'][attribute_name]['properties'].keys()]
+        except KeyError:
+          return []
+      return properties
 
 def add_boolean_attribute_to_profiles(full_attribute_name,attributes,profiles):
-  """ """
+  """ Adds boolean attributes to the profiles. """
+
+  if len(full_attribute_name.split('.')) < 3:
+    full_attribute_name += '.'
+  
+  _,attribute_name,property_name = full_attribute_name.split('.')
+
+  for attribute,profile in zip(attributes,profiles):
+    attribute_list = attribute.split(',')
+    value = ''
+    for item in attribute_list:
+      if item in BOOLEAN_DICT.keys():
+        if item == 'True' or item == 'False':
+          if property_name != '':
+            profile[attribute_name][property_name] = BOOLEAN_DICT[item]
+            return
+          else:
+            profile[attribute_name] = BOOLEAN_DICT[item]
+            return
+        else:
+          value = BOOLEAN_DICT[item]
+      elif item.isdigit():
+        value = item
+      else:
+        raise ValueError(f'Invalid value for item {item} in {_}')
+
+      if property_name != '':
+        profile[attribute_name][property_name] = value
+      else:
+        profile[attribute_name][value] = True
 
 def attribute_is_valid(full_attribute_name,attribute):
   """ Given a full attribute name, check the API to make sure the attribute is valid or not. """
@@ -413,11 +488,16 @@ def validate_attribute(full_attribute_name):
 def get_attribute_type(full_attribute_name):
   """ Returns the type of the attribute as checked against the API_REF. """
 
-  profile_name,attribute_name = full_attribute_name.split('.')
+  if len(full_attribute_name.split('.')) < 3:
+    full_attribute_name += '.'
+  profile_name,attribute_name,property_name = full_attribute_name.split('.')
 
   for ref in API_REF:
     if profile_name in ref['definitions']:
-      return ref['definitions'][profile_name]['properties'][attribute_name]['type']
+      if property_name != '':
+        return ref['definitions'][profile_name]['properties'][attribute_name]['properties'][property_name]['type']
+      else: 
+        return ref['definitions'][profile_name]['properties'][attribute_name]['type']
 
 def extract_numbers_from_attribute(attribute):
   """ For integer attributes, remove any text that might have been included i.e. units like dBm. """

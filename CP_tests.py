@@ -1,5 +1,7 @@
+from re import fullmatch
 import AOS8_config_automation as CA
 import setup
+import pytest
 from docx import Document
 
 API_FILES_TEST = setup.get_API_JSON_files()
@@ -387,3 +389,117 @@ def test_add_string_attribute_to_profiles_correctly_adds_nested_strings():
     CA.add_string_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
     assert 'test_ap_multizone_prof' == profiles[0]['ap_multizone_prof_clone']['source']
+
+def test_add_boolean_attribute_to_profiles_correctly_adds_attribute():
+
+    full_attribute_name = 'airmatch_ap_unfreeze.all-aps'
+
+    profiles = [{}]
+    attributes = ['True']
+
+    CA.add_boolean_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+    assert True == profiles[0]['all-aps']
+
+def test_add_boolean_attribute_to_profiles_correctly_adds_nested_boolean_attribute():
+
+    full_attribute_name = 'ssid_prof.opmode.wpa3-sae-aes'
+
+    profiles = [{'opmode':{}}]
+    attributes = ['True']
+
+    CA.add_boolean_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+    assert True == profiles[0]['opmode']['wpa3-sae-aes']
+
+def test_add_object_attribute_to_profiles_correctly_adds_an_empty_object_attribute():
+
+    full_attribute_name = 'ssid_prof.enable_ssid'
+
+    profiles = [{}]
+    attributes = ['True']
+
+    CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+    assert {} == profiles[0]['enable_ssid']
+
+def test_add_object_attribute_to_profiles_correctly_adds_an_enumerated_string_correctly():
+
+    full_attribute_name = 'ap_mesh_radio_prof.metric_algorithm'
+
+    profiles = [{}]
+    attributes = ['best-link-rssi']
+
+    CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+    assert 'best-link-rssi' == profiles[0]['metric_algorithm']['metric_algorithm_enum']
+
+def test_add_object_attribute_to_profiles_raises_error_if_string_is_not_in_enumerated_list():
+
+    full_attribute_name = 'ap_mesh_radio_prof.metric_algorithm'
+
+    profiles = [{}]
+    attributes = ['dankest-link-rssi']
+
+    with pytest.raises(ValueError):
+        CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+def test_add_object_attribute_to_profiles_adds_string_to_object_attribute():
+
+    full_attribute_name = "anqp_nwk_auth_prof.anqp_redirect_url"
+
+    profiles = [{}]
+    attributes = ['https://www.google.com']
+
+    CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+    assert 'https://www.google.com' == profiles[0]['anqp_redirect_url']['url']
+
+def test_get_attribute_properties_returns_list_of_properties():
+
+    full_attribute_name = "ap_mesh_radio_prof.mesh_a_tx_rates"
+
+    expected = ['6','9','12','18','24','36','48','54']
+    generated = CA.get_attribute_properties(full_attribute_name)
+
+    assert expected == generated
+
+def test_get_attribute_properties_returns_empty_list_for_attributes_without_properties():
+
+    full_attribute_name = "ap_mesh_radio_prof.mesh_mcast_opt"
+
+    expected = []
+    generated = CA.get_attribute_properties(full_attribute_name)
+
+    assert expected == generated
+
+def test_add_object_attributes_to_profiles_adds_boolean_objects_correctly():
+
+    full_attribute_name = "ids_general_prof.frame_types_for_rssi"
+
+    profiles = [{}]
+    attributes = ['Beacon,Probe,Management,Control']
+
+    CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+    assert {'ba':True,'pr':True,'mgmt':True,'ctrl':True} == profiles[0]['frame_types_for_rssi']
+
+def test_add_object_attributes_to_profiles_adds_integer_boolean_objects_correctly():
+
+    full_attribute_name = "ssid_prof.a_basic_rates"
+
+    profiles = [{}]
+    attributes = ['6,12,18,24,36']
+
+    CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+    assert {'6':True,'12':True,'18':True,'24':True,'36':True}
+
+def test_add_object_attributes_to_profiles_raises_value_error_when_boolean_not_defined():
+
+    full_attribute_name = "ids_general_prof.frame_types_for_rssi"
+
+    profiles = [{}]
+    attributes = ['Beacon,Probes,Management,Control']
+    with pytest.raises(ValueError):
+        CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
