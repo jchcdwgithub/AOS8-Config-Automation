@@ -1,3 +1,4 @@
+from xml.sax.xmlreader import AttributesImpl
 import requests
 import ex_tokens 
 import json
@@ -31,6 +32,9 @@ COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.pro
                "G Rates Allowed":["ssid_prof.g_tx_rates"],
                "A Rates Required":["ssid_prof.a_basic_rates"],
                "A Rates Allowed":["ssid_prof.a_tx_rates"]}
+
+BOOLEAN_DICT = {'Beacon':'ba', 'Probe':'pr', 'dlow': 'Low Data', 'dhigh': 'High Data', 'Management':'mgmt',
+                'Control': 'ctrl', 'All': 'all'}
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -170,44 +174,173 @@ def build_profile(profile_name, profile_attributes, attribute_columns, profiles_
 def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
   """ Checks against the API that the attributes in the column are correct and adds them to the provided profiles. """
   
-  _,attribute_name = full_attribute_name.split('.')
+  prof_name,attribute_name = full_attribute_name.split('.')
 
+  
+  attribute_type = get_attribute_type(full_attribute_name)
+
+  if attribute_type == 'object':
+    add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
+  elif attribute_type == 'integer':
+    add_integer_attribute_to_profiles(full_attribute_name,attributes,profiles)
+  elif attribute_type == 'string':
+    add_string_attribute_to_profiles(full_attribute_name,attributes,profiles)
+  elif attribute_type == 'array':
+    add_array_attribute_to_profiles(full_attribute_name,attributes,profiles)
+  else:
+    add_boolean_attribute_to_profiles(full_attribute_name,attributes,profiles)
+  
   for attribute,profile in zip(attributes,profiles):
-
-    if not validate_attribute(full_attribute_name):
-      exit()
 
     attribute_type = get_attribute_type(full_attribute_name)
 
     if attribute_type == 'object':
+      profile[attribute_name] = {}
       if attribute_has_properties(full_attribute_name):
         property_name = get_object_property_name(full_attribute_name)
-        profile[attribute_name] = {property_name: {attribute}}
-      else:
-        profile[attribute_name] = {}
+        attribute_required_properties = get_required_properties(prof_name,attribute_name)
+        if len(attribute_required_properties) == 0:
+          add_boolean_attributes_to_profile(prof_name,attribute_name,attribute,profile)
+        elif len(attribute_required_properties) == 1:
+          if attribute_is_valid(full_attribute_name+'.'+attribute_required_properties[0],attribute):
+            profile[attribute_name][attribute][attribute_required_properties[0]] = attribute
+
     elif attribute_type == 'integer':
       attribute = extract_numbers_from_attribute(attribute)
-      for number_attribute in attribute:
-        profile[attribute_name] = int(number_attribute)
+      profile[attribute_name] = int(attribute[0])
+
     else:
       profile[attribute_name] = attribute
+
+def add_attribute_to_profiles(full_attribute_name,attribute_type,attribute,profiles):
+  """ Adds the attribute of type attribute_type to the profiles. """
+
+  if attribute_type == 'object':
+    add_object_attribute_to_profiles(full_attribute_name,attribute,profiles)
+  elif attribute_type == 'integer':
+    add_integer_attribute_to_profiles(full_attribute_name,attribute,profiles)
+  elif attribute_type == 'string':
+    add_string_attribute_to_profiles(full_attribute_name,attribute,profiles)
+  elif attribute_type == 'array':
+    add_array_attribute_to_profiles(full_attribute_name,attribute,profiles)
+  else:
+    add_boolean_attribute_to_profiles(full_attribute_name,attribute,profiles)
+
+def add_integer_attribute_to_profiles(full_attribute_name,attributes,profiles):
+  """ Add the integer attribute to the provided profiles. """
+  if len(full_attribute_name.split('.')) < 3:
+    full_attribute_name += '.'
+  
+  prof_name,attribute_name,property_name = full_attribute_name.split('.')
+
+  for profile,attribute in zip(profiles,attributes):
+    attribute_number = int(attribute)
+    if is_valid_string_or_number(prof_name,attribute_name,attribute_number,property_name=property_name,type="integer"):
+      if property_name != '':
+        profile[attribute_name][property_name] = attribute_number
+      else:
+        profile[attribute_name] = attribute_number
+    else:
+      exit()
+
+def add_string_attribute_to_profiles(full_attribute_name,attributes,profiles):
+  """ Add the string attributes to the provided profiles. """
+  if len(full_attribute_name.split('.')) < 3:
+    full_attribute_name += '.'
+  
+  prof_name,attribute_name,property_name = full_attribute_name.split('.')
+
+  for profile,attribute in zip(profiles,attributes):
+    if is_valid_string_or_number(prof_name,attribute_name,attribute,property_name=property_name):
+      if property_name != '':
+        profile[attribute_name][property_name] = attribute
+      else:
+        profile[attribute_name] = attribute
+    else:
+      exit()
+
+def add_array_attribute_to_profiles(full_attribute_name,attributes,profiles):
+  """ """
+
+def add_object_attribute_to_profiles(full_attribute_name,attributes,profiles):
+  """ """
+
+def add_boolean_attribute_to_profiles(full_attribute_name,attributes,profiles):
+  """ """
+
+def attribute_is_valid(full_attribute_name,attribute):
+  """ Given a full attribute name, check the API to make sure the attribute is valid or not. """
+
+  names = full_attribute_name.split('.')
+  
+  if len(names) == 3:
+      property_name = names[2]
+  else:
+      property_name = ""
+
+  attribute_type = get_attribute_type(full_attribute_name)
+
+  return is_valid_string_or_number(names[0],names[1],attribute,property_name=property_name,type=attribute_type)
+
+def add_boolean_attributes_to_profile(prof_name,attribute_name,attribute,profile):
+  """ Adds the boolean values to the attribute object in the profile. """
+
+  boolean_list = attribute.split(',')
+  digit_pattern = re.compile(r'\d+')
+
+  for boolean in boolean_list:
+    if digit_pattern.match(boolean) is not None:
+      if property_is_in_properties(prof_name,attribute_name,boolean):
+        profile[attribute_name][boolean] = True
+    elif boolean in BOOLEAN_DICT.keys():
+      profile[attribute_name][boolean] = True
+    else:
+      print(f'Invalid value encountered in {prof_name}: {boolean} not an excepted value.')
+      exit()
+
+def property_is_in_properties(prof_name,attribute_name,property):
+  """ Checks whether the property is in the properties of the given attribute. Returns True if so. """
+
+  for ref in API_REF:
+    if prof_name in ref["definitions"].keys():
+      if property in ref["definitions"][prof_name]["properties"][attribute_name]["properties"]:
+        return True
+      else:
+        return False
+
+def get_required_properties(prof_name,attribute_name):
+  """ Returns the required properties list or an empty list. """
+
+  for ref in API_REF:
+    if prof_name in ref["definitions"].keys():
+      try:
+        required = ref["definitions"][prof_name]["properties"][attribute_name]["required"]
+        return required
+      except KeyError:
+        return []
+
 
 def add_string_attribute(profile_name,attribute_name,attributes,profiles):
   """ Adds non-nested string attributes to the profiles. """
 
   for attribute,profile in zip(attributes,profiles):
-    if is_valid_string(profile_name,attribute_name,attribute):
+    if is_valid_string_or_number(profile_name,attribute_name,attribute):
       profile[attribute_name] = attribute
     else:
       exit()
 
-def is_valid_string(profile_name,attribute_name,attribute,property_name=""):
+def is_valid_string_or_number(profile_name,attribute_name,attribute,property_name="",type="string"):
   """ Checks the API reference to ensure that the input is valid. """
   
-  str_min_len = get_attribute_min_len(profile_name,attribute_name,property_name)
-  str_max_len = get_attribute_max_len(profile_name,attribute_name,property_name)
+  min_len = get_attribute_min_len(profile_name,attribute_name,property_name)
+  max_len = get_attribute_max_len(profile_name,attribute_name,property_name)
 
-  return len(attribute) >= str_min_len and len(attribute) <= str_max_len
+  if type == "string":
+    current_len = len(attribute)
+  else:
+    current_len = attribute
+  
+  return current_len >= min_len and current_len <= max_len
 
 def get_attribute_min_len(profile_name,attribute_name,property_name=""):
   """ Returns the minimal value for an attribute, property_name should exist for nested attributes. """
@@ -215,6 +348,8 @@ def get_attribute_min_len(profile_name,attribute_name,property_name=""):
   if property_name != "":
     for ref in API_REF:
       if profile_name in ref["definitions"]:
+        if get_attribute_type(profile_name+'.'+attribute_name) == 'array':
+          return ref["definitions"][profile_name]["properties"][attribute_name]["items"]["properties"][property_name]["minimum"]
         return ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["minimum"]
   else:
     for ref in API_REF:
@@ -227,6 +362,8 @@ def get_attribute_max_len(profile_name,attribute_name,property_name=""):
   if property_name != "":
     for ref in API_REF:
       if profile_name in ref["definitions"]:
+        if get_attribute_type(profile_name+'.'+attribute_name) == 'array':
+          return ref["definitions"][profile_name]["properties"][attribute_name]["items"]["properties"][property_name]["maximum"]
         return ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["maximum"]
   else:
     for ref in API_REF:

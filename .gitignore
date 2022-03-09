@@ -131,5 +131,5 @@ dmypy.json
 .pyre/
 
 #local api tester
-/api.py
-/ex_tokens.py
+api.py
+ex_tokens.py

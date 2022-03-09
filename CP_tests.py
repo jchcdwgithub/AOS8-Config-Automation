@@ -218,7 +218,7 @@ def test_is_valid_string_returns_true_for_string_length_check():
     attribute_name = "profile-name"
     string = "some_profile_name"
 
-    Result = CA.is_valid_string(profile_name,attribute_name,string)
+    Result = CA.is_valid_string_or_number(profile_name,attribute_name,string)
 
     assert Result == True
 
@@ -228,7 +228,7 @@ def test_is_valid_string_returns_false_for_null_string_length_check():
     attribute_name = "profile-name"
     string = ""
 
-    Result = CA.is_valid_string(profile_name,attribute_name,string)
+    Result = CA.is_valid_string_or_number(profile_name,attribute_name,string)
 
     assert Result == False
 
@@ -238,7 +238,7 @@ def test_is_valid_string_returns_false_for_too_long_string_length_check():
     attribute_name = "profile-name"
     string = "a"*257
 
-    Result = CA.is_valid_string(profile_name,attribute_name,string)
+    Result = CA.is_valid_string_or_number(profile_name,attribute_name,string)
 
     assert Result == False
 
@@ -249,7 +249,7 @@ def test_is_valid_string_returns_true_for_nested_string_length_check():
     property_name = "vlan-list"
     string = "WIRELESS"
 
-    Result = CA.is_valid_string(profile_name,attribute_name,string,property_name=property_name)
+    Result = CA.is_valid_string_or_number(profile_name,attribute_name,string,property_name=property_name)
 
     assert Result == True
 
@@ -260,7 +260,7 @@ def test_is_valid_string_returns_false_for_null_nested_string_length_check():
     property_name = "vlan-list"
     string = ""
 
-    Result = CA.is_valid_string(profile_name,attribute_name,string,property_name=property_name)
+    Result = CA.is_valid_string_or_number(profile_name,attribute_name,string,property_name=property_name)
 
     assert Result == False
 
@@ -271,6 +271,119 @@ def test_is_valid_string_returns_false_for_too_long_nested_string_length_check()
     property_name = "vlan-list"
     string = "a"*257
 
-    Result = CA.is_valid_string(profile_name,attribute_name,string,property_name=property_name)
+    Result = CA.is_valid_string_or_number(profile_name,attribute_name,string,property_name=property_name)
 
     assert Result == False
+
+def test_get_required_properties_returns_expected_required_list_when_it_exists():
+
+    profile_name = "ids_signature_prof"
+    attribute_name = "ids_condition_frame_type"
+
+    expected = [
+                        "control",
+                        "deauth",
+                        "frame_type_w_ssid",
+                        "auth",
+                        "assoc",
+                        "disassoc",
+                        "mgmt",
+                        "data"
+                    ]
+    
+    generated = CA.get_required_properties(profile_name,attribute_name)
+
+    for item in expected:
+        assert item in generated
+
+def test_get_required_properties_returns_empty_required_list_when_it_doesnt_exist():
+
+    profile_name = "ap_mesh_radio_prof"
+    attribute_name = "mesh_a_tx_rates"
+    
+    generated = CA.get_required_properties(profile_name,attribute_name)
+
+    assert len(generated) == 0
+
+def test_property_is_in_properties_returns_true_for_a_existing_property():
+
+    profile_name = "ap_mesh_radio_prof"
+    attribute_name = "mesh_a_tx_rates"
+
+    Result = CA.property_is_in_properties(profile_name,attribute_name,'6')
+
+    assert Result == True
+
+def test_property_is_in_properties_returns_false_for_a_nonexisting_property():
+
+    profile_name = "ap_mesh_radio_prof"
+    attribute_name = "mesh_a_tx_rates"
+
+    Result = CA.property_is_in_properties(profile_name,attribute_name,'127')
+
+    assert Result == False
+
+def test_is_valid_string_or_number_returns_true_for_number_in_bound():
+
+    profile_name = "ap_g_radio_prof"
+    attribute_name = "max_distance"
+    property_name = "maximum-distance"
+
+    Result = CA.is_valid_string_or_number(profile_name,attribute_name,100,property_name=property_name,type="integer")
+
+    assert Result == True
+
+def test_is_valid_string_or_number_returns_false_for_number_too_big():
+
+    profile_name = "ap_g_radio_prof"
+    attribute_name = "max_distance"
+    property_name = "maximum-distance"
+
+    Result = CA.is_valid_string_or_number(profile_name,attribute_name,1000000,property_name=property_name,type="integer")
+
+    assert Result == False
+
+def test_is_valid_string_or_number_returns_false_for_number_too_small():
+
+    profile_name = "ap_g_radio_prof"
+    attribute_name = "max_distance"
+    property_name = "maximum-distance"
+
+    Result = CA.is_valid_string_or_number(profile_name,attribute_name,-1,property_name=property_name,type="integer")
+
+    assert Result == False
+
+def test_add_integer_attributes_to_profiles_correctly_adds_attributes_to_profiles():
+
+    full_attribute_name = 'ap_multizone_prof.controller.num_vaps'
+
+    profiles = [{'controller': {}}]
+
+    attributes = ['15']
+
+    expected = 15
+    CA.add_integer_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+    assert expected == profiles[0]['controller']['num_vaps']
+
+def test_add_string_attributes_to_profiles_correctly_adds_attributes_to_profiles():
+
+    full_attribute_name = 'ap_multizone_prof.profile-name'
+
+    profiles = [{}]
+    attributes = ['test_ap_multizone_prof']
+
+    CA.add_string_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+    assert 'test_ap_multizone_prof' == profiles[0]['profile-name']
+
+def test_add_string_attribute_to_profiles_correctly_adds_nested_strings():
+
+    full_attribute_name = 'ap_multizone_prof.ap_multizone_prof_clone.source'
+
+    profiles = [{'ap_multizone_prof_clone':{}}]
+    attributes = ['test_ap_multizone_prof']
+
+    CA.add_string_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+    assert 'test_ap_multizone_prof' == profiles[0]['ap_multizone_prof_clone']['source']
