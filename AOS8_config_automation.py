@@ -193,18 +193,45 @@ def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
       profile[attribute_name] = attribute
 
 def add_string_attribute(profile_name,attribute_name,attributes,profiles):
-  """ Adds the attributes to the profiles. """
+  """ Adds non-nested string attributes to the profiles. """
 
   for attribute,profile in zip(attributes,profiles):
-    if is_valid(profile_name,attribute_name,attribute):
+    if is_valid_string(profile_name,attribute_name,attribute):
       profile[attribute_name] = attribute
     else:
       exit()
 
-def is_valid(profile_name,attribute_name,attribute):
+def is_valid_string(profile_name,attribute_name,attribute,property_name=""):
   """ Checks the API reference to ensure that the input is valid. """
+  
+  str_min_len = get_attribute_min_len(profile_name,attribute_name,property_name)
+  str_max_len = get_attribute_max_len(profile_name,attribute_name,property_name)
 
-  return True
+  return len(attribute) >= str_min_len and len(attribute) <= str_max_len
+
+def get_attribute_min_len(profile_name,attribute_name,property_name=""):
+  """ Returns the minimal value for an attribute, property_name should exist for nested attributes. """
+
+  if property_name != "":
+    for ref in API_REF:
+      if profile_name in ref["definitions"]:
+        return ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["minimum"]
+  else:
+    for ref in API_REF:
+      if profile_name in ref["definitions"]:
+        return ref["definitions"][profile_name]["properties"][attribute_name]["minimum"]
+
+def get_attribute_max_len(profile_name,attribute_name,property_name=""):
+  """ Returns the maximum value for an attribute, property_name should exist for nested attributes. """
+
+  if property_name != "":
+    for ref in API_REF:
+      if profile_name in ref["definitions"]:
+        return ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["maximum"]
+  else:
+    for ref in API_REF:
+      if profile_name in ref["definitions"]:
+        return ref["definitions"][profile_name]["properties"][attribute_name]["maximum"]
 
 def attribute_has_properties(full_attribute_name):
   """ Checks whether the attribute has a properties key. Returns True if it does. """

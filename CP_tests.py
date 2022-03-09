@@ -165,3 +165,112 @@ def test_string_is_in_enumerated_properties_list_returns_false_for_strings_not_i
     Result = CA.string_is_in_enumerated_property_list(profile_name,attribute_name,property_name,test_string)
 
     assert Result == False
+
+def test_get_attribute_min_len_returns_correct_minimum_number_for_non_nested_string():
+
+    profile_name = "ap_mesh_radio_prof"
+    attribute_name = "profile-name"
+    
+    expected = 1
+
+    generated = CA.get_attribute_min_len(profile_name,attribute_name)
+
+    assert expected == generated
+
+def test_get_attribute_max_len_returns_correct_maximum_number_for_non_nested_string():
+
+    profile_name = "ap_mesh_radio_prof"
+    attribute_name = "profile-name"
+    
+    expected = 256
+
+    generated = CA.get_attribute_max_len(profile_name,attribute_name)
+
+    assert expected == generated
+
+def test_get_attribute_min_len_returns_correct_minimum_number_for_nested_string():
+
+    profile_name = "ap_mesh_radio_prof"
+    attribute_name = "mesh_allowed_vlans"
+    property_name = "vlan-list"
+    
+    expected = 1
+
+    generated = CA.get_attribute_min_len(profile_name,attribute_name,property_name)
+
+    assert expected == generated
+
+def test_get_attribute_max_len_returns_correct_maximum_number_for_nested_string():
+
+    profile_name = "ap_mesh_radio_prof"
+    attribute_name = "mesh_allowed_vlans"
+    property_name = "vlan-list"
+    
+    expected = 256
+
+    generated = CA.get_attribute_max_len(profile_name,attribute_name,property_name)
+
+    assert expected == generated
+
+def test_is_valid_string_returns_true_for_string_length_check():
+
+    profile_name = "ap_mesh_radio_prof"
+    attribute_name = "profile-name"
+    string = "some_profile_name"
+
+    Result = CA.is_valid_string(profile_name,attribute_name,string)
+
+    assert Result == True
+
+def test_is_valid_string_returns_false_for_null_string_length_check():
+
+    profile_name = "ap_mesh_radio_prof"
+    attribute_name = "profile-name"
+    string = ""
+
+    Result = CA.is_valid_string(profile_name,attribute_name,string)
+
+    assert Result == False
+
+def test_is_valid_string_returns_false_for_too_long_string_length_check():
+
+    profile_name = "ap_mesh_radio_prof"
+    attribute_name = "profile-name"
+    string = "a"*257
+
+    Result = CA.is_valid_string(profile_name,attribute_name,string)
+
+    assert Result == False
+
+def test_is_valid_string_returns_true_for_nested_string_length_check():
+
+    profile_name = "ap_mesh_radio_prof"
+    attribute_name = "mesh_allowed_vlans"
+    property_name = "vlan-list"
+    string = "WIRELESS"
+
+    Result = CA.is_valid_string(profile_name,attribute_name,string,property_name=property_name)
+
+    assert Result == True
+
+def test_is_valid_string_returns_false_for_null_nested_string_length_check():
+
+    profile_name = "ap_mesh_radio_prof"
+    attribute_name = "mesh_allowed_vlans"
+    property_name = "vlan-list"
+    string = ""
+
+    Result = CA.is_valid_string(profile_name,attribute_name,string,property_name=property_name)
+
+    assert Result == False
+
+def test_is_valid_string_returns_false_for_too_long_nested_string_length_check():
+
+    profile_name = "ap_mesh_radio_prof"
+    attribute_name = "mesh_allowed_vlans"
+    property_name = "vlan-list"
+    string = "a"*257
+
+    Result = CA.is_valid_string(profile_name,attribute_name,string,property_name=property_name)
+
+    assert Result == False
