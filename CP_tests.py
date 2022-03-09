@@ -54,7 +54,7 @@ def test_get_profiles_to_be_configured_returns_correct_dictionary():
     generated = CA.get_profiles_to_be_configured(attributes)
 
     assert expected == generated
-
+    
 def test_check_for_required_attributes_returns_true_when_all_attributes_are_configured():
 
     profile_name = "configuration_device_filename"

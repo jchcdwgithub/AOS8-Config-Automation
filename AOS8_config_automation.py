@@ -174,9 +174,6 @@ def build_profile(profile_name, profile_attributes, attribute_columns, profiles_
 def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
   """ Checks against the API that the attributes in the column are correct and adds them to the provided profiles. """
   
-  prof_name,attribute_name = full_attribute_name.split('.')
-
-  
   attribute_type = get_attribute_type(full_attribute_name)
 
   if attribute_type == 'object':
@@ -189,42 +186,6 @@ def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
     add_array_attribute_to_profiles(full_attribute_name,attributes,profiles)
   else:
     add_boolean_attribute_to_profiles(full_attribute_name,attributes,profiles)
-  
-  for attribute,profile in zip(attributes,profiles):
-
-    attribute_type = get_attribute_type(full_attribute_name)
-
-    if attribute_type == 'object':
-      profile[attribute_name] = {}
-      if attribute_has_properties(full_attribute_name):
-        property_name = get_object_property_name(full_attribute_name)
-        attribute_required_properties = get_required_properties(prof_name,attribute_name)
-        if len(attribute_required_properties) == 0:
-          add_boolean_attributes_to_profile(prof_name,attribute_name,attribute,profile)
-        elif len(attribute_required_properties) == 1:
-          if attribute_is_valid(full_attribute_name+'.'+attribute_required_properties[0],attribute):
-            profile[attribute_name][attribute][attribute_required_properties[0]] = attribute
-
-    elif attribute_type == 'integer':
-      attribute = extract_numbers_from_attribute(attribute)
-      profile[attribute_name] = int(attribute[0])
-
-    else:
-      profile[attribute_name] = attribute
-
-def add_attribute_to_profiles(full_attribute_name,attribute_type,attribute,profiles):
-  """ Adds the attribute of type attribute_type to the profiles. """
-
-  if attribute_type == 'object':
-    add_object_attribute_to_profiles(full_attribute_name,attribute,profiles)
-  elif attribute_type == 'integer':
-    add_integer_attribute_to_profiles(full_attribute_name,attribute,profiles)
-  elif attribute_type == 'string':
-    add_string_attribute_to_profiles(full_attribute_name,attribute,profiles)
-  elif attribute_type == 'array':
-    add_array_attribute_to_profiles(full_attribute_name,attribute,profiles)
-  else:
-    add_boolean_attribute_to_profiles(full_attribute_name,attribute,profiles)
 
 def add_integer_attribute_to_profiles(full_attribute_name,attributes,profiles):
   """ Add the integer attribute to the provided profiles. """
@@ -1191,11 +1152,13 @@ def get_profiles_to_be_configured(columns):
   profiles_to_configure = {}
 
   for name in columns:
-    profile_name,attribute = name.split('.')
+    if len(name.split('.')) < 3:
+      name += '.'
+    profile_name,attribute,property = name.split('.')
     if profile_name in profiles_to_configure.keys():
-      profiles_to_configure[profile_name].append(attribute)
+      profiles_to_configure[profile_name].append(attribute+property)
     else:
-      profiles_to_configure[profile_name] = [attribute]
+      profiles_to_configure[profile_name] = [attribute+property]
   
   return profiles_to_configure
 
