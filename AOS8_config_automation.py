@@ -40,6 +40,9 @@ COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.pro
                "AP Group 5 GHz Profile":["ap_group.dot11a_prof.profile-name"],
                "AP Group Virtual APs":["ap_group.virtual_ap.profile-name"],
                "WMM EAP AC":["ssid_prof.wmm_eap_ac.wmm_ac"],
+               "QoS Profile":["wlan_qos_prof.profile-name"],
+               "QoS BW Allocation VAP":["wlan_qos_prof.bw_alloc.virtual-ap"],
+               "QoS BW Allocation Share":["wlan_qos_prof.bw_alloc.share"]
 }
 
 BOOLEAN_DICT = {'Beacon':'ba', 'Probe':'pr', 'dlow': 'Low Data', 'dhigh': 'High Data', 'Management':'mgmt',
@@ -251,7 +254,7 @@ def add_string_attribute_to_profiles(full_attribute_name,attributes,profiles):
       else:
         exit()
 
-def add_array_attribute_to_profiles(full_attribute_name,attributes,profiles):
+def add_array_attribute_to_profiles(full_attribute_name,profiles):
   """ Adds an array attribute to the profile. """
 
   prof_name,attribute_name = full_attribute_name.split('.')
@@ -264,6 +267,7 @@ def add_array_attribute_to_profiles(full_attribute_name,attributes,profiles):
   for required_property in required_properties:
     required_property_path = prof_name + '.' + attribute_name + '.' + required_property
     property_type = get_array_property_type(full_attribute_name,required_property)
+    attributes = TABLE_COLUMNS[required_property_path]
 
     if property_type == 'string' or property_type == 'integer':
       for attribute,profile in zip(attributes,profiles):
@@ -274,7 +278,7 @@ def add_array_attribute_to_profiles(full_attribute_name,attributes,profiles):
           except KeyError:
             print(f'Entry not in the BOOLEAN_DICT: Add {full_attribute_name}.{required_property}')
             exit()
-        if is_valid_string_or_number_in_array(full_attribute_name,attribute,type=property_type):
+        if is_valid_string_or_number_in_array(required_property_path,attribute,type=property_type):
           attribute_value = int(attribute) if attribute.isdigit() else attribute
         else:
           raise ValueError(f'Invalid value. {required_property} is incorrectly configured.')
@@ -293,8 +297,8 @@ def is_enumerated_array_property(full_attribute_name):
 def is_valid_string_or_number_in_array(full_attribute_name,attribute,type='string'):
   """ Returns True if the value is valid in the array. """
 
-  min_len = get_array_attribute_min_length(full_attribute_name,attribute)
-  max_len = get_array_attribute_max_length(full_attribute_name,attribute)
+  min_len = get_array_attribute_min_length(full_attribute_name)
+  max_len = get_array_attribute_max_length(full_attribute_name)
   attribute_len = 0
 
   if type == 'string':
@@ -304,23 +308,23 @@ def is_valid_string_or_number_in_array(full_attribute_name,attribute,type='strin
 
   return attribute_len <= max_len and attribute_len >= min_len    
 
-def get_array_attribute_min_length(full_attribute_name,attribute):
+def get_array_attribute_min_length(full_attribute_name):
   """ Returns the minimum length of the array attribute. """
   
-  prof_name,attribute_name = full_attribute_name.split('.')
+  prof_name,attribute_name,property_name = full_attribute_name.split('.')
 
   for ref in API_REF:
     if prof_name in ref['definitions'].keys():
-      return ref['definitions'][prof_name]['properties'][attribute_name]['items']['properties'][attribute]['minimum']
+      return ref['definitions'][prof_name]['properties'][attribute_name]['items']['properties'][property_name]['minimum']
 
-def get_array_attribute_max_length(full_attribute_name,attribute):
+def get_array_attribute_max_length(full_attribute_name):
   """ Returns the maximum length of the array attribute. """
   
-  prof_name,attribute_name = full_attribute_name.split('.')
+  prof_name,attribute_name,property_name = full_attribute_name.split('.')
 
   for ref in API_REF:
     if prof_name in ref['definitions'].keys():
-      return ref['definitions'][prof_name]['properties'][attribute_name]['items']['properties'][attribute]['maximum']
+      return ref['definitions'][prof_name]['properties'][attribute_name]['items']['properties'][property_name]['maximum']
 
 def get_array_property_type(full_attribute_name,property):
   """ Returns the type of the property inside the array. """

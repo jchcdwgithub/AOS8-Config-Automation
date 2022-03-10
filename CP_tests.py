@@ -506,20 +506,18 @@ def test_get_array_property_type_returns_correct_type():
 
 def test_get_array_property_minimum_length_returns_correct_minimum():
 
-    full_attribute_name = 'ap_group.virtual_ap'
-    property = 'profile-name'
+    full_attribute_name = 'ap_group.virtual_ap.profile-name'
 
-    min = CA.get_array_attribute_min_length(full_attribute_name,property)
+    min = CA.get_array_attribute_min_length(full_attribute_name)
 
     assert min == 1
     
 
 def test_get_array_property_maximum_length_returns_correct_minimum():
 
-    full_attribute_name = 'ap_group.virtual_ap'
-    property = 'profile-name'
+    full_attribute_name = 'ap_group.virtual_ap.profile-name'
 
-    max = CA.get_array_attribute_max_length(full_attribute_name,property)
+    max = CA.get_array_attribute_max_length(full_attribute_name)
 
     assert max == 256
 
@@ -534,3 +532,15 @@ def test_is_enumerated_array_property_returns_false_for_non_enumerated_property(
     full_attribute_name = 'ids_rap_wml_server_prof.wml_table.profile-name'
     
     assert False == CA.is_enumerated_array_property(full_attribute_name)
+
+def test_add_array_attribute_correctly_adds_attributes():
+
+    full_attribute_name = "wlan_qos_prof.bw_alloc"
+
+    CA.build_tables_columns_dict(Document('../Extension Testing Tables.docx').tables)
+
+    profiles = [{}]
+
+    CA.add_array_attribute_to_profiles(full_attribute_name,profiles)
+
+    assert [{'virtual-ap':'ChoiceAccess'},{'share':20}] == profiles[0]['bw_alloc']
