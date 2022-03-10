@@ -1,3 +1,4 @@
+import string
 from webbrowser import get
 from xml.sax.xmlreader import AttributesImpl
 import requests
@@ -35,6 +36,9 @@ COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.pro
                "G Rates Allowed":["ssid_prof.g_tx_rates"],
                "A Rates Required":["ssid_prof.a_basic_rates"],
                "A Rates Allowed":["ssid_prof.a_tx_rates"],
+               "AP Group":["ap_group.profile-name"],
+               "AP Group 5 GHz Profile":["ap_group.dot11a_prof.profile-name"],
+               "AP Group Virtual APs":["ap_group.virtual_ap.profile-name"],
                "WMM EAP AC":["ssid_prof.wmm_eap_ac.wmm_ac"],
 }
 
@@ -185,12 +189,16 @@ def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
   else:
     prof_name,attribute,_ = full_attribute_name.split('.')
     attribute_type = get_attribute_type(prof_name+'.'+attribute)
-    if attribute_type == 'object' and attribute not in profiles[0].keys():
-      add_object_attribute_to_profiles(prof_name+'.'+attribute,[],profiles)
+    if attribute_type == 'object':
+      if attribute not in profiles[0].keys():
+        add_object_attribute_to_profiles(prof_name+'.'+attribute,[],profiles)
+        return
+      else:
+        attribute_type = get_attribute_type(full_attribute_name)
     elif attribute_type == 'array':
       add_array_attribute_to_profiles(prof_name+'.'+attribute,[],profiles)
-    return
-
+      return
+    
   if attribute_type == 'integer':
     add_integer_attribute_to_profiles(full_attribute_name,attributes,profiles)
   elif attribute_type == 'string':
@@ -222,14 +230,26 @@ def add_string_attribute_to_profiles(full_attribute_name,attributes,profiles):
   
   prof_name,attribute_name,property_name = full_attribute_name.split('.')
 
-  for profile,attribute in zip(profiles,attributes):
-    if is_valid_string_or_number(prof_name,attribute_name,attribute,property_name=property_name):
-      if property_name != '':
-        profile[attribute_name][property_name] = attribute
+  if property_name != '' and is_enumerated_property(prof_name,attribute_name,property_name):
+      for profile,attribute in zip(profiles,attributes):
+        try:
+          api_string = BOOLEAN_DICT[attribute]
+        except KeyError:
+          print(f'Value not defined in BOOLEAN_DICT. Please add and try again.')
+          exit()
+        if string_is_in_enumerated_property_list(prof_name,attribute_name,property_name,api_string):
+          profile[attribute_name][property_name] = api_string
+        else:
+          raise ValueError(f'Invalid value {attribute} in {prof_name}. Fix and try again.')
+  else:
+    for profile,attribute in zip(profiles,attributes):
+      if is_valid_string_or_number(prof_name,attribute_name,attribute,property_name=property_name):
+        if property_name != '':
+         profile[attribute_name][property_name] = attribute
+        else:
+          profile[attribute_name] = attribute
       else:
-        profile[attribute_name] = attribute
-    else:
-      exit()
+        exit()
 
 def add_array_attribute_to_profiles(full_attribute_name,attributes,profiles):
   """ Adds an array attribute to the profile. """
@@ -243,7 +263,73 @@ def add_array_attribute_to_profiles(full_attribute_name,attributes,profiles):
   
   for required_property in required_properties:
     required_property_path = prof_name + '.' + attribute_name + '.' + required_property
-    add_object_attribute_to_profiles(required_property_path,TABLE_COLUMNS[required_property_path],profiles)
+    property_type = get_array_property_type(full_attribute_name,required_property)
+
+    if property_type == 'string' or property_type == 'integer':
+      for attribute,profile in zip(attributes,profiles):
+        attribute_value = None
+        if property_type == 'string' and is_enumerated_array_property(required_property_path):
+          try:
+            attribute_value = BOOLEAN_DICT[attribute]
+          except KeyError:
+            print(f'Entry not in the BOOLEAN_DICT: Add {full_attribute_name}.{required_property}')
+            exit()
+        if is_valid_string_or_number_in_array(full_attribute_name,attribute,type=property_type):
+          attribute_value = int(attribute) if attribute.isdigit() else attribute
+        else:
+          raise ValueError(f'Invalid value. {required_property} is incorrectly configured.')
+        profile[attribute_name].append({required_property:attribute_value})
+
+def is_enumerated_array_property(full_attribute_name):
+  """ Returns True if the array property is an enumeration. """
+
+  prof_name,attribute_name,property_name = full_attribute_name.split('.')
+
+  for ref in API_REF:
+    if prof_name in ref['definitions'].keys():
+      return "enum" in ref['definitions'][prof_name]['properties'][attribute_name]['items']['properties'][property_name].keys()
+        
+    
+def is_valid_string_or_number_in_array(full_attribute_name,attribute,type='string'):
+  """ Returns True if the value is valid in the array. """
+
+  min_len = get_array_attribute_min_length(full_attribute_name,attribute)
+  max_len = get_array_attribute_max_length(full_attribute_name,attribute)
+  attribute_len = 0
+
+  if type == 'string':
+    attribute_len = len(attribute)
+  else:
+    attribute_len = int(attribute)
+
+  return attribute_len <= max_len and attribute_len >= min_len    
+
+def get_array_attribute_min_length(full_attribute_name,attribute):
+  """ Returns the minimum length of the array attribute. """
+  
+  prof_name,attribute_name = full_attribute_name.split('.')
+
+  for ref in API_REF:
+    if prof_name in ref['definitions'].keys():
+      return ref['definitions'][prof_name]['properties'][attribute_name]['items']['properties'][attribute]['minimum']
+
+def get_array_attribute_max_length(full_attribute_name,attribute):
+  """ Returns the maximum length of the array attribute. """
+  
+  prof_name,attribute_name = full_attribute_name.split('.')
+
+  for ref in API_REF:
+    if prof_name in ref['definitions'].keys():
+      return ref['definitions'][prof_name]['properties'][attribute_name]['items']['properties'][attribute]['maximum']
+
+def get_array_property_type(full_attribute_name,property):
+  """ Returns the type of the property inside the array. """
+
+  prof_name,attribute_name = full_attribute_name.split('.')
+
+  for ref in API_REF:
+    if prof_name in ref['definitions']:
+      return ref['definitions'][prof_name]['properties'][attribute_name]['items']['properties'][property]['type']
 
 def add_object_attribute_to_profiles(full_attribute_name,attributes,profiles):
   """ Adds the object attributes to the profiles. """
@@ -263,19 +349,6 @@ def add_object_attribute_to_profiles(full_attribute_name,attributes,profiles):
     for required_property in required_properties:
       required_property_path = full_attribute_name + '.' + required_property
       add_attributes_to_profiles(required_property_path,TABLE_COLUMNS[required_property_path],profiles)
-
-#  else len(required_properties) == 1:
-#    full_attribute_name += '.' + required_properties[0]
- #   attribute_type = get_attribute_type(full_attribute_name)
- #   if attribute_type == 'string':
-  #    if is_enumerated_property(prof_name,attribute_name,required_properties[0]):
-   #     for attribute,profile in zip(attributes,profiles):
-    #      if string_is_in_enumerated_property_list(prof_name,attribute_name,required_properties[0],attribute):
-     #       profile[attribute_name] = {required_properties[0]: attribute}
-      #    else:
-      #      raise ValueError(f'Invalid value {attribute} for {prof_name}. Fix and retry.')
-     # else:
-      #  add_string_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
 def get_attribute_properties(full_attribute_name):
   """ Returns a list of properties for the attribute or an empty list. """
@@ -376,7 +449,10 @@ def get_required_properties(full_attribute_name):
   for ref in API_REF:
     if prof_name in ref["definitions"].keys():
       try:
-        required = ref["definitions"][prof_name]["properties"][attribute_name]["required"]
+        if get_attribute_type(full_attribute_name) == 'array':
+          required = ref["definitions"][prof_name]["properties"][attribute_name]["items"]["required"]
+        else:
+          required = ref["definitions"][prof_name]["properties"][attribute_name]["required"]
         return required
       except KeyError:
         return []

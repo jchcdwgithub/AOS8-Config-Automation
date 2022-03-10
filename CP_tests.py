@@ -424,35 +424,27 @@ def test_add_object_attribute_to_profiles_correctly_adds_an_empty_object_attribu
 
 def test_add_object_attribute_to_profiles_correctly_adds_an_enumerated_string_correctly():
 
-    full_attribute_name = 'ssid_prof.wmm_eap_ac.wmm_ac'
+    full_attribute_name = 'ssid_prof.wmm_eap_ac'
 
     profiles = [{}]
     attributes = ['Voice']
 
+    CA.build_tables_columns_dict(Document('../Extension Testing Tables.docx').tables)
     CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
-    assert 'voice' == profiles[0]['wmm_eap_ac']['wmm_ac']
-
-def test_add_object_attribute_to_profiles_raises_error_if_string_is_not_in_enumerated_list():
-
-    full_attribute_name = 'ap_mesh_radio_prof.metric_algorithm'
-
-    profiles = [{}]
-    attributes = ['dankest-link-rssi']
-
-    with pytest.raises(ValueError):
-        CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
+    assert 'best-effort' == profiles[0]['wmm_eap_ac']['wmm_ac']
 
 def test_add_object_attribute_to_profiles_adds_string_to_object_attribute():
 
-    full_attribute_name = "anqp_nwk_auth_prof.anqp_redirect_url"
+    full_attribute_name = "ap_group.dot11a_prof"
 
     profiles = [{}]
     attributes = ['https://www.google.com']
 
+    CA.build_tables_columns_dict(Document('../Extension Testing Tables.docx').tables)
     CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
-    assert 'https://www.google.com' == profiles[0]['anqp_redirect_url']['url']
+    assert 'HQ' == profiles[0]['dot11a_prof']['profile-name']
 
 def test_get_attribute_properties_returns_list_of_properties():
 
@@ -502,3 +494,43 @@ def test_add_object_attributes_to_profiles_raises_value_error_when_boolean_not_d
     attributes = ['Beacon,Probes,Management,Control']
     with pytest.raises(ValueError):
         CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+def test_get_array_property_type_returns_correct_type():
+
+    full_attribute_name = 'ap_group.virtual_ap'
+    property = 'profile-name'
+
+    type = CA.get_array_property_type(full_attribute_name,property)
+
+    assert 'string' == type
+
+def test_get_array_property_minimum_length_returns_correct_minimum():
+
+    full_attribute_name = 'ap_group.virtual_ap'
+    property = 'profile-name'
+
+    min = CA.get_array_attribute_min_length(full_attribute_name,property)
+
+    assert min == 1
+    
+
+def test_get_array_property_maximum_length_returns_correct_minimum():
+
+    full_attribute_name = 'ap_group.virtual_ap'
+    property = 'profile-name'
+
+    max = CA.get_array_attribute_max_length(full_attribute_name,property)
+
+    assert max == 256
+
+def test_is_enumerated_array_property_returns_true_for_enumerated_property():
+
+    full_attribute_name = 'usb_acl_prof.usb_access_rule.usb_vendor_list'
+    
+    assert True == CA.is_enumerated_array_property(full_attribute_name)
+
+def test_is_enumerated_array_property_returns_false_for_non_enumerated_property():
+
+    full_attribute_name = 'ids_rap_wml_server_prof.wml_table.profile-name'
+    
+    assert False == CA.is_enumerated_array_property(full_attribute_name)
