@@ -5,7 +5,6 @@ import pytest
 from docx import Document
 
 API_FILES_TEST = setup.get_API_JSON_files()
-CA.build_tables_columns_dict(Document('../Radio Testing Tables.docx').tables)
 
 def test_build_hierarchy_builds_all_paths():
     """ The build hierarchy function correctly returns all intermediate paths. """
@@ -38,6 +37,22 @@ def test_get_columns_from_tables_returns_all_columns():
                 "ssid_prof.a_tx_rates":["12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54"]}
     
     CA.build_tables_columns_dict(tables)    
+
+    assert expected == CA.TABLE_COLUMNS
+
+def test_build_tables_columns_dict_builds_comma_separated_name_node_pairs():
+
+    tables = Document('../Node Testing Tables.docx').tables
+
+    expected = {"ap_g_radio_prof.profile-name":["Global,/md/HQ","HQ,/md/HQ","WAREHOUSE,/md/Branch1","FACTORY,/md/Branch2"],
+                "ap_a_radio_prof.profile-name":["Global,/md/HQ","HQ,/md/HQ","WAREHOUSE,/md/Branch1","FACTORY,/md/Branch2"],
+                "reg_domain_prof.profile-name":["Global,/md/HQ","HQ,/md/HQ","WAREHOUSE,/md/Branch1","FACTORY,/md/Branch2"],
+                "ap_g_radio_prof.eirp_min.eirp-min":["8 dBm", "5 dBm", "11 dBm", "8 dBm"],
+                "ap_g_radio_prof.eirp_max.eirp-max":["14 dBm", "11 dBm", "14 dBm", "14 dBm"],
+                "ap_a_radio_prof.eirp_min.eirp-min":["11 dBm", "8 dBm", "11 dBm", "11 dBm"],
+                "ap_a_radio_prof.eirp_max.eirp-max":["17 dBm", "14 dBm", "16 dBm", "14 dBm"]}
+    
+    CA.build_tables_columns_dict(tables)
 
     assert expected == CA.TABLE_COLUMNS
 

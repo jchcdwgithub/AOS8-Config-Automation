@@ -1,4 +1,5 @@
 import string
+from tkinter import W
 from webbrowser import get
 from xml.sax.xmlreader import AttributesImpl
 import requests
@@ -45,7 +46,7 @@ COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.pro
                "QoS BW Allocation Share":["wlan_qos_prof.bw_alloc.share"]
 }
 
-BOOLEAN_DICT = {'Beacon':'ba', 'Probe':'pr', 'dlow': 'Low Data', 'dhigh': 'High Data', 'Management':'mgmt',
+BOOLEAN_DICT = {'Beacon':'ba', 'Probe':'pr', 'Low Data': 'ldata', 'High Data': 'hdata', 'Management':'mgmt',
                 'Control': 'ctrl', 'All': 'all','True':True, 'False':False, 'Default':'default', 'Best Effort': 'best-effort',
                 'Background': 'background', 'Voice': 'voice', 'Video': 'video'}
 
@@ -217,7 +218,7 @@ def add_integer_attribute_to_profiles(full_attribute_name,attributes,profiles):
   prof_name,attribute_name,property_name = full_attribute_name.split('.')
 
   for profile,attribute in zip(profiles,attributes):
-    attribute_number = int(attribute)
+    attribute_number = extract_numbers_from_attribute(attribute) 
     if is_valid_string_or_number(prof_name,attribute_name,attribute_number,property_name=property_name,type="integer"):
       if property_name != '':
         profile[attribute_name][property_name] = attribute_number
@@ -575,7 +576,7 @@ def extract_numbers_from_attribute(attribute):
     print(f"{attribute} must be a number.")
     exit()
   else:
-    return extract_numbers
+    return int(extract_numbers[0])
 
 def is_nested_profile(profile_attribute):
   """ If an attribute points to another profile then it is a nested profile. Returns True or False. """
@@ -1241,9 +1242,27 @@ def get_column_from_table(column_name,table):
 def build_tables_columns_dict(tables):
   """ Build a dictionary of column_name : column_cells from the tables provided. """
 
+  node_column = None
+
   for table in tables:
     for column in table.columns:
-      if column.cells[0].text not in TABLE_COLUMNS.keys():
+      if column.cells[0].text == 'Node':
+        node_column = column.cells[1:]
+    
+    if node_column is not None:
+      for column in table.columns:
+        if column.cells[0].text == 'Node':
+          continue
+        for attribute in COL_TO_ATTR[column.cells[0].text]:
+          if 'profile-name' in attribute:
+            for profile,node in zip(column.cells[1:],node_column):
+              profile.text += "," + node.text
+            break
+    
+    for column in table.columns:
+      if column.cells[0].text == 'Node':
+        continue
+      elif column.cells[0].text not in TABLE_COLUMNS.keys():
         attribute_names = COL_TO_ATTR[column.cells[0].text]
         for attribute_name in attribute_names:
           TABLE_COLUMNS[attribute_name] = [sanitize_white_spaces(cell.text) for cell in column.cells[1:]]
