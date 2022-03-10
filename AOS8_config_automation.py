@@ -1,3 +1,4 @@
+from webbrowser import get
 from xml.sax.xmlreader import AttributesImpl
 import requests
 import ex_tokens 
@@ -16,14 +17,16 @@ API_ROOT = 'configuration/object/'
 API_REF = setup.get_API_JSON_files()
 CONFIG_HISTORY = []
 
+TABLE_COLUMNS = {}
+
 COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.profile-name","reg_domain_prof.profile-name"],
                "System Name": ["configuration_device_filename.filename"],
                "System MAC": ["configuration_device_filename.mac"],
                "Part Number": ["configuration_device_filename.dev-model"],
-               "2.4 GHz Minimum": ["ap_g_radio_prof.eirp_min"],
-               "2.4 GHz Maximum": ["ap_g_radio_prof.eirp_max"],
-               "5 GHz Minimum": ["ap_a_radio_prof.eirp_min"],
-               "5 GHz Maximum": ["ap_a_radio_prof.eirp_max"],
+               "2.4 GHz Minimum": ["ap_g_radio_prof.eirp_min.eirp-min"],
+               "2.4 GHz Maximum": ["ap_g_radio_prof.eirp_max.eirp-max"],
+               "5 GHz Minimum": ["ap_a_radio_prof.eirp_min.eirp-min"],
+               "5 GHz Maximum": ["ap_a_radio_prof.eirp_max.eirp-max"],
                "2.4 GHz Channels": ["reg_domain_prof.valid_11b_channels"],
                "5 GHz Channels": ["reg_domain_prof.valid_11a_channels"],
                "5 GHz Channel Width":["reg_domain_prof.valid_11a_40mhz_chan_nd","reg_domain_prof.valid_11a_80mhz_chan_nd"],
@@ -31,10 +34,13 @@ COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.pro
                "G Rates Required":["ssid_prof.g_basic_rates"],
                "G Rates Allowed":["ssid_prof.g_tx_rates"],
                "A Rates Required":["ssid_prof.a_basic_rates"],
-               "A Rates Allowed":["ssid_prof.a_tx_rates"]}
+               "A Rates Allowed":["ssid_prof.a_tx_rates"],
+               "WMM EAP AC":["ssid_prof.wmm_eap_ac.wmm_ac"],
+}
 
 BOOLEAN_DICT = {'Beacon':'ba', 'Probe':'pr', 'dlow': 'Low Data', 'dhigh': 'High Data', 'Management':'mgmt',
-                'Control': 'ctrl', 'All': 'all','True':True, 'False':False}
+                'Control': 'ctrl', 'All': 'all','True':True, 'False':False, 'Default':'default', 'Best Effort': 'best-effort',
+                'Background': 'background', 'Voice': 'voice', 'Video': 'video'}
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -174,16 +180,21 @@ def build_profile(profile_name, profile_attributes, attribute_columns, profiles_
 def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
   """ Checks against the API that the attributes in the column are correct and adds them to the provided profiles. """
   
-  attribute_type = get_attribute_type(full_attribute_name)
+  if len(full_attribute_name.split('.')) < 3:
+    attribute_type = get_attribute_type(full_attribute_name)
+  else:
+    prof_name,attribute,_ = full_attribute_name.split('.')
+    attribute_type = get_attribute_type(prof_name+'.'+attribute)
+    if attribute_type == 'object' and attribute not in profiles[0].keys():
+      add_object_attribute_to_profiles(prof_name+'.'+attribute,[],profiles)
+    elif attribute_type == 'array':
+      add_array_attribute_to_profiles(prof_name+'.'+attribute,[],profiles)
+    return
 
-  if attribute_type == 'object':
-    add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
-  elif attribute_type == 'integer':
+  if attribute_type == 'integer':
     add_integer_attribute_to_profiles(full_attribute_name,attributes,profiles)
   elif attribute_type == 'string':
     add_string_attribute_to_profiles(full_attribute_name,attributes,profiles)
-  elif attribute_type == 'array':
-    add_array_attribute_to_profiles(full_attribute_name,attributes,profiles)
   else:
     add_boolean_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
@@ -221,15 +232,26 @@ def add_string_attribute_to_profiles(full_attribute_name,attributes,profiles):
       exit()
 
 def add_array_attribute_to_profiles(full_attribute_name,attributes,profiles):
-  """ """
+  """ Adds an array attribute to the profile. """
+
+  prof_name,attribute_name = full_attribute_name.split('.')
+
+  for profile in profiles:
+    profile[attribute_name] = []
+
+  required_properties = get_required_properties(full_attribute_name)
+  
+  for required_property in required_properties:
+    required_property_path = prof_name + '.' + attribute_name + '.' + required_property
+    add_object_attribute_to_profiles(required_property_path,TABLE_COLUMNS[required_property_path],profiles)
 
 def add_object_attribute_to_profiles(full_attribute_name,attributes,profiles):
   """ Adds the object attributes to the profiles. """
 
-  prof_name,attribute_name = full_attribute_name.split('.')
-  required_properties = get_required_properties(prof_name,attribute_name)
+  _,attribute_name = full_attribute_name.split('.')
+  required_properties = get_required_properties(full_attribute_name)
 
-  for attribute,profile in zip(attributes,profiles):
+  for profile in profiles:
     profile[attribute_name] = {}
 
   if len(required_properties) == 0:
@@ -237,18 +259,23 @@ def add_object_attribute_to_profiles(full_attribute_name,attributes,profiles):
     if len(properties) != 0:
       add_boolean_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
-  elif len(required_properties) == 1:
-    full_attribute_name += '.' + required_properties[0]
-    attribute_type = get_attribute_type(full_attribute_name)
-    if attribute_type == 'string':
-      if is_enumerated_property(prof_name,attribute_name,required_properties[0]):
-        for attribute,profile in zip(attributes,profiles):
-          if string_is_in_enumerated_property_list(prof_name,attribute_name,required_properties[0],attribute):
-            profile[attribute_name] = {required_properties[0]: attribute}
-          else:
-            raise ValueError(f'Invalid value {attribute} for {prof_name}. Fix and retry.')
-      else:
-        add_string_attribute_to_profiles(full_attribute_name,attributes,profiles)
+  else:
+    for required_property in required_properties:
+      required_property_path = full_attribute_name + '.' + required_property
+      add_attributes_to_profiles(required_property_path,TABLE_COLUMNS[required_property_path],profiles)
+
+#  else len(required_properties) == 1:
+#    full_attribute_name += '.' + required_properties[0]
+ #   attribute_type = get_attribute_type(full_attribute_name)
+ #   if attribute_type == 'string':
+  #    if is_enumerated_property(prof_name,attribute_name,required_properties[0]):
+   #     for attribute,profile in zip(attributes,profiles):
+    #      if string_is_in_enumerated_property_list(prof_name,attribute_name,required_properties[0],attribute):
+     #       profile[attribute_name] = {required_properties[0]: attribute}
+      #    else:
+      #      raise ValueError(f'Invalid value {attribute} for {prof_name}. Fix and retry.')
+     # else:
+      #  add_string_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
 def get_attribute_properties(full_attribute_name):
   """ Returns a list of properties for the attribute or an empty list. """
@@ -307,16 +334,13 @@ def add_boolean_attribute_to_profiles(full_attribute_name,attributes,profiles):
 def attribute_is_valid(full_attribute_name,attribute):
   """ Given a full attribute name, check the API to make sure the attribute is valid or not. """
 
-  names = full_attribute_name.split('.')
+  if len(full_attribute_name.split('.')) < 3:
+    full_attribute_name += '.'
+  prof_name,attribute_name,property_name = full_attribute_name.split('.')
   
-  if len(names) == 3:
-      property_name = names[2]
-  else:
-      property_name = ""
-
   attribute_type = get_attribute_type(full_attribute_name)
 
-  return is_valid_string_or_number(names[0],names[1],attribute,property_name=property_name,type=attribute_type)
+  return is_valid_string_or_number(prof_name,attribute_name,attribute,property_name=property_name,type=attribute_type)
 
 def add_boolean_attributes_to_profile(prof_name,attribute_name,attribute,profile):
   """ Adds the boolean values to the attribute object in the profile. """
@@ -344,8 +368,10 @@ def property_is_in_properties(prof_name,attribute_name,property):
       else:
         return False
 
-def get_required_properties(prof_name,attribute_name):
+def get_required_properties(full_attribute_name):
   """ Returns the required properties list or an empty list. """
+
+  prof_name,attribute_name= full_attribute_name.split('.')
 
   for ref in API_REF:
     if prof_name in ref["definitions"].keys():
@@ -1132,33 +1158,35 @@ def get_column_from_table(column_name,table):
     if index == len(table.columns):
         raise ValueError
 
-def get_columns_from_tables(tables):
+def build_tables_columns_dict(tables):
   """ Build a dictionary of column_name : column_cells from the tables provided. """
-
-  table_columns = {}
 
   for table in tables:
     for column in table.columns:
-      if column.cells[0].text not in table_columns.keys():
+      if column.cells[0].text not in TABLE_COLUMNS.keys():
         attribute_names = COL_TO_ATTR[column.cells[0].text]
         for attribute_name in attribute_names:
-          table_columns[attribute_name] = [sanitize_white_spaces(cell.text) for cell in column.cells[1:]]
-  
-  return table_columns
+          TABLE_COLUMNS[attribute_name] = [sanitize_white_spaces(cell.text) for cell in column.cells[1:]]
 
-def get_profiles_to_be_configured(columns):
+def get_profiles_to_be_configured():
   """ Get the profiles to be configured from the table keys. The result is a dictionary of profile: [attributes]. """
 
   profiles_to_configure = {}
+  full_name = ''
 
-  for name in columns:
+  for name in TABLE_COLUMNS:
     if len(name.split('.')) < 3:
       name += '.'
     profile_name,attribute,property = name.split('.')
-    if profile_name in profiles_to_configure.keys():
-      profiles_to_configure[profile_name].append(attribute+property)
+    if property != '':
+      full_name = attribute + '.' + property
     else:
-      profiles_to_configure[profile_name] = [attribute+property]
+      full_name = attribute
+
+    if profile_name in profiles_to_configure.keys():
+      profiles_to_configure[profile_name].append(full_name)
+    else:
+      profiles_to_configure[profile_name] = [full_name]
   
   return profiles_to_configure
 

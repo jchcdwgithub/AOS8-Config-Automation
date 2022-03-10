@@ -5,6 +5,7 @@ import pytest
 from docx import Document
 
 API_FILES_TEST = setup.get_API_JSON_files()
+CA.build_tables_columns_dict(Document('../Radio Testing Tables.docx').tables)
 
 def test_build_hierarchy_builds_all_paths():
     """ The build hierarchy function correctly returns all intermediate paths. """
@@ -22,10 +23,10 @@ def test_get_columns_from_tables_returns_all_columns():
     expected = {"ap_g_radio_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
                 "ap_a_radio_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
                 "reg_domain_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
-                "ap_g_radio_prof.eirp_min":["3 dBm", "3 dBm", "3 dBm", "3 dBm", "3 dBm", "3 dBm"],
-                "ap_g_radio_prof.eirp_max":["7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm"],
-                "ap_a_radio_prof.eirp_min":["6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm"],
-                "ap_a_radio_prof.eirp_max":["10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm"],
+                "ap_g_radio_prof.eirp_min.eirp-min":["3 dBm", "3 dBm", "3 dBm", "3 dBm", "3 dBm", "3 dBm"],
+                "ap_g_radio_prof.eirp_max.eirp-max":["7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm"],
+                "ap_a_radio_prof.eirp_min.eirp-min":["6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm"],
+                "ap_a_radio_prof.eirp_max.eirp-max":["10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm"],
                 "reg_domain_prof.valid_11b_channels":["1, 6, 11", "1,6,11", "1, 6, 11", "1, 6, 11", "1, 6, 11", "1, 6, 11"],
                 "reg_domain_prof.valid_11a_channels":["36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 149, 153, 157, 161,165" ],
                 "reg_domain_prof.valid_11a_40mhz_chan_nd":["20 MHz", "20 MHz", "20 MHz", "20 MHz", "20 MHz", "80 MHz"],
@@ -36,22 +37,22 @@ def test_get_columns_from_tables_returns_all_columns():
                 "ssid_prof.a_basic_rates":["12", "12", "12, 24", "12", "12"],
                 "ssid_prof.a_tx_rates":["12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54"]}
     
-    generated = CA.get_columns_from_tables(tables)
+    CA.build_tables_columns_dict(tables)    
 
-    assert expected == generated
+    assert expected == CA.TABLE_COLUMNS
 
 def test_get_profiles_to_be_configured_returns_correct_dictionary():
     """ Given the above test tables, get the names and attributes of profiles to be configured. """
 
     tables = Document('../Radio Testing Tables.docx').tables
-    attributes = CA.get_columns_from_tables(tables)
+    CA.build_tables_columns_dict(tables)
 
-    expected = {"ap_g_radio_prof":["profile-name","eirp_min","eirp_max"],
-                "ap_a_radio_prof":["profile-name","eirp_min","eirp_max"],
+    expected = {"ap_g_radio_prof":["profile-name","eirp_min.eirp-min","eirp_max.eirp-max"],
+                "ap_a_radio_prof":["profile-name","eirp_min.eirp-min","eirp_max.eirp-max"],
                 "reg_domain_prof":["profile-name","valid_11b_channels","valid_11a_channels","valid_11a_40mhz_chan_nd","valid_11a_80mhz_chan_nd"],
                 "ssid_prof":["profile-name","g_basic_rates","g_tx_rates","a_basic_rates","a_tx_rates"]}
     
-    generated = CA.get_profiles_to_be_configured(attributes)
+    generated = CA.get_profiles_to_be_configured()
 
     assert expected == generated
     
@@ -279,8 +280,7 @@ def test_is_valid_string_returns_false_for_too_long_nested_string_length_check()
 
 def test_get_required_properties_returns_expected_required_list_when_it_exists():
 
-    profile_name = "ids_signature_prof"
-    attribute_name = "ids_condition_frame_type"
+    full_attribute_name = "ids_signature_prof.ids_condition_frame_type"
 
     expected = [
                         "control",
@@ -293,17 +293,16 @@ def test_get_required_properties_returns_expected_required_list_when_it_exists()
                         "data"
                     ]
     
-    generated = CA.get_required_properties(profile_name,attribute_name)
+    generated = CA.get_required_properties(full_attribute_name)
 
     for item in expected:
         assert item in generated
 
 def test_get_required_properties_returns_empty_required_list_when_it_doesnt_exist():
 
-    profile_name = "ap_mesh_radio_prof"
-    attribute_name = "mesh_a_tx_rates"
+    full_attribute_name = "ap_mesh_radio_prof.mesh_a_tx_rates"
     
-    generated = CA.get_required_properties(profile_name,attribute_name)
+    generated = CA.get_required_properties(full_attribute_name)
 
     assert len(generated) == 0
 
@@ -425,14 +424,14 @@ def test_add_object_attribute_to_profiles_correctly_adds_an_empty_object_attribu
 
 def test_add_object_attribute_to_profiles_correctly_adds_an_enumerated_string_correctly():
 
-    full_attribute_name = 'ap_mesh_radio_prof.metric_algorithm'
+    full_attribute_name = 'ssid_prof.wmm_eap_ac.wmm_ac'
 
     profiles = [{}]
-    attributes = ['best-link-rssi']
+    attributes = ['Voice']
 
     CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
-    assert 'best-link-rssi' == profiles[0]['metric_algorithm']['metric_algorithm_enum']
+    assert 'voice' == profiles[0]['wmm_eap_ac']['wmm_ac']
 
 def test_add_object_attribute_to_profiles_raises_error_if_string_is_not_in_enumerated_list():
 
