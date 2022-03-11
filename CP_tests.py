@@ -559,3 +559,74 @@ def test_add_array_attribute_correctly_adds_attributes():
     CA.add_array_attribute_to_profiles(full_attribute_name,profiles)
 
     assert [{'virtual-ap':'ChoiceAccess'},{'share':20}] == profiles[0]['bw_alloc']
+
+def test_profile_is_an_attribute_of_current_profile_returns_true_for_properties():
+
+    current_profile = 'ap_group'
+    other_profile = 'dot11a_snd_prof'
+
+    Result = CA.profile_is_an_attribute_of_current_profile(current_profile,other_profile)
+
+    assert Result == True
+
+def test_profile_is_an_attribute_of_current_profile_returns_false_for_nonproperties():
+
+    current_profile = 'ap_group'
+    other_profile = 'dank_prof'
+
+    Result = CA.profile_is_an_attribute_of_current_profile(current_profile,other_profile)
+
+    assert Result == False
+
+def test_add_dependencies_to_table_columns_dict_adds_dependent_profiles():
+
+    CA.build_tables_columns_dict(Document('../Radio Testing Tables.docx').tables)
+    profiles = CA.get_profiles_to_be_configured()
+    CA.build_profiles_dependencies(profiles)
+
+    expected = {"ap_g_radio_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
+                "ap_a_radio_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
+                "reg_domain_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
+                "ap_group.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
+                "ap_g_radio_prof.eirp_min.eirp-min":["3 dBm", "3 dBm", "3 dBm", "3 dBm", "3 dBm", "3 dBm"],
+                "ap_g_radio_prof.eirp_max.eirp-max":["7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm"],
+                "ap_a_radio_prof.eirp_min.eirp-min":["6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm"],
+                "ap_a_radio_prof.eirp_max.eirp-max":["10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm"],
+                "reg_domain_prof.valid_11b_channels":["1, 6, 11", "1,6,11", "1, 6, 11", "1, 6, 11", "1, 6, 11", "1, 6, 11"],
+                "reg_domain_prof.valid_11a_channels":["36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 149, 153, 157, 161,165" ],
+                "reg_domain_prof.valid_11a_40mhz_chan_nd":["20 MHz", "20 MHz", "20 MHz", "20 MHz", "20 MHz", "80 MHz"],
+                "reg_domain_prof.valid_11a_80mhz_chan_nd":["20 MHz", "20 MHz", "20 MHz", "20 MHz", "20 MHz", "80 MHz"],
+                "ssid_prof.profile-name":["ChoiceAccess", "CorpAccess", "CorpTest", "GuestAccess", "MobiAccess"],
+                "ssid_prof.g_basic_rates":["12", "12", "12", "12", "12"],
+                "ssid_prof.g_tx_rates":["12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54"],
+                "ssid_prof.a_basic_rates":["12", "12", "12, 24", "12", "12"],
+                "ssid_prof.a_tx_rates":["12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54"],
+                "ap_group.dot11g_prof.profile-name":["CGR_ap_g_radio_prof","DEP_ap_g_radio_prof","KFD_ap_g_radio_prof","PWK_ap_g_radio_prof","SIG_ap_g_radio_prof","Test_ap_g_radio_prof"],
+                "ap_group.dot11a_prof.profile-name":["CGR_ap_a_radio_prof","DEP_ap_a_radio_prof","KFD_ap_a_radio_prof","PWK_ap_a_radio_prof","SIG_ap_a_radio_prof","Test_ap_a_radio_prof"],
+                "ap_group.reg_domain_prof.profile-name":["CGR_reg_domain_prof","DEP_reg_domain_prof","KFD_reg_domain_prof","PWK_reg_domain_prof","SIG_reg_domain_prof","Test_reg_domain_prof"]}
+
+    assert expected == CA.TABLE_COLUMNS
+
+def test_add_dependencies_to_table_columns_dict_adds_new_profiles_to_profiles_to_be_configured():
+
+    CA.build_tables_columns_dict(Document('../Radio Testing Tables.docx').tables)
+    profiles = CA.get_profiles_to_be_configured()
+    CA.build_profiles_dependencies(profiles)
+
+    assert 'dot11g_prof.profile-name' in profiles['ap_group'] and 'dot11a_prof.profile-name' in profiles['ap_group'] and 'reg_domain_prof.profile-name' in profiles['ap_group']                
+
+def test_build_ordered_configuration_list_builds_list_correctly():
+
+    CA.build_tables_columns_dict(Document('../Radio Testing Tables.docx').tables)
+    profiles = CA.get_profiles_to_be_configured()
+    CA.build_profiles_dependencies(profiles)
+    
+    expected = {"ap_g_radio_prof":["profile-name","eirp_min.eirp-min","eirp_max.eirp-max"],
+                "ap_a_radio_prof":["profile-name","eirp_min.eirp-min","eirp_max.eirp-max"],
+                "reg_domain_prof":["profile-name","valid_11b_channels","valid_11a_channels","valid_11a_40mhz_chan_nd","valid_11a_80mhz_chan_nd"],
+                "ap_group.dot11g_prof":["profile-name","ap_group.dot11g_prof.profile-name","ap_group.dot11a_prof.profile-name","ap_group.reg_domain_prof.profile-name"],
+                "ssid_prof":["profile-name","g_basic_rates","g_tx_rates","a_basic_rates","a_tx_rates"]}
+
+    generated = CA.build_ordered_configuration_list(profiles)
+
+    assert expected == generated

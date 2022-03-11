@@ -50,6 +50,8 @@ BOOLEAN_DICT = {'Beacon':'ba', 'Probe':'pr', 'Low Data': 'ldata', 'High Data': '
                 'Control': 'ctrl', 'All': 'all','True':True, 'False':False, 'Default':'default', 'Best Effort': 'best-effort',
                 'Background': 'background', 'Voice': 'voice', 'Video': 'video'}
 
+DEPENDENCY_DICT = {'ap_g_radio_prof':'dot11g_prof', 'ap_a_radio_prof':'dot11a_prof'}
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 #login/logout and security tokens
@@ -184,6 +186,31 @@ def build_profile(profile_name, profile_attributes, attribute_columns, profiles_
     CONFIG_HISTORY += profiles
   
   return profiles
+
+def build_ordered_configuration_list(profiles_to_configure):
+  """ Returns an ordered list of profiles to configure. """
+
+  ordered_configuration_list = []
+
+  for profile in profiles_to_configure:
+    for attribute in profiles_to_configure[profile]:
+      if is_nested_profile(attribute):
+        add_profile_to_ordered_configuration_list(attribute,profiles_to_configure,ordered_configuration_list)
+        remove_nested_profile_from_profiles_to_configure(attribute,profiles_to_configure)
+    add_profile_to_ordered_configuration_list(profile,profiles_to_configure,ordered_configuration_list)
+  
+  return ordered_configuration_list
+
+def add_profile_to_ordered_configuration_list(profile,profiles_to_configure,ordered_configuration_list):
+  """ Adds the profile and all its attributes to be configured to the ordered list. """
+
+  for attribute in profiles_to_configure[profile]:
+    ordered_configuration_list.append(f'{profile}.{attribute}')
+  
+def remove_nested_profile_from_profiles_to_configure(profile,profiles_to_configure):
+  """ Removes the nested profile from the profiles to configure list. """
+
+  profiles_to_configure.pop(profile,None)
 
 def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
   """ Checks against the API that the attributes in the column are correct and adds them to the provided profiles. """
@@ -1283,7 +1310,68 @@ def add_node_info_to_profile_name(node_column, table_columns):
   
   return table_columns
   
+def build_profiles_dependencies(profiles_to_be_configured):
+  """ Look for nested profiles and add entries to the TABLE_COLUMNS dictionary to configure those inner profiles. """
+
+  copy = None
+
+  for profile in profiles_to_be_configured:
+    copy = profiles_to_be_configured.copy()
+    copy.pop(profile)
+    for other_profile in copy:
+      if profile_is_an_attribute_of_current_profile(profile,other_profile):
+        add_dependency_to_table_columns_dict(profile,other_profile)
+        add_dependency_to_profiles_to_be_configured(profile,other_profile,profiles_to_be_configured)
+
+def add_dependency_to_profiles_to_be_configured(current_profile,other_profile,profiles_to_be_configured):
+  """ Adds the dynamic profiles to profiles to be configured. """
+
+  profile_name = ''
+
+  if other_profile in DEPENDENCY_DICT.keys():
+    profile_name = f'{DEPENDENCY_DICT[other_profile]}.profile-name'
+  else:
+    profile_name = f'{other_profile}.profile-name'
+
+  profiles_to_be_configured[current_profile].append(profile_name)  
+
+
+def profile_is_an_attribute_of_current_profile(current_profile,other_profile):
+  """ Returns True if other_profile is an attribute of current_profile. """
   
+  current_profile_properties = get_profile_properties(current_profile)
+
+  if other_profile in DEPENDENCY_DICT.keys():
+    return DEPENDENCY_DICT[other_profile] in current_profile_properties
+  else:
+    return other_profile in current_profile_properties
+
+def add_dependency_to_table_columns_dict(current_profile,other_profile):
+  """ Adds entries to the TABLE_COLUMNS dictionary if the two profiles are dependent. """
+
+  current_profile_names = TABLE_COLUMNS[f'{current_profile}.profile-name']
+  other_profile_names = TABLE_COLUMNS[f'{other_profile}.profile-name']
+  dynamic_profile_name = ''
+
+  for profile_name in current_profile_names:
+    if profile_name in other_profile_names:
+      name_without_node_info = profile_name.split(',')[0]
+      if other_profile in DEPENDENCY_DICT.keys():
+        dynamic_profile_name = f'{current_profile}.{DEPENDENCY_DICT[other_profile]}.profile-name'
+      else:
+        dynamic_profile_name = f'{current_profile}.{other_profile}.profile-name'      
+      if dynamic_profile_name in TABLE_COLUMNS.keys():
+        TABLE_COLUMNS[dynamic_profile_name].append(f'{name_without_node_info}_{other_profile}')
+      else:
+        TABLE_COLUMNS[dynamic_profile_name] = [f'{name_without_node_info}_{other_profile}'] 
+
+def get_profile_properties(profile):
+  """ Returns properties of the profile from the API_REF dictionary. """
+
+  for ref in API_REF:
+    if profile in ref['definitions']:
+      return [prop for prop in ref['definitions'][profile]['properties']]
+
 def get_profiles_to_be_configured():
   """ Get the profiles to be configured from the table keys. The result is a dictionary of profile: [attributes]. """
 
