@@ -1245,28 +1245,45 @@ def build_tables_columns_dict(tables):
   node_column = None
 
   for table in tables:
-    for column in table.columns:
+    table_columns = [column for column in table.columns]
+    for column in table_columns:
       if column.cells[0].text == 'Node':
         node_column = column.cells[1:]
+        table_columns = remove_node_column(table)
+        table_columns = add_node_info_to_profile_name(node_column, table_columns)
     
-    if node_column is not None:
-      for column in table.columns:
-        if column.cells[0].text == 'Node':
-          continue
-        for attribute in COL_TO_ATTR[column.cells[0].text]:
-          if 'profile-name' in attribute:
-            for profile,node in zip(column.cells[1:],node_column):
-              profile.text += "," + node.text
-            break
-    
-    for column in table.columns:
-      if column.cells[0].text == 'Node':
-        continue
-      elif column.cells[0].text not in TABLE_COLUMNS.keys():
+    for column in table_columns:
+      if column.cells[0].text not in TABLE_COLUMNS.keys():
         attribute_names = COL_TO_ATTR[column.cells[0].text]
         for attribute_name in attribute_names:
           TABLE_COLUMNS[attribute_name] = [sanitize_white_spaces(cell.text) for cell in column.cells[1:]]
 
+def remove_node_column(table):
+  """ Removes the node column from the table. """
+
+  table_columns = []
+  
+  for column in table.columns:
+    if column.cells[0].text != 'Node':
+      table_columns.append(column)
+  
+  return table_columns
+
+def add_node_info_to_profile_name(node_column, table_columns):
+  """ Adds the node information to the profile names in the table. """
+  
+  node_info_added = False
+
+  for column in table_columns:
+    for attribute in COL_TO_ATTR[column.cells[0].text]:
+      if 'profile-name' in attribute and not node_info_added:
+        for profile,node in zip(column.cells[1:],node_column):
+          profile.text += ',' + node.text
+        node_info_added = True
+  
+  return table_columns
+  
+  
 def get_profiles_to_be_configured():
   """ Get the profiles to be configured from the table keys. The result is a dictionary of profile: [attributes]. """
 
