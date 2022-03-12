@@ -8,6 +8,7 @@ import json
 import re
 import urllib3
 import setup
+import data_structures
 from docx import Document
 from pprint import pprint
 
@@ -20,37 +21,6 @@ API_REF = setup.get_API_JSON_files()
 CONFIG_HISTORY = []
 
 TABLE_COLUMNS = {}
-
-COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.profile-name","reg_domain_prof.profile-name"],
-               "System Name": ["configuration_device_filename.filename"],
-               "System MAC": ["configuration_device_filename.mac"],
-               "Part Number": ["configuration_device_filename.dev-model"],
-               "2.4 GHz Minimum": ["ap_g_radio_prof.eirp_min.eirp-min"],
-               "2.4 GHz Maximum": ["ap_g_radio_prof.eirp_max.eirp-max"],
-               "5 GHz Minimum": ["ap_a_radio_prof.eirp_min.eirp-min"],
-               "5 GHz Maximum": ["ap_a_radio_prof.eirp_max.eirp-max"],
-               "2.4 GHz Channels": ["reg_domain_prof.valid_11b_channels"],
-               "5 GHz Channels": ["reg_domain_prof.valid_11a_channels"],
-               "5 GHz Channel Width":["reg_domain_prof.valid_11a_40mhz_chan_nd","reg_domain_prof.valid_11a_80mhz_chan_nd"],
-               "SSID Profile":["ssid_prof.profile-name"],
-               "G Rates Required":["ssid_prof.g_basic_rates"],
-               "G Rates Allowed":["ssid_prof.g_tx_rates"],
-               "A Rates Required":["ssid_prof.a_basic_rates"],
-               "A Rates Allowed":["ssid_prof.a_tx_rates"],
-               "AP Group":["ap_group.profile-name"],
-               "AP Group 5 GHz Profile":["ap_group.dot11a_prof.profile-name"],
-               "AP Group Virtual APs":["ap_group.virtual_ap.profile-name"],
-               "WMM EAP AC":["ssid_prof.wmm_eap_ac.wmm_ac"],
-               "QoS Profile":["wlan_qos_prof.profile-name"],
-               "QoS BW Allocation VAP":["wlan_qos_prof.bw_alloc.virtual-ap"],
-               "QoS BW Allocation Share":["wlan_qos_prof.bw_alloc.share"]
-}
-
-BOOLEAN_DICT = {'Beacon':'ba', 'Probe':'pr', 'Low Data': 'ldata', 'High Data': 'hdata', 'Management':'mgmt',
-                'Control': 'ctrl', 'All': 'all','True':True, 'False':False, 'Default':'default', 'Best Effort': 'best-effort',
-                'Background': 'background', 'Voice': 'voice', 'Video': 'video'}
-
-DEPENDENCY_DICT = {'ap_g_radio_prof':'dot11g_prof', 'ap_a_radio_prof':'dot11a_prof'}
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -187,6 +157,72 @@ def build_profile(profile_name, profile_attributes, attribute_columns, profiles_
   
   return profiles
 
+def get_list_of_api_endpoints(ordered_profiles):
+  """ Given an ordered list of profiles to configure, extract the endpoint information and return them as a list. """
+
+  api_endpoints = []
+
+  for profile_group in ordered_profiles:
+    profile_parts = profile_group[0].split('.')
+    api_endpoint = profile_parts[0]
+    if api_endpoint not in api_endpoints:
+      api_endpoints.append(api_endpoint)
+  
+  return api_endpoints
+
+def push_profiles_to_network(ordered_configuration_list, profiles):
+  """ Given a list of profiles, push them to the network. """
+
+  for profile_api_endpoint,profile_list in zip(ordered_configuration_list,profiles):
+    for profile in profile_list:
+      profile_name,node = profile['profile-name'].split(',')
+      profile['profile-name'] = profile_name
+      if node == 'default_node':
+        node = DEFAULT_PATH
+      
+      print(f"Pushing configuration profile {profile_name} to {node}:")
+      pprint(profile)
+      proceed = input("Proceed? (y/n)")
+      if proceed == 'y':
+        response = call_api(profile_api_endpoint,config_path=node,data=profile,post=True)
+        if (response.status_code == 200 and response.json()['_global_status']['_status'] != 0) or response.status_code != 200:
+          if response.status_code != 200:
+            print(f"Something went wrong while trying to communicate with the MM. HTTP Status Code: {response.status_code}. Exiting...")
+            exit()
+          else:
+            print(f"One or more of the attributes in the configuration profile {profile_name} failed to push:")
+            pprint(response.json())
+        else:
+          print(f'Successfully configuration profile {profile_name} to {node}.')
+      else:
+        exit()
+    print(f"Saving configurations...")
+    response = write_mem(path=node)
+    if response != 200:
+      print(f"Encountered problem when trying to write memory. HTTP Status Code: {response.status_code}. Aborting...")
+      exit()
+  print(f'All configuration pushed to the network.')
+
+def build_profiles_from_ordered_list(ordered_profiles):
+  """ Given an ordered list of profiles to configure, build the profiles from the TABLE_COLUMNS information. """
+
+  profiles = []
+  for profile in ordered_profiles:
+    current_profiles = []
+    for profile_name in TABLE_COLUMNS[profile[0]]:
+      api_prof_name,_ = profile[0].split('.')
+      if len(profile_name.split(',')) < 2:
+        name = profile_name
+        node = 'default_node'
+      else:
+        name,node = profile_name.split(',')
+      current_profiles.append({'profile-name':f'{name}_{api_prof_name},{node}'})
+    for profile_attribute in profile[1:]:
+      add_attributes_to_profiles(profile_attribute,TABLE_COLUMNS[profile_attribute],current_profiles)
+    profiles.append(current_profiles)
+
+  return profiles
+    
 def build_ordered_configuration_list(profiles_to_configure):
   """ Returns an ordered list of profiles to configure. """
 
@@ -204,8 +240,11 @@ def build_ordered_configuration_list(profiles_to_configure):
 def add_profile_to_ordered_configuration_list(profile,profiles_to_configure,ordered_configuration_list):
   """ Adds the profile and all its attributes to be configured to the ordered list. """
 
+  grouped_attributes = []
   for attribute in profiles_to_configure[profile]:
-    ordered_configuration_list.append(f'{profile}.{attribute}')
+    grouped_attributes.append(f'{profile}.{attribute}')
+  
+  ordered_configuration_list.append(grouped_attributes)
   
 def remove_nested_profile_from_profiles_to_configure(profile,profiles_to_configure):
   """ Removes the nested profile from the profiles to configure list. """
@@ -227,13 +266,15 @@ def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
       else:
         attribute_type = get_attribute_type(full_attribute_name)
     elif attribute_type == 'array':
-      add_array_attribute_to_profiles(prof_name+'.'+attribute,[],profiles)
+      add_array_attribute_to_profiles(prof_name+'.'+attribute,profiles)
       return
     
   if attribute_type == 'integer':
     add_integer_attribute_to_profiles(full_attribute_name,attributes,profiles)
   elif attribute_type == 'string':
     add_string_attribute_to_profiles(full_attribute_name,attributes,profiles)
+  elif attribute_type == 'object':
+    add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
   else:
     add_boolean_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
@@ -245,14 +286,18 @@ def add_integer_attribute_to_profiles(full_attribute_name,attributes,profiles):
   prof_name,attribute_name,property_name = full_attribute_name.split('.')
 
   for profile,attribute in zip(profiles,attributes):
-    attribute_number = extract_numbers_from_attribute(attribute) 
-    if is_valid_string_or_number(prof_name,attribute_name,attribute_number,property_name=property_name,type="integer"):
-      if property_name != '':
-        profile[attribute_name][property_name] = attribute_number
+    attribute_number = extract_numbers_from_attribute(attribute)[0] 
+    if attribute_number.isdigit():
+      attribute_value = int(attribute_number)
+      if is_valid_string_or_number(prof_name,attribute_name,attribute_value,property_name=property_name,type="integer"):
+        if property_name != '':
+          profile[attribute_name][property_name] = attribute_value
+        else:
+          profile[attribute_name] = attribute_value
       else:
-        profile[attribute_name] = attribute_number
+        raise ValueError(f'Invalid value. Number not within acceptable range: {prof_name} {attribute_name}')
     else:
-      exit()
+      raise ValueError(f'Attribute {attribute_name} in {prof_name} must be a number.')      
 
 def add_string_attribute_to_profiles(full_attribute_name,attributes,profiles):
   """ Add the string attributes to the provided profiles. """
@@ -264,7 +309,7 @@ def add_string_attribute_to_profiles(full_attribute_name,attributes,profiles):
   if property_name != '' and is_enumerated_property(prof_name,attribute_name,property_name):
       for profile,attribute in zip(profiles,attributes):
         try:
-          api_string = BOOLEAN_DICT[attribute]
+          api_string = data_structures.BOOLEAN_DICT[attribute]
         except KeyError:
           print(f'Value not defined in BOOLEAN_DICT. Please add and try again.')
           exit()
@@ -300,17 +345,29 @@ def add_array_attribute_to_profiles(full_attribute_name,profiles):
     if property_type == 'string' or property_type == 'integer':
       for attribute,profile in zip(attributes,profiles):
         attribute_value = None
-        if property_type == 'string' and is_enumerated_array_property(required_property_path):
+        attribute_was_list = False
+        possible_attribute_numbers = extract_numbers_from_attribute(attribute)
+        if len(possible_attribute_numbers) != 0:
+          attribute_was_list = True
+          for number in possible_attribute_numbers:
+            if is_valid_string_or_number_in_array(required_property_path,int(number),type=property_type):
+              attribute_value = int(number)
+              profile[attribute_name].append({required_property:attribute_value})
+            else:
+              raise ValueError(f'Invalid value. {required_property} is incorrectly configured.')
+        elif property_type == 'string' and is_enumerated_array_property(required_property_path):
           try:
-            attribute_value = BOOLEAN_DICT[attribute]
+            attribute_value = data_structures.BOOLEAN_DICT[attribute]
           except KeyError:
             print(f'Entry not in the BOOLEAN_DICT: Add {full_attribute_name}.{required_property}')
             exit()
-        if is_valid_string_or_number_in_array(required_property_path,attribute,type=property_type):
-          attribute_value = int(attribute) if attribute.isdigit() else attribute
         else:
-          raise ValueError(f'Invalid value. {required_property} is incorrectly configured.')
-        profile[attribute_name].append({required_property:attribute_value})
+          if is_valid_string_or_number_in_array(required_property_path,attribute):
+            attribute_value = attribute
+          else:
+            raise ValueError(f'Invalid value. {required_property} is incorrectly configured.')
+        if not attribute_was_list:
+          profile[attribute_name].append({required_property:attribute_value})
 
 def is_enumerated_array_property(full_attribute_name):
   """ Returns True if the array property is an enumeration. """
@@ -413,19 +470,20 @@ def add_boolean_attribute_to_profiles(full_attribute_name,attributes,profiles):
   _,attribute_name,property_name = full_attribute_name.split('.')
 
   for attribute,profile in zip(attributes,profiles):
+    attribute = attribute.replace(' ','')
     attribute_list = attribute.split(',')
     value = ''
     for item in attribute_list:
-      if item in BOOLEAN_DICT.keys():
+      if item in data_structures.BOOLEAN_DICT.keys():
         if item == 'True' or item == 'False':
           if property_name != '':
-            profile[attribute_name][property_name] = BOOLEAN_DICT[item]
+            profile[attribute_name][property_name] = data_structures.BOOLEAN_DICT[item]
             return
           else:
-            profile[attribute_name] = BOOLEAN_DICT[item]
+            profile[attribute_name] = data_structures.BOOLEAN_DICT[item]
             return
         else:
-          value = BOOLEAN_DICT[item]
+          value = data_structures.BOOLEAN_DICT[item]
       elif item.isdigit():
         value = item
       else:
@@ -457,7 +515,7 @@ def add_boolean_attributes_to_profile(prof_name,attribute_name,attribute,profile
     if digit_pattern.match(boolean) is not None:
       if property_is_in_properties(prof_name,attribute_name,boolean):
         profile[attribute_name][boolean] = True
-    elif boolean in BOOLEAN_DICT.keys():
+    elif boolean in data_structures.BOOLEAN_DICT.keys():
       profile[attribute_name][boolean] = True
     else:
       print(f'Invalid value encountered in {prof_name}: {boolean} not an excepted value.')
@@ -597,13 +655,12 @@ def get_attribute_type(full_attribute_name):
 def extract_numbers_from_attribute(attribute):
   """ For integer attributes, remove any text that might have been included i.e. units like dBm. """
 
-  numbers = re.compile(r'(\d+)')
+  numbers = re.compile(r'\d+')
   extract_numbers = numbers.findall(attribute)
   if len(extract_numbers) == 0:
-    print(f"{attribute} must be a number.")
-    exit()
+    return []
   else:
-    return int(extract_numbers[0])
+    return extract_numbers
 
 def is_nested_profile(profile_attribute):
   """ If an attribute points to another profile then it is a nested profile. Returns True or False. """
@@ -1281,7 +1338,7 @@ def build_tables_columns_dict(tables):
     
     for column in table_columns:
       if column.cells[0].text not in TABLE_COLUMNS.keys():
-        attribute_names = COL_TO_ATTR[column.cells[0].text]
+        attribute_names = data_structures.COL_TO_ATTR[column.cells[0].text]
         for attribute_name in attribute_names:
           TABLE_COLUMNS[attribute_name] = [sanitize_white_spaces(cell.text) for cell in column.cells[1:]]
 
@@ -1302,7 +1359,7 @@ def add_node_info_to_profile_name(node_column, table_columns):
   node_info_added = False
 
   for column in table_columns:
-    for attribute in COL_TO_ATTR[column.cells[0].text]:
+    for attribute in data_structures.COL_TO_ATTR[column.cells[0].text]:
       if 'profile-name' in attribute and not node_info_added:
         for profile,node in zip(column.cells[1:],node_column):
           profile.text += ',' + node.text
@@ -1328,8 +1385,8 @@ def add_dependency_to_profiles_to_be_configured(current_profile,other_profile,pr
 
   profile_name = ''
 
-  if other_profile in DEPENDENCY_DICT.keys():
-    profile_name = f'{DEPENDENCY_DICT[other_profile]}.profile-name'
+  if other_profile in data_structures.DEPENDENCY_DICT.keys():
+    profile_name = f'{data_structures.DEPENDENCY_DICT[other_profile]}.profile-name'
   else:
     profile_name = f'{other_profile}.profile-name'
 
@@ -1341,8 +1398,8 @@ def profile_is_an_attribute_of_current_profile(current_profile,other_profile):
   
   current_profile_properties = get_profile_properties(current_profile)
 
-  if other_profile in DEPENDENCY_DICT.keys():
-    return DEPENDENCY_DICT[other_profile] in current_profile_properties
+  if other_profile in data_structures.DEPENDENCY_DICT.keys():
+    return data_structures.DEPENDENCY_DICT[other_profile] in current_profile_properties
   else:
     return other_profile in current_profile_properties
 
@@ -1356,8 +1413,8 @@ def add_dependency_to_table_columns_dict(current_profile,other_profile):
   for profile_name in current_profile_names:
     if profile_name in other_profile_names:
       name_without_node_info = profile_name.split(',')[0]
-      if other_profile in DEPENDENCY_DICT.keys():
-        dynamic_profile_name = f'{current_profile}.{DEPENDENCY_DICT[other_profile]}.profile-name'
+      if other_profile in data_structures.DEPENDENCY_DICT.keys():
+        dynamic_profile_name = f'{current_profile}.{data_structures.DEPENDENCY_DICT[other_profile]}.profile-name'
       else:
         dynamic_profile_name = f'{current_profile}.{other_profile}.profile-name'      
       if dynamic_profile_name in TABLE_COLUMNS.keys():

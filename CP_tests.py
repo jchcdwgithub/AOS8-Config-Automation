@@ -1,4 +1,4 @@
-from re import fullmatch
+from re import I, fullmatch
 import AOS8_config_automation as CA
 import setup
 import pytest
@@ -621,12 +621,36 @@ def test_build_ordered_configuration_list_builds_list_correctly():
     profiles = CA.get_profiles_to_be_configured()
     CA.build_profiles_dependencies(profiles)
     
-    expected = {"ap_g_radio_prof":["profile-name","eirp_min.eirp-min","eirp_max.eirp-max"],
-                "ap_a_radio_prof":["profile-name","eirp_min.eirp-min","eirp_max.eirp-max"],
-                "reg_domain_prof":["profile-name","valid_11b_channels","valid_11a_channels","valid_11a_40mhz_chan_nd","valid_11a_80mhz_chan_nd"],
-                "ap_group.dot11g_prof":["profile-name","ap_group.dot11g_prof.profile-name","ap_group.dot11a_prof.profile-name","ap_group.reg_domain_prof.profile-name"],
-                "ssid_prof":["profile-name","g_basic_rates","g_tx_rates","a_basic_rates","a_tx_rates"]}
+    expected = [["ap_g_radio_prof.profile-name",
+                "ap_g_radio_prof.eirp_min.eirp-min",
+                "ap_g_radio_prof.eirp_max.eirp-max"],
+                ["ap_a_radio_prof.profile-name",
+                "ap_a_radio_prof.eirp_min.eirp-min",
+                "ap_a_radio_prof.eirp_max.eirp-max"],
+                ["reg_domain_prof.profile-name",
+                "reg_domain_prof.valid_11b_channels",
+                "reg_domain_prof.valid_11a_channels",
+                "reg_domain_prof.valid_11a_40mhz_chan_nd",
+                "reg_domain_prof.valid_11a_80mhz_chan_nd"],
+                ["ap_group.profile-name",
+                "ap_group.dot11g_prof.profile-name",
+                "ap_group.dot11a_prof.profile-name",
+                "ap_group.reg_domain_prof.profile-name"],
+                ["ssid_prof.profile-name",
+                "ssid_prof.g_basic_rates",
+                "ssid_prof.g_tx_rates",
+                "ssid_prof.a_basic_rates",
+                "ssid_prof.a_tx_rates"]]
 
     generated = CA.build_ordered_configuration_list(profiles)
+
+    assert expected == generated
+
+def test_get_api_endpoints_returns_correct_list_of_endpoints():
+
+    ordered_profiles = [['ap_g_radio_prof.profile-name'],['ap_a_radio_prof.profile-name'],['reg_domain_prof.profile-name'],['ap_group.profile-name'],['ssid_prof.profile-name'],['virtual_ap_prof.profile-name']]
+    expected = ['ap_g_radio_prof','ap_a_radio_prof','reg_domain_prof','ap_group','ssid_prof','virtual_ap_prof']
+
+    generated = CA.get_list_of_api_endpoints(ordered_profiles)
 
     assert expected == generated
