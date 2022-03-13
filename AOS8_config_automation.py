@@ -18,9 +18,11 @@ DEFAULT_PATH = '/mm/mynode'
 API_ROOT = 'configuration/object/'
 
 API_REF = setup.get_API_JSON_files()
+
 CONFIG_HISTORY = []
 
 TABLE_COLUMNS = {}
+OBJECT_IDENTIFIERS = {}
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -173,19 +175,19 @@ def get_list_of_api_endpoints(ordered_profiles):
 def push_profiles_to_network(ordered_configuration_list, profiles):
   """ Given a list of profiles, push them to the network. """
 
+  object_ids = get_object_identifiers()
+
   for profile_api_endpoint,profile_list in zip(ordered_configuration_list,profiles):
     for profile in profile_list:
-      profile_name,node = profile['profile-name'].split(',')
-      profile['profile-name'] = profile_name
-      if node == 'default_node':
-        node = DEFAULT_PATH
+      node = profile.pop('node')
+      profile_name = get_object_name(profile,object_ids)
       
-      print(f"Pushing configuration profile {profile_name} to {node}:")
+      print(f"Pushing configuration object {profile_api_endpoint} {profile_name} to {node}:")
       pprint(profile)
       proceed = input("Proceed? (y/n)")
       if proceed == 'y':
         response = call_api(profile_api_endpoint,config_path=node,data=profile,post=True)
-        if (response.status_code == 200 and response.json()['_global_status']['_status'] != 0) or response.status_code != 200:
+        if (response.status_code == 200 and response.json()['_global_result']['_status'] != 0) or response.status_code != 200:
           if response.status_code != 200:
             print(f"Something went wrong while trying to communicate with the MM. HTTP Status Code: {response.status_code}. Exiting...")
             exit()
@@ -209,15 +211,23 @@ def build_profiles_from_ordered_list(ordered_profiles):
   profiles = []
   for profile in ordered_profiles:
     current_profiles = []
-    for profile_name in TABLE_COLUMNS[profile[0]]:
-      api_prof_name,_ = profile[0].split('.')
+    profile_type = profile[0].split('.')[0]
+
+    profile_names = TABLE_COLUMNS[profile[0]]
+    suffixed_names = []
+
+    for profile_name in profile_names:
       if len(profile_name.split(',')) < 2:
-        name = profile_name
-        node = 'default_node'
+        node = DEFAULT_PATH
+        profile_name += f'_{profile_type}'
       else:
         name,node = profile_name.split(',')
-      current_profiles.append({'profile-name':f'{name}_{api_prof_name},{node}'})
-    for profile_attribute in profile[1:]:
+        profile_name = name + profile_type
+      suffixed_names.append(profile_name)
+      current_profiles.append({'node':node})
+
+    TABLE_COLUMNS[profile[0]] = suffixed_names
+    for profile_attribute in profile:
       add_attributes_to_profiles(profile_attribute,TABLE_COLUMNS[profile_attribute],current_profiles)
     profiles.append(current_profiles)
 
@@ -250,6 +260,13 @@ def remove_nested_profile_from_profiles_to_configure(profile,profiles_to_configu
   """ Removes the nested profile from the profiles to configure list. """
 
   profiles_to_configure.pop(profile,None)
+
+def get_object_name(object,object_ids):
+  """ Given an API object, return the ID for the object. """
+  
+  for attribute in object:
+    if attribute in object_ids:
+      return attribute
 
 def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
   """ Checks against the API that the attributes in the column are correct and adds them to the provided profiles. """
@@ -1353,17 +1370,30 @@ def remove_node_column(table):
   
   return table_columns
 
+def add_entries_to_object_identifiers():
+  """ Adds a list of entries to the objects identifiers set. """
+  for ref in API_REF:
+    for object in ref['definitions']:
+      if 'required' in ref['definitions'][object]:
+        if len(ref['definitions'][object]['required']) == 1:
+          OBJECT_IDENTIFIERS[object] = f'{object}.{ref["definitions"][object]["required"][0]}'
+        else:
+          name_pattern = re.compile(r'.*name$')
+          required_props = ref['definitions'][object]['required']
+          for required_prop in required_props:
+            if name_pattern.match(required_prop) is not None:
+              if object not in OBJECT_IDENTIFIERS:
+                OBJECT_IDENTIFIERS[object] = f'{object}.{required_prop}'
+
 def add_node_info_to_profile_name(node_column, table_columns):
   """ Adds the node information to the profile names in the table. """
   
-  node_info_added = False
-
   for column in table_columns:
     for attribute in data_structures.COL_TO_ATTR[column.cells[0].text]:
-      if 'profile-name' in attribute and not node_info_added:
+      attribute_name = attribute.split('.')[0]
+      if attribute == OBJECT_IDENTIFIERS[attribute_name]:
         for profile,node in zip(column.cells[1:],node_column):
           profile.text += ',' + node.text
-        node_info_added = True
   
   return table_columns
   
@@ -1384,11 +1414,12 @@ def add_dependency_to_profiles_to_be_configured(current_profile,other_profile,pr
   """ Adds the dynamic profiles to profiles to be configured. """
 
   profile_name = ''
+  other_profile_identifier = get_object_identifier(other_profile)
 
   if other_profile in data_structures.DEPENDENCY_DICT.keys():
-    profile_name = f'{data_structures.DEPENDENCY_DICT[other_profile]}.profile-name'
+    profile_name = f'{data_structures.DEPENDENCY_DICT[other_profile]}.{other_profile_identifier}'
   else:
-    profile_name = f'{other_profile}.profile-name'
+    profile_name = f'{other_profile}.{other_profile_identifier}'
 
   profiles_to_be_configured[current_profile].append(profile_name)  
 
@@ -1406,21 +1437,36 @@ def profile_is_an_attribute_of_current_profile(current_profile,other_profile):
 def add_dependency_to_table_columns_dict(current_profile,other_profile):
   """ Adds entries to the TABLE_COLUMNS dictionary if the two profiles are dependent. """
 
-  current_profile_names = TABLE_COLUMNS[f'{current_profile}.profile-name']
-  other_profile_names = TABLE_COLUMNS[f'{other_profile}.profile-name']
-  dynamic_profile_name = ''
+  current_profile_identifier = OBJECT_IDENTIFIERS[current_profile]
+  other_profile_identifier = OBJECT_IDENTIFIERS[other_profile]
+  if current_profile != '' and other_profile_identifier != '':
+    current_profile_names = TABLE_COLUMNS[current_profile_identifier]
+    other_profile_names = TABLE_COLUMNS[other_profile_identifier]
+    dynamic_profile_name = ''
 
-  for profile_name in current_profile_names:
-    if profile_name in other_profile_names:
-      name_without_node_info = profile_name.split(',')[0]
-      if other_profile in data_structures.DEPENDENCY_DICT.keys():
-        dynamic_profile_name = f'{current_profile}.{data_structures.DEPENDENCY_DICT[other_profile]}.profile-name'
-      else:
-        dynamic_profile_name = f'{current_profile}.{other_profile}.profile-name'      
-      if dynamic_profile_name in TABLE_COLUMNS.keys():
-        TABLE_COLUMNS[dynamic_profile_name].append(f'{name_without_node_info}_{other_profile}')
-      else:
-        TABLE_COLUMNS[dynamic_profile_name] = [f'{name_without_node_info}_{other_profile}'] 
+    for profile_name in current_profile_names:
+      if profile_name in other_profile_names:
+        name_without_node_info = profile_name.split(',')[0]
+        if other_profile in data_structures.DEPENDENCY_DICT.keys():
+          _,identifier = other_profile_identifier.split('.')
+          dynamic_profile_name = f'{current_profile}.{data_structures.DEPENDENCY_DICT[other_profile]}.{identifier}'
+        else:
+          dynamic_profile_name = f'{current_profile}.{other_profile_identifier}'      
+        if dynamic_profile_name in TABLE_COLUMNS.keys():
+          TABLE_COLUMNS[dynamic_profile_name].append(f'{name_without_node_info}_{other_profile}')
+        else:
+          TABLE_COLUMNS[dynamic_profile_name] = [f'{name_without_node_info}_{other_profile}'] 
+
+def get_object_identifier(object):
+  """ Given an API object, return a possible identifier. If object does not have an identifier, return an empty string. """
+
+  for ref in API_REF:
+    if object in ref['definitions']:
+      if 'required' in ref['definitions'][object]:
+        for possible_identifier in ref['definitions'][object]['required']:
+          if 'name' in possible_identifier:
+            return possible_identifier
+        return ''
 
 def get_profile_properties(profile):
   """ Returns properties of the profile from the API_REF dictionary. """
@@ -1465,6 +1511,31 @@ def check_that_required_attributes_are_provided(profile_name,profile_attributes,
           return False
 
   return True
+
+def get_object_identifiers():
+  """ Crawl through the API and get the required properties for all the objects. Returns a set of possible object identifiers. """
+
+  object_ids = set() 
+
+  for ref in API_REF:
+    for ref_object in ref['definitions']:
+      if 'required' in ref['definitions'][ref_object]:
+        for required_prop in ref['definitions'][ref_object]['required']:
+          object_ids.add(required_prop)        
+  
+  return object_ids
+
+def get_objects_without_required_attributes():
+  """ Returns a set of objects without required properties from the API. """
+
+  objects = set()
+
+  for ref in API_REF:
+    for ref_object in ref['definitions']:
+      if 'required' not in ref['definitions'][ref_object]:
+        objects.add(ref_object)
+  
+  return objects
    
 def sanitize_white_spaces(text):
   """ Remove leading/trailing white spaces and replace any carriage returns with spaces. """

@@ -1,3 +1,5 @@
+import AOS8_config_automation as CA
+
 COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.profile-name","reg_domain_prof.profile-name"],
                "Device MAC": ["configuration_device.mac"],
                "Device Node": ["configuration_device.config_path"],
@@ -18,7 +20,7 @@ COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.pro
                "PC Jumbo Frames":['int_pc.int_pc_jumbo'],
                "PC Description":['int_pc.channel_int_desc.LINE'],
                "Loopback Interface":['int_loop.int_loop_ip.ipaddr'],
-               "VLAN Name":['vlan_name_id.vlan_name','vlan_name.name'],
+               "VLAN Name":['vlan_name_id.name','vlan_name.name'],
                "VLAN Associated IDs":['vlan_name_id.vlan-ids'],
                "IP Route":['ip_route.destip'],
                "Interface VLAN ID":['int_vlan.id'],
@@ -104,4 +106,10 @@ BOOLEAN_DICT = {'Beacon':'ba', 'Probe':'pr', 'Low Data': 'ldata', 'High Data': '
                 'Control': 'ctrl', 'All': 'all','True':True, 'False':False, 'Default':'default', 'Best Effort': 'best-effort',
                 'Background': 'background', 'Voice': 'voice', 'Video': 'video'}
 
-DEPENDENCY_DICT = {'ap_g_radio_prof':'dot11g_prof', 'ap_a_radio_prof':'dot11a_prof','server_group':'dot1x_server_group'}
+DEPENDENCY_DICT = {'ap_g_radio_prof':'dot11g_prof', 
+                   'ap_a_radio_prof':'dot11a_prof',
+                   'server_group':'dot1x_server_group',
+                   'acl_sess':'role__acl',
+                   'acl_std':'role__acl',
+                   'acl_ext': 'role__acl',
+                   'ap_group':'loc'}
