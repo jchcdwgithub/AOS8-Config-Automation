@@ -1,5 +1,6 @@
 import string
 from tkinter import W
+from tkinter.font import names
 from webbrowser import get
 from xml.sax.xmlreader import AttributesImpl
 import requests
@@ -219,16 +220,22 @@ def build_profiles_from_ordered_list(ordered_profiles):
     for profile_name in profile_names:
       if len(profile_name.split(',')) < 2:
         node = DEFAULT_PATH
-        profile_name += f'_{profile_type}'
+        if '_prof' in profile_type:
+          profile_name += f'_{profile_type}'
       else:
         name,node = profile_name.split(',')
-        profile_name = name + profile_type
+        if '_prof' in profile_type:
+          profile_name = f'{name}_{profile_type}'
+        else:
+          profile_name = name
       suffixed_names.append(profile_name)
       current_profiles.append({'node':node})
 
     TABLE_COLUMNS[profile[0]] = suffixed_names
     for profile_attribute in profile:
       add_attributes_to_profiles(profile_attribute,TABLE_COLUMNS[profile_attribute],current_profiles)
+      remove_empty_objects_that_are_not_booleans(profile_attribute,TABLE_COLUMNS[profile_attribute],current_profiles)
+
     profiles.append(current_profiles)
 
   return profiles
@@ -313,11 +320,14 @@ def add_integer_attribute_to_profiles(full_attribute_name,attributes,profiles):
           profile[attribute_name] = attribute_value
       else:
         raise ValueError(f'Invalid value. Number not within acceptable range: {prof_name} {attribute_name}')
+    elif attribute == '':
+      continue
     else:
       raise ValueError(f'Attribute {attribute_name} in {prof_name} must be a number.')      
 
 def add_string_attribute_to_profiles(full_attribute_name,attributes,profiles):
   """ Add the string attributes to the provided profiles. """
+
   if len(full_attribute_name.split('.')) < 3:
     full_attribute_name += '.'
   
@@ -336,55 +346,90 @@ def add_string_attribute_to_profiles(full_attribute_name,attributes,profiles):
           raise ValueError(f'Invalid value {attribute} in {prof_name}. Fix and try again.')
   else:
     for profile,attribute in zip(profiles,attributes):
-      if is_valid_string_or_number(prof_name,attribute_name,attribute,property_name=property_name):
-        if property_name != '':
-         profile[attribute_name][property_name] = attribute
+      if attribute != '':
+        if is_valid_string_or_number(prof_name,attribute_name,attribute,property_name=property_name):
+          if property_name != '':
+           profile[attribute_name][property_name] = attribute
+          else:
+            profile[attribute_name] = attribute
         else:
-          profile[attribute_name] = attribute
-      else:
-        exit()
+          exit()
+
+def add_acls_to_role(full_attribute_name,profiles):
+  """Special function for handling roles and their associated ACLs. """
+  
+  acl_lists = TABLE_COLUMNS[f'{full_attribute_name}.pname']
+
+  for acl_list,profile in zip(acl_lists,profiles):
+    acls = acl_list.split(', ')
+    for acl in acls:
+      acl_type,pname = acl.split(' ')
+      profile['role__acl'].append({'pname':pname,'acl_type':acl_type}) 
 
 def add_array_attribute_to_profiles(full_attribute_name,profiles):
   """ Adds an array attribute to the profile. """
 
   prof_name,attribute_name = full_attribute_name.split('.')
-
+  
   for profile in profiles:
     profile[attribute_name] = []
+  if attribute_name == 'role__acl':
+    add_acls_to_role(full_attribute_name,profiles)
 
-  required_properties = get_required_properties(full_attribute_name)
+  else:
+    required_properties = get_required_properties(full_attribute_name)
   
-  for required_property in required_properties:
-    required_property_path = prof_name + '.' + attribute_name + '.' + required_property
-    property_type = get_array_property_type(full_attribute_name,required_property)
-    attributes = TABLE_COLUMNS[required_property_path]
+    for required_property in required_properties:
+      required_property_path = prof_name + '.' + attribute_name + '.' + required_property
+      property_type = get_array_property_type(full_attribute_name,required_property)
+      if required_property_path in TABLE_COLUMNS:
+        attributes = TABLE_COLUMNS[required_property_path]
 
-    if property_type == 'string' or property_type == 'integer':
-      for attribute,profile in zip(attributes,profiles):
-        attribute_value = None
-        attribute_was_list = False
-        possible_attribute_numbers = extract_numbers_from_attribute(attribute)
-        if len(possible_attribute_numbers) != 0:
-          attribute_was_list = True
-          for number in possible_attribute_numbers:
-            if is_valid_string_or_number_in_array(required_property_path,int(number),type=property_type):
-              attribute_value = int(number)
-              profile[attribute_name].append({required_property:attribute_value})
+        if property_type == 'string' or property_type == 'integer':
+          for attribute,profile in zip(attributes,profiles):
+            attribute_value = None
+            possible_attribute_numbers = extract_numbers_from_attribute(attribute)
+            if len(possible_attribute_numbers) != 0:
+              for number in possible_attribute_numbers:
+                if is_valid_string_or_number_in_array(required_property_path,int(number),type=property_type):
+                  attribute_value = int(number)
+                  profile[attribute_name].append({required_property:attribute_value})
+                else:
+                  raise ValueError(f'Invalid value. {required_property} is incorrectly configured.')
+            elif property_type == 'string' and is_enumerated_array_property(required_property_path):
+              try:
+               attribute_value = data_structures.BOOLEAN_DICT[attribute]
+              except KeyError:
+                print(f'Entry not in the BOOLEAN_DICT: Add {full_attribute_name}.{required_property}')
+                exit()
             else:
-              raise ValueError(f'Invalid value. {required_property} is incorrectly configured.')
-        elif property_type == 'string' and is_enumerated_array_property(required_property_path):
-          try:
-            attribute_value = data_structures.BOOLEAN_DICT[attribute]
-          except KeyError:
-            print(f'Entry not in the BOOLEAN_DICT: Add {full_attribute_name}.{required_property}')
-            exit()
-        else:
-          if is_valid_string_or_number_in_array(required_property_path,attribute):
-            attribute_value = attribute
-          else:
-            raise ValueError(f'Invalid value. {required_property} is incorrectly configured.')
-        if not attribute_was_list:
-          profile[attribute_name].append({required_property:attribute_value})
+              attribute_list = attribute.replace(' ','').split(',')
+              if len(attribute_list) > 1:
+                for attribute_item in attribute_list:
+                  if is_valid_string_or_number_in_array(required_property_path,attribute_item):
+                    profile[attribute_name].append({required_property:attribute_item})
+                  else:
+                    raise ValueError(f'Invalid value. {required_property} is incorrectly configured.')
+
+def remove_empty_objects_that_are_not_booleans(full_attribute_name,attributes,profiles):
+  """ Removes any attributes that were left empty in the table. """
+
+  attribute_type = ''
+  names = full_attribute_name.split('.')
+  prof_name = names[0]
+  attribute_name = names[1]
+  
+  if len(names) == 3 and get_attribute_type(f'{prof_name}.{attribute_name}') == 'array':
+    property_name = names[2]
+    attribute_type = get_array_property_type(f'{prof_name}.{attribute_name}',property_name)
+  else:    
+    attribute_type = get_attribute_type(f'{prof_name}.{attribute_name}')
+  
+  if attribute_type == 'object':
+    for attribute,profile in zip(attributes,profiles):
+      if attribute == '' and len(profile[attribute_name].keys()) == 0:
+        profile.pop(attribute_name)
+  
 
 def is_enumerated_array_property(full_attribute_name):
   """ Returns True if the array property is an enumeration. """
@@ -454,7 +499,8 @@ def add_object_attribute_to_profiles(full_attribute_name,attributes,profiles):
   else:
     for required_property in required_properties:
       required_property_path = full_attribute_name + '.' + required_property
-      add_attributes_to_profiles(required_property_path,TABLE_COLUMNS[required_property_path],profiles)
+      if required_property_path in TABLE_COLUMNS:
+        add_attributes_to_profiles(required_property_path,TABLE_COLUMNS[required_property_path],profiles)
 
 def get_attribute_properties(full_attribute_name):
   """ Returns a list of properties for the attribute or an empty list. """
@@ -671,13 +717,15 @@ def get_attribute_type(full_attribute_name):
 
 def extract_numbers_from_attribute(attribute):
   """ For integer attributes, remove any text that might have been included i.e. units like dBm. """
-
+  
+  has_letters = re.compile(r'[^\d]+')
   numbers = re.compile(r'\d+')
-  extract_numbers = numbers.findall(attribute)
-  if len(extract_numbers) == 0:
+  extracted_numbers = numbers.findall(attribute)
+  
+  if len(has_letters.findall(attribute)) != 0 or len(extracted_numbers) == 0:
     return []
   else:
-    return extract_numbers
+    return extracted_numbers
 
 def is_nested_profile(profile_attribute):
   """ If an attribute points to another profile then it is a nested profile. Returns True or False. """
@@ -1389,11 +1437,13 @@ def add_node_info_to_profile_name(node_column, table_columns):
   """ Adds the node information to the profile names in the table. """
   
   for column in table_columns:
+    node_info_added = False
     for attribute in data_structures.COL_TO_ATTR[column.cells[0].text]:
       attribute_name = attribute.split('.')[0]
-      if attribute == OBJECT_IDENTIFIERS[attribute_name]:
+      if attribute == OBJECT_IDENTIFIERS[attribute_name] and not node_info_added:
         for profile,node in zip(column.cells[1:],node_column):
           profile.text += ',' + node.text
+        node_info_added = True
   
   return table_columns
   
@@ -1414,12 +1464,17 @@ def add_dependency_to_profiles_to_be_configured(current_profile,other_profile,pr
   """ Adds the dynamic profiles to profiles to be configured. """
 
   profile_name = ''
-  other_profile_identifier = get_object_identifier(other_profile)
+  other_profile_identifier = OBJECT_IDENTIFIERS[other_profile].split('.')[1]
 
   if other_profile in data_structures.DEPENDENCY_DICT.keys():
-    profile_name = f'{data_structures.DEPENDENCY_DICT[other_profile]}.{other_profile_identifier}'
+    profile_name = f'{data_structures.DEPENDENCY_DICT[other_profile]}.'
   else:
-    profile_name = f'{other_profile}.{other_profile_identifier}'
+    profile_name = f'{other_profile}.'
+  
+  if other_profile_identifier in data_structures.DEPENDENCY_DICT.keys():
+    profile_name += data_structures.DEPENDENCY_DICT[other_profile_identifier]
+  else:
+    profile_name += other_profile_identifier
 
   profiles_to_be_configured[current_profile].append(profile_name)  
 

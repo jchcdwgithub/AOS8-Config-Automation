@@ -20,7 +20,7 @@ COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.pro
                "PC Jumbo Frames":['int_pc.int_pc_jumbo'],
                "PC Description":['int_pc.channel_int_desc.LINE'],
                "Loopback Interface":['int_loop.int_loop_ip.ipaddr'],
-               "VLAN Name":['vlan_name_id.name','vlan_name.name'],
+               "VLAN Name":['vlan_name.name'],
                "VLAN Associated IDs":['vlan_name_id.vlan-ids'],
                "IP Route":['ip_route.destip'],
                "Interface VLAN ID":['int_vlan.id'],
@@ -81,6 +81,7 @@ COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.pro
                "Netdest Network Names":['netdst.netdst__name.host_name'],
                "Role":['role.rname'],
                "Role ACLs":['role.role__acl.pname'],
+               "Role VLAN":['role.role__vlan.vlanstr'],
                "Role CP Profile":['role.role__cp.cp_profile_name'],
                "2.4 GHz Minimum": ["ap_g_radio_prof.eirp_min.eirp-min"],
                "2.4 GHz Maximum": ["ap_g_radio_prof.eirp_max.eirp-max"],
@@ -99,7 +100,8 @@ COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.pro
                "WMM EAP AC":["ssid_prof.wmm_eap_ac.wmm_ac"],
                "QoS Profile":["wlan_qos_prof.profile-name"],
                "QoS BW Allocation VAP":["wlan_qos_prof.bw_alloc.virtual-ap"],
-               "QoS BW Allocation Share":["wlan_qos_prof.bw_alloc.share"]
+               "QoS BW Allocation Share":["wlan_qos_prof.bw_alloc.share"],
+               "ESSID":["ssid.essid.essid"]
 }
 
 BOOLEAN_DICT = {'Beacon':'ba', 'Probe':'pr', 'Low Data': 'ldata', 'High Data': 'hdata', 'Management':'mgmt',
@@ -112,4 +114,5 @@ DEPENDENCY_DICT = {'ap_g_radio_prof':'dot11g_prof',
                    'acl_sess':'role__acl',
                    'acl_std':'role__acl',
                    'acl_ext': 'role__acl',
-                   'ap_group':'loc'}
+                   'ap_group':'loc',
+                   'accname':'pname'}
