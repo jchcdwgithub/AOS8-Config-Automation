@@ -654,3 +654,91 @@ def test_get_api_endpoints_returns_correct_list_of_endpoints():
     generated = CA.get_list_of_api_endpoints(ordered_profiles)
 
     assert expected == generated
+
+def test_add_src_dst_values_to_ace_object_adds_host_correctly():
+
+    ace_values = ['host','1.1.1.1','192.168.1.1']
+    ace_object = {}
+
+    expected = {'src':'shost','sipaddr':'1.1.1.1'}
+
+    CA.add_src_dst_values_to_ace_object(ace_values,ace_object,'s')
+
+    assert expected == ace_object
+
+def test_add_src_dst_values_to_ace_object_adds_network_correctly():
+
+    ace_values = ['192.168.1.1/29','other_value']
+    ace_object = {}
+
+    expected = {'src':'snetwork','snetwork':'192.168.1.1','snetmask':'255.255.255.248'}
+
+    CA.add_src_dst_values_to_ace_object(ace_values,ace_object,'s')
+
+    assert expected == ace_object
+
+def test_add_src_dst_values_to_ace_object_adds_any_source_correctly():
+
+    ace_values = ['any','other_value']
+    ace_object = {}
+
+    expected = {'src':'sany','sany':True}
+
+    CA.add_src_dst_values_to_ace_object(ace_values,ace_object,'s')
+
+    assert expected == ace_object
+
+def test_add_src_dst_values_to_ace_object_adds_role_source_correctly():
+
+    ace_values = ['role','CP-logon-role','other_value']
+    ace_object = {}
+
+    expected = {'src':'suserrole','surname':'CP-logon-role'}
+
+    CA.add_src_dst_values_to_ace_object(ace_values,ace_object,'s')
+
+    assert expected == ace_object
+
+def test_add_src_dst_values_to_ace_object_adds_alias_source_correctly():
+
+    ace_values = ['alias','CP-net-dest','other_value']
+    ace_object = {}
+
+    expected = {'src':'salias','srcalias':'CP-net-dest'}
+
+    CA.add_src_dst_values_to_ace_object(ace_values,ace_object,'s')
+
+    assert expected == ace_object
+
+def test_add_src_dst_values_to_ace_object_adds_user_source_correctly():
+
+    ace_values = ['user','CP-net-dest','other_value']
+    ace_object = {}
+
+    expected = {'src':'suser','suser':True}
+
+    CA.add_src_dst_values_to_ace_object(ace_values,ace_object,'s')
+
+    assert expected == ace_object
+
+def test_add_action_values_to_acl_adds_permit_action_correctly():
+
+    ace_values = ['permit', 'other_value']
+    ace_object = {}
+
+    expected = {'permit':True, 'action':'permit'}
+
+    CA.add_action_values_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_action_values_to_acl_adds_deny_action_correctly():
+
+    ace_values = ['deny', 'other_value']
+    ace_object = {}
+
+    expected = {'deny':True, 'action':'deny'}
+
+    CA.add_action_values_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object

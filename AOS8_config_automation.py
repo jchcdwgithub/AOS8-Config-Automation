@@ -1,12 +1,16 @@
+from fnmatch import translate
+from optparse import Values
 import string
 from tkinter import W
 from tkinter.font import names
+from turtle import pos
 from webbrowser import get
 from xml.sax.xmlreader import AttributesImpl
 import requests
 import ex_tokens 
 import json
 import re
+import math
 import urllib3
 import setup
 import data_structures
@@ -24,6 +28,7 @@ CONFIG_HISTORY = []
 
 TABLE_COLUMNS = {}
 OBJECT_IDENTIFIERS = {}
+SPECIAL_COLUMNS = {'VLAN Name','5 GHz Channel Width','Role ACLs','ACEs'}
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -354,6 +359,337 @@ def add_string_attribute_to_profiles(full_attribute_name,attributes,profiles):
             profile[attribute_name] = attribute
         else:
           exit()
+
+def build_session_acl_object():
+  """ Build session ACL objects from the TABLE_COLUMN dictionary. """
+
+  acl_objects = []
+
+  acl_names = TABLE_COLUMNS['acl_sess.accname']
+  aces_list = TABLE_COLUMNS['acl_sess.acl_sess__v4policy']
+  for acl_name,aces in zip(acl_names,aces_list):
+    current_acl_object = {'accname':acl_name, 'acc_sess__v4policy':[]}
+    add_entries_to_session_acl(aces,current_acl_object['acl_sess__v4policy'])
+    acl_objects.append(current_acl_object)
+  
+  return acl_objects
+
+def add_entries_to_session_acl(aces,acl):
+  """ Add the ace to the ACL """
+  
+  for ace in aces:
+    acl.append(translate_ace_to_api_values(ace))
+  
+def translate_ace_to_api_values(ace):
+  """ Given a typical ACE i.e. user any alias internal-networks any deny, extract the information and translate it to API specific values. """
+  
+  ace_values = ace.split(' ')
+  
+  ace_object = {}
+
+  ace_values = add_src_dst_values_to_ace_object(ace_values,ace_object,'s')
+  ace_values = add_src_dst_values_to_ace_object(ace_values,ace_object,'d')
+  ace_values = add_service_to_ace_object(ace_values,ace_object)
+  ace_values = add_action_values_to_ace_object(ace_values,ace_object)
+  ace_values = add_extended_action_values_to_ace_object(ace_values,ace_object)
+
+  return ace_object
+
+def add_src_dst_values_to_ace_object(ace_values,ace_object,src_dst):
+  """ Given a list of ACE values, extract the source information, add them to the ace_object and return a truncated list of ACE values. """
+  src_value = ace_values[0]
+  values_to_remove = 1
+
+  if src_value == 'host':
+    values_to_remove += 1
+    if is_valid_ip_address(ace_values[values_to_remove-1]):
+      ace_object[f'{src_dst}ipaddr'] = ace_values[values_to_remove-1]
+      ace_object['src'] = f'{src_dst}host'
+    else:
+      print("Invalid host IP address for source value in ACE. Fix and try again.")
+      exit()
+  elif src_value == 'user':
+    ace_object['src'] = f'{src_dst}user'
+    ace_object[f'{src_dst}user'] = True
+  elif src_value == 'any':
+    ace_object['src'] = f'{src_dst}any'
+    ace_object[f'{src_dst}any'] = True
+  elif src_value == 'alias':
+    ace_object['src'] = f'{src_dst}alias'
+    alias_prefix = 'src' if src_dst == 's' else 'dst'
+    ace_object[f'{alias_prefix}alias'] = ace_values[values_to_remove]
+    values_to_remove += 1
+  elif src_value == 'role':
+    ace_object['src'] = f'{src_dst}userrole'
+    ace_object[f'{src_dst}urname'] = ace_values[values_to_remove]
+    values_to_remove += 1
+  elif src_value == 'localip':
+    ace_object['src'] = f'{src_dst}localip'
+    ace_object[f'{src_dst}localip'] = True
+  elif len(src_value.split('.')) == 4:
+    ipaddr,netmask = src_value.split('/')
+    if is_valid_ip_address(ipaddr):
+      ace_object['src'] = f'{src_dst}network'
+      ace_object[f'{src_dst}network'] = ipaddr 
+      ace_object[f'{src_dst}netmask'] = convert_subnetmask(netmask)
+    else:
+      print('IP and or netmask not valid for source value in ACE. Aborting ...')
+      exit()
+  else:
+    print('Invalid entry for source value in ACE. Fix and try again.')
+    exit()
+  
+  return ace_values[values_to_remove]
+
+def is_valid_ip_address(ipaddress):
+  """ An IP address should be four integers separated by periods. """
+  octets = ipaddress.split('.')
+  for octet in octets:
+    if octet.isdigit():
+      octet_value = int(octet)
+      if octet_value < 0 or octet_value > 255:
+        return False
+    else:
+      return False
+  
+  return True
+
+def convert_subnetmask(ipsubmask):
+  """ Given a number between 1 and 32, convert to the decimal mask value. """
+
+  octet_values = ['128','192','224','240','248','252','254','255']
+
+  if ipsubmask.isdigit():
+    subnet_number = int(ipsubmask)
+    if subnet_number > 1 and subnet_number <= 32:
+      iterations = math.ceil(subnet_number/8)
+      netmask_string = ''
+      while subnet_number > 0:
+        if subnet_number <= 8:
+          if netmask_string == '':
+            netmask_string = f'{octet_values[subnet_number-1]}'
+          else:
+            netmask_string += f'.{octet_values[subnet_number-1]}'
+          subnet_number -= subnet_number
+        else:
+          subnet_number -= 8
+          if netmask_string == '':
+            netmask_string = f'255'
+          else:
+            netmask_string += '.255'
+      number_of_octets_added = len(netmask_string.split('.'))
+      if number_of_octets_added < 4:
+        iterations = 4 - number_of_octets_added
+        while iterations > 0:
+          netmask_string += '.0'
+          iterations -= 1
+      return netmask_string
+    else:
+      print("Subnet mask must be between 1 and 32. Fix and try again.")
+      exit()
+  else:
+    print("Invalid value for subnet mask. Must be a number between 1 and 32. Fix and try again.")
+
+def add_action_values_to_ace_object(ace_values,ace_object):
+  """ Adds the action values to the ace object and returns the ace_values without the consumed action values. """
+
+  action_value = ace_values[0]
+  values_to_remove = 1
+
+  if action_value == 'permit' or action_value == 'deny':
+    ace_object[action_value] = True
+    ace_object['action'] = action_value
+  elif action_value == 'dst-nat':
+    ace_object['action'] = action_value
+    if ace_values[values_to_remove] == 'ip':
+      ipaddr = ace_values[values_to_remove+1]
+      if is_valid_ip_address(ipaddr):
+        ace_object['dnatip'] = ace_values[values_to_remove+1]
+        values_to_remove += 2
+      else:
+        print(f'Not a valid destination NAT IP:{ipaddr}. Fix and try again.')
+        exit()
+      if values_to_remove < len(ace_values):
+        if ace_values[values_to_remove].isdigit():
+          port_number = int(ace_values[values_to_remove])
+          if port_number > 0 and port_number <= 65535:
+            ace_object['dnatport'] = port_number
+            values_to_remove += 1
+          else:
+            print('Port number must be between 0 and 65535. Fix and try again.')
+            exit()
+      else:
+        return []
+    elif ace_values[values_to_remove] == 'name':
+      ace_object['dnathostname'] = ace_values[values_to_remove+1]
+      values_to_remove += 2
+    else:
+      print("Destination NAT must specify an ip or name. Fix and try again.")
+      exit()
+  elif action_value == 'src-nat':
+    ace_object['action'] = action_value
+    ace_object['src-nat'] = True
+    if values_to_remove < len(ace_values):
+      if ace_values[values_to_remove] == 'pool':
+        ace_object['poolname'] = ace_values[values_to_remove]
+        values_to_remove += 1
+  elif action_value == 'redirect':
+    ace_object['action'] = 'redir_opt'
+    redir_opt = ace_values[values_to_remove]
+    values_to_remove += 1
+    if redir_opt == 'tunnel':
+      tunnel_id = ace_values[values_to_remove]
+      if tunnel_id.isdigit():
+        tunnel_id = int(tunnel_id)
+        if tunnel_id > 1 and tunnel_id <= 500:
+          ace_object['tunid'] = tunnel_id
+          ace_object['redir_opt'] = redir_opt
+          values_to_remove += 1
+      else:
+        print('Redirect tunnel ID must be a number. Fix and try again.')
+        exit()
+    elif redir_opt == 'tunnel-group':
+      ace_object['redir_opt'] = redir_opt
+      ace_object['tungrpname'] = ace_values[values_to_remove]
+      values_to_remove += 1
+    elif redir_opt == 'group':
+      ace_object['redir_opt'] = 'esi-group'
+      ace_object['group'] = ace_values[values_to_remove]
+      values_to_remove += 1
+      if values_to_remove < len(ace_values):
+        poss_direction = ace_values[values_to_remove]
+        if poss_direction == 'direction':
+          values_to_remove += 1
+          if values_to_remove < len(ace_values):
+            direction = ace_values[values_to_remove]
+            if direction in ["forward","reverse","both"]:
+              ace_object["dir"] = direction
+              values_to_remove += 1
+            else:
+              print('Invalid value for direction: use forward, reverse or both. Fix and try again.')
+              exit()
+          else:
+            print("Must specify forward, reverse or both after direction. Fix and try again.")
+            exit()
+  else:
+    print("Invalid action. Specify permit, deny, redirect, src-nat or dst-nat.")
+      
+  if values_to_remove == len(ace_values):
+    return []
+  else:
+    return ace_values[values_to_remove:]    
+
+def add_service_to_ace_object(ace_values,ace_object):
+  """ Adds the service or protocol values to the ace_object. """
+
+  ace_object['service_app'] = 'service'
+  values_to_remove = 1
+  proto_or_service = ace_values[0]
+  
+  if proto_or_service == 'udp' or proto_or_service == 'tcp':
+    ace_object['svc'] = 'tcp_udp'
+    ace_object['proto'] = proto_or_service
+    proto = ace_values[values_to_remove]
+    if proto.isdigit():
+      proto = int(proto)
+      if proto > 1 and proto <= 255:
+        ace_object['port'] = 'range'
+        ace_object['port1'] = proto
+        values_to_remove += 1
+        poss_port_range = ace_values[values_to_remove]
+        if poss_port_range.isdigit():
+          poss_port_range = int(poss_port_range)
+          if poss_port_range > 1 and poss_port_range <= 255:
+            if poss_port_range < proto:
+              ace_object['port2'] = poss_port_range
+              values_to_remove += 1
+            else:
+              print('Second port value must be smaller than first port value. Fix and try again.')
+              exit()
+          else:
+            print("Ports must be from 1 to 255. Fix and try again.")
+            exit()
+        else:
+          print("Port must be from 1 to 255. Fix and try again.")
+      else:
+        print("Port must be a number from 1 to 255. Fix and try again.")
+    else:
+      print("Port number or range must be specified.")
+  elif proto_or_service == 'any':
+    ace_object['service-any'] = True
+    ace_object['svc'] = 'service-any'
+  elif proto_or_service == 'service':
+    ace_object['svc'] = 'service-name'
+    #double check that service exists on the network.
+    ace_object['service-name'] = ace_values[values_to_remove]
+  elif proto_or_service == 'icmp':
+    #fill in later.
+    print('icmp.')
+  else:
+    print('Invalid service keyword. Choose from tcp, udp, protocol, icmp, service or any.')
+    exit()
+  
+  return ace_values[values_to_remove:]
+
+def add_extended_action_values_to_ace_object(ace_values,ace_object):
+  """ Add the extended actions to the ace object. """
+  allowed_extended_actions = set(['blacklist','prio8021p','disable-scanning','tos','time-range','queue','log','mirror'])
+  
+  ext_action = ace_values[0]
+  current_index = 1
+
+  if ext_action not in allowed_extended_actions:
+    print("Invalid extended action specified. Allowed are blacklist, prio8021p, disable-scanning, tos, time-range, queue, log, mirror")
+  else:
+    if ext_action == 'time-range':
+      ace_object['trname'] = ace_values[current_index]
+      if current_index < len(ace_values):
+        return add_extended_action_values_to_ace_object(ace_values[current_index:],ace_object)
+    elif ext_action == 'queue':
+      ace_object['queue'] = True
+      option = ace_values[current_index]
+      if option == 'high' or option == 'low':
+        ace_object['queue-type'] = option
+      else:
+        print("Queue must be specified as high or low. Fix and try again.")
+        exit()
+      current_index += 1
+      if current_index < len(ace_values):
+        return add_extended_action_values_to_ace_object(ace_values[current_index:],ace_object)
+    elif ext_action == 'tos':
+      tos_value = ace_values[current_index]
+      if tos_value.isdigit():
+        tos = int(tos_value)
+        if tos >= 0 and tos <= 63:
+         ace_object['tosstr'] = tos
+        else:
+          print("TOS value must be between 0 and 63 inclusive. Fix and try again.")
+          exit()
+        current_index += 1
+      else:
+        print('TOS value must be a number between 0 and 63 inclusive. Fix and try again.')
+        exit()
+      if current_index < len(ace_values):
+        return add_extended_action_values_to_ace_object(ace_values[current_index:],ace_object)
+    elif ext_action == '802.1p':
+      dot1p_value = ace_values[current_index]
+      if dot1p_value.isdigit():
+        dot1p = int(dot1p_value)
+        if dot1p >= 0 and dot1p <= 7:
+          ace_object['prio8021p'] = dot1p
+        else:
+          print("802.1p value must be between 0 and 7. Fix and try again.")
+          exit()
+        if current_index < len(ace_values):
+          return add_extended_action_values_to_ace_object(ace_values[current_index:],ace_object)
+      else:
+        print("802.1p value must be a number between 0 and 7. Fix and try again.")
+        exit()
+    else:
+      ace_object[ext_action] = True
+      current_index += 1
+      if current_index < len(ace_values):
+        return add_extended_action_values_to_ace_object(ace_values[current_index:],ace_object)
 
 def add_acls_to_role(full_attribute_name,profiles):
   """Special function for handling roles and their associated ACLs. """
