@@ -397,10 +397,14 @@ def translate_ace_to_api_values(ace):
 
 def add_src_dst_values_to_ace_object(ace_values,ace_object,src_dst):
   """ Given a list of ACE values, extract the source information, add them to the ace_object and return a truncated list of ACE values. """
+  allowed_values = set(['host','user','alias','network','role','localip','any'])
   src_value = ace_values[0]
   values_to_remove = 1
 
-  if src_value == 'host':
+  if src_value not in allowed_values:
+    print('Invalid entry for source value in ACE. Fix and try again.')
+    exit()
+  elif src_value == 'host':
     values_to_remove += 1
     if is_valid_ip_address(ace_values[values_to_remove-1]):
       ace_object[f'{src_dst}ipaddr'] = ace_values[values_to_remove-1]
@@ -426,20 +430,19 @@ def add_src_dst_values_to_ace_object(ace_values,ace_object,src_dst):
   elif src_value == 'localip':
     ace_object['src'] = f'{src_dst}localip'
     ace_object[f'{src_dst}localip'] = True
-  elif len(src_value.split('.')) == 4:
-    ipaddr,netmask = src_value.split('/')
-    if is_valid_ip_address(ipaddr):
-      ace_object['src'] = f'{src_dst}network'
-      ace_object[f'{src_dst}network'] = ipaddr 
-      ace_object[f'{src_dst}netmask'] = convert_subnetmask(netmask)
-    else:
-      print('IP and or netmask not valid for source value in ACE. Aborting ...')
-      exit()
   else:
-    print('Invalid entry for source value in ACE. Fix and try again.')
-    exit()
+    if len(ace_values[values_to_remove].split('.')) == 4:
+      ipaddr,netmask = ace_values[values_to_remove].split('/')
+      if is_valid_ip_address(ipaddr):
+        ace_object['src'] = f'{src_dst}network'
+        ace_object[f'{src_dst}network'] = ipaddr 
+        ace_object[f'{src_dst}netmask'] = convert_subnetmask(netmask)
+        values_to_remove += 1
+      else:
+        print('IP and or netmask not valid for source value in ACE. Aborting ...')
+        exit()
   
-  return ace_values[values_to_remove]
+  return ace_values[values_to_remove:]
 
 def is_valid_ip_address(ipaddress):
   """ An IP address should be four integers separated by periods. """

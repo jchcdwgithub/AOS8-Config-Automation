@@ -102,7 +102,7 @@ COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.pro
                "QoS Profile":["wlan_qos_prof.profile-name"],
                "QoS BW Allocation VAP":["wlan_qos_prof.bw_alloc.virtual-ap"],
                "QoS BW Allocation Share":["wlan_qos_prof.bw_alloc.share"],
-               "ESSID":["ssid.essid.essid"]
+               "ESSID":["ssid_prof.profile-name","ssid_prof.essid.essid"]
 }
 
 BOOLEAN_DICT = {'Beacon':'ba', 'Probe':'pr', 'Low Data': 'ldata', 'High Data': 'hdata', 'Management':'mgmt',

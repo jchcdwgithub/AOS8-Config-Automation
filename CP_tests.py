@@ -67,6 +67,7 @@ def test_get_profiles_to_be_configured_returns_correct_dictionary():
                 "reg_domain_prof":["profile-name","valid_11b_channels","valid_11a_channels","valid_11a_40mhz_chan_nd","valid_11a_80mhz_chan_nd"],
                 "ssid_prof":["profile-name","g_basic_rates","g_tx_rates","a_basic_rates","a_tx_rates"]}
     
+    CA.add_entries_to_object_identifiers()
     generated = CA.get_profiles_to_be_configured()
 
     assert expected == generated
@@ -444,6 +445,7 @@ def test_add_object_attribute_to_profiles_correctly_adds_an_enumerated_string_co
     profiles = [{}]
     attributes = ['Voice']
 
+    CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(Document('../Extension Testing Tables.docx').tables)
     CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
@@ -456,6 +458,7 @@ def test_add_object_attribute_to_profiles_adds_string_to_object_attribute():
     profiles = [{}]
     attributes = ['https://www.google.com']
 
+    CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(Document('../Extension Testing Tables.docx').tables)
     CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
@@ -552,6 +555,7 @@ def test_add_array_attribute_correctly_adds_attributes():
 
     full_attribute_name = "wlan_qos_prof.bw_alloc"
 
+    CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(Document('../Extension Testing Tables.docx').tables)
 
     profiles = [{}]
@@ -580,6 +584,7 @@ def test_profile_is_an_attribute_of_current_profile_returns_false_for_nonpropert
 
 def test_add_dependencies_to_table_columns_dict_adds_dependent_profiles():
 
+    CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(Document('../Radio Testing Tables.docx').tables)
     profiles = CA.get_profiles_to_be_configured()
     CA.build_profiles_dependencies(profiles)
@@ -592,15 +597,15 @@ def test_add_dependencies_to_table_columns_dict_adds_dependent_profiles():
                 "ap_g_radio_prof.eirp_max.eirp-max":["7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm"],
                 "ap_a_radio_prof.eirp_min.eirp-min":["6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm"],
                 "ap_a_radio_prof.eirp_max.eirp-max":["10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm"],
-                "reg_domain_prof.valid_11b_channels":["1, 6, 11", "1,6,11", "1, 6, 11", "1, 6, 11", "1, 6, 11", "1, 6, 11"],
-                "reg_domain_prof.valid_11a_channels":["36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 149, 153, 157, 161,165" ],
-                "reg_domain_prof.valid_11a_40mhz_chan_nd":["20 MHz", "20 MHz", "20 MHz", "20 MHz", "20 MHz", "80 MHz"],
-                "reg_domain_prof.valid_11a_80mhz_chan_nd":["20 MHz", "20 MHz", "20 MHz", "20 MHz", "20 MHz", "80 MHz"],
+                "reg_domain_prof.valid_11b_channels.valid-11b-channels":["1, 6, 11", "1,6,11", "1, 6, 11", "1, 6, 11", "1, 6, 11", "1, 6, 11"],
+                "reg_domain_prof.valid_11a_channels.valid-11a-channels":["36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 149, 153, 157, 161,165" ],
                 "ssid_prof.profile-name":["ChoiceAccess", "CorpAccess", "CorpTest", "GuestAccess", "MobiAccess"],
+                "ssid_prof.essid.essid":["ChoiceAccess", "CorpAccess", "CorpTest", "GuestAccess", "MobiAccess"],
                 "ssid_prof.g_basic_rates":["12", "12", "12", "12", "12"],
                 "ssid_prof.g_tx_rates":["12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54"],
                 "ssid_prof.a_basic_rates":["12", "12", "12, 24", "12", "12"],
                 "ssid_prof.a_tx_rates":["12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54"],
+                "ap_group.profile-name":["CGR_ap_group","DEP_ap_group","KFD_ap_group","PWK_ap_group","SIG_ap_group","Test_ap_group"],
                 "ap_group.dot11g_prof.profile-name":["CGR_ap_g_radio_prof","DEP_ap_g_radio_prof","KFD_ap_g_radio_prof","PWK_ap_g_radio_prof","SIG_ap_g_radio_prof","Test_ap_g_radio_prof"],
                 "ap_group.dot11a_prof.profile-name":["CGR_ap_a_radio_prof","DEP_ap_a_radio_prof","KFD_ap_a_radio_prof","PWK_ap_a_radio_prof","SIG_ap_a_radio_prof","Test_ap_a_radio_prof"],
                 "ap_group.reg_domain_prof.profile-name":["CGR_reg_domain_prof","DEP_reg_domain_prof","KFD_reg_domain_prof","PWK_reg_domain_prof","SIG_reg_domain_prof","Test_reg_domain_prof"]}
@@ -609,6 +614,7 @@ def test_add_dependencies_to_table_columns_dict_adds_dependent_profiles():
 
 def test_add_dependencies_to_table_columns_dict_adds_new_profiles_to_profiles_to_be_configured():
 
+    CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(Document('../Radio Testing Tables.docx').tables)
     profiles = CA.get_profiles_to_be_configured()
     CA.build_profiles_dependencies(profiles)
@@ -617,6 +623,7 @@ def test_add_dependencies_to_table_columns_dict_adds_new_profiles_to_profiles_to
 
 def test_build_ordered_configuration_list_builds_list_correctly():
 
+    CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(Document('../Radio Testing Tables.docx').tables)
     profiles = CA.get_profiles_to_be_configured()
     CA.build_profiles_dependencies(profiles)
@@ -668,7 +675,7 @@ def test_add_src_dst_values_to_ace_object_adds_host_correctly():
 
 def test_add_src_dst_values_to_ace_object_adds_network_correctly():
 
-    ace_values = ['192.168.1.1/29','other_value']
+    ace_values = ['network', '192.168.1.1/29','other_value']
     ace_object = {}
 
     expected = {'src':'snetwork','snetwork':'192.168.1.1','snetmask':'255.255.255.248'}
