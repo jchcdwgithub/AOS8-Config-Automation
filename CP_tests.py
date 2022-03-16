@@ -22,15 +22,15 @@ def test_get_columns_from_tables_returns_all_columns():
     expected = {"ap_g_radio_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
                 "ap_a_radio_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
                 "reg_domain_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
+                "ap_group.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
                 "ap_g_radio_prof.eirp_min.eirp-min":["3 dBm", "3 dBm", "3 dBm", "3 dBm", "3 dBm", "3 dBm"],
                 "ap_g_radio_prof.eirp_max.eirp-max":["7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm"],
                 "ap_a_radio_prof.eirp_min.eirp-min":["6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm"],
                 "ap_a_radio_prof.eirp_max.eirp-max":["10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm"],
-                "reg_domain_prof.valid_11b_channels":["1, 6, 11", "1,6,11", "1, 6, 11", "1, 6, 11", "1, 6, 11", "1, 6, 11"],
-                "reg_domain_prof.valid_11a_channels":["36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 149, 153, 157, 161,165" ],
-                "reg_domain_prof.valid_11a_40mhz_chan_nd":["20 MHz", "20 MHz", "20 MHz", "20 MHz", "20 MHz", "80 MHz"],
-                "reg_domain_prof.valid_11a_80mhz_chan_nd":["20 MHz", "20 MHz", "20 MHz", "20 MHz", "20 MHz", "80 MHz"],
+                "reg_domain_prof.valid_11b_channel.valid-11g-channel":["1, 6, 11", "1,6,11", "1, 6, 11", "1, 6, 11", "1, 6, 11", "1, 6, 11"],
+                "reg_domain_prof.valid_11a_channel.valid-11a-channel":["36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 149, 153, 157, 161,165" ],
                 "ssid_prof.profile-name":["ChoiceAccess", "CorpAccess", "CorpTest", "GuestAccess", "MobiAccess"],
+                "ssid_prof.essid.essid":["ChoiceAccess", "CorpAccess", "CorpTest", "GuestAccess", "MobiAccess"],
                 "ssid_prof.g_basic_rates":["12", "12", "12", "12", "12"],
                 "ssid_prof.g_tx_rates":["12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54"],
                 "ssid_prof.a_basic_rates":["12", "12", "12, 24", "12", "12"],
@@ -52,6 +52,7 @@ def test_build_tables_columns_dict_builds_comma_separated_name_node_pairs():
                 "ap_a_radio_prof.eirp_min.eirp-min":["11 dBm", "8 dBm", "11 dBm", "11 dBm"],
                 "ap_a_radio_prof.eirp_max.eirp-max":["17 dBm", "14 dBm", "16 dBm", "14 dBm"]}
     
+    CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(tables)
 
     assert expected == CA.TABLE_COLUMNS
@@ -60,12 +61,14 @@ def test_get_profiles_to_be_configured_returns_correct_dictionary():
     """ Given the above test tables, get the names and attributes of profiles to be configured. """
 
     tables = Document('../Radio Testing Tables.docx').tables
+    CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(tables)
 
     expected = {"ap_g_radio_prof":["profile-name","eirp_min.eirp-min","eirp_max.eirp-max"],
                 "ap_a_radio_prof":["profile-name","eirp_min.eirp-min","eirp_max.eirp-max"],
-                "reg_domain_prof":["profile-name","valid_11b_channels","valid_11a_channels","valid_11a_40mhz_chan_nd","valid_11a_80mhz_chan_nd"],
-                "ssid_prof":["profile-name","g_basic_rates","g_tx_rates","a_basic_rates","a_tx_rates"]}
+                "ap_group":["profile-name"],
+                "reg_domain_prof":["profile-name","valid_11b_channel.valid-11g-channel","valid_11a_channel.valid-11a-channel"],
+                "ssid_prof":["profile-name","essid.essid","g_basic_rates","g_tx_rates","a_basic_rates","a_tx_rates"]}
     
     CA.add_entries_to_object_identifiers()
     generated = CA.get_profiles_to_be_configured()
@@ -592,20 +595,19 @@ def test_add_dependencies_to_table_columns_dict_adds_dependent_profiles():
     expected = {"ap_g_radio_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
                 "ap_a_radio_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
                 "reg_domain_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
-                "ap_group.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
                 "ap_g_radio_prof.eirp_min.eirp-min":["3 dBm", "3 dBm", "3 dBm", "3 dBm", "3 dBm", "3 dBm"],
                 "ap_g_radio_prof.eirp_max.eirp-max":["7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm"],
                 "ap_a_radio_prof.eirp_min.eirp-min":["6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm"],
                 "ap_a_radio_prof.eirp_max.eirp-max":["10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm"],
-                "reg_domain_prof.valid_11b_channels.valid-11b-channels":["1, 6, 11", "1,6,11", "1, 6, 11", "1, 6, 11", "1, 6, 11", "1, 6, 11"],
-                "reg_domain_prof.valid_11a_channels.valid-11a-channels":["36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 149, 153, 157, 161,165" ],
+                "reg_domain_prof.valid_11b_channel.valid-11g-channel":["1, 6, 11", "1,6,11", "1, 6, 11", "1, 6, 11", "1, 6, 11", "1, 6, 11"],
+                "reg_domain_prof.valid_11a_channel.valid-11a-channel":["36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 149, 153, 157, 161,165" ],
                 "ssid_prof.profile-name":["ChoiceAccess", "CorpAccess", "CorpTest", "GuestAccess", "MobiAccess"],
                 "ssid_prof.essid.essid":["ChoiceAccess", "CorpAccess", "CorpTest", "GuestAccess", "MobiAccess"],
                 "ssid_prof.g_basic_rates":["12", "12", "12", "12", "12"],
                 "ssid_prof.g_tx_rates":["12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54"],
                 "ssid_prof.a_basic_rates":["12", "12", "12, 24", "12", "12"],
                 "ssid_prof.a_tx_rates":["12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54"],
-                "ap_group.profile-name":["CGR_ap_group","DEP_ap_group","KFD_ap_group","PWK_ap_group","SIG_ap_group","Test_ap_group"],
+                "ap_group.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
                 "ap_group.dot11g_prof.profile-name":["CGR_ap_g_radio_prof","DEP_ap_g_radio_prof","KFD_ap_g_radio_prof","PWK_ap_g_radio_prof","SIG_ap_g_radio_prof","Test_ap_g_radio_prof"],
                 "ap_group.dot11a_prof.profile-name":["CGR_ap_a_radio_prof","DEP_ap_a_radio_prof","KFD_ap_a_radio_prof","PWK_ap_a_radio_prof","SIG_ap_a_radio_prof","Test_ap_a_radio_prof"],
                 "ap_group.reg_domain_prof.profile-name":["CGR_reg_domain_prof","DEP_reg_domain_prof","KFD_reg_domain_prof","PWK_reg_domain_prof","SIG_reg_domain_prof","Test_reg_domain_prof"]}
@@ -635,15 +637,14 @@ def test_build_ordered_configuration_list_builds_list_correctly():
                 "ap_a_radio_prof.eirp_min.eirp-min",
                 "ap_a_radio_prof.eirp_max.eirp-max"],
                 ["reg_domain_prof.profile-name",
-                "reg_domain_prof.valid_11b_channels",
-                "reg_domain_prof.valid_11a_channels",
-                "reg_domain_prof.valid_11a_40mhz_chan_nd",
-                "reg_domain_prof.valid_11a_80mhz_chan_nd"],
+                "reg_domain_prof.valid_11b_channel.valid-11g-channel",
+                "reg_domain_prof.valid_11a_channel.valid-11a-channel"],
                 ["ap_group.profile-name",
                 "ap_group.dot11g_prof.profile-name",
                 "ap_group.dot11a_prof.profile-name",
                 "ap_group.reg_domain_prof.profile-name"],
                 ["ssid_prof.profile-name",
+                 "ssid_prof.essid.essid",
                 "ssid_prof.g_basic_rates",
                 "ssid_prof.g_tx_rates",
                 "ssid_prof.a_basic_rates",
@@ -749,3 +750,263 @@ def test_add_action_values_to_acl_adds_deny_action_correctly():
     CA.add_action_values_to_ace_object(ace_values,ace_object)
 
     assert expected == ace_object
+
+def test_add_action_values_to_acl_adds_dst_nat_ip():
+
+    ace_values = ['dst-nat','ip','1.1.1.1','other_value']
+    ace_object = {}
+
+    expected = {'action':'dst-nat','dnatip':'1.1.1.1'}
+
+    CA.add_action_values_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_action_values_to_acl_adds_dst_nat_name():
+
+    ace_values = ['dst-nat','name','some_name.domain','other_value']
+    ace_object = {}
+
+    expected = {'action':'dst-nat','dnathostname':'some_name.domain'}
+
+    CA.add_action_values_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_action_values_to_acl_adds_src_nat_without_pool_correctly():
+
+    ace_values = ['src-nat','other_value']
+    ace_object = {}
+
+    expected = {'action':'src-nat','src-nat':True}
+
+    CA.add_action_values_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_action_values_to_acl_adds_src_nat_with_pool_correctly():
+
+    ace_values = ['src-nat','pool','srcnatpool','other_value']
+    ace_object = {}
+
+    expected = {'action':'src-nat','src-nat':True,'poolname':'srcnatpool'}
+
+    CA.add_action_values_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_action_values_to_acl_adds_redirect_with_tunnel_id_correctly():
+
+    ace_values = ['redirect','tunnel','10','other_value']
+    ace_object = {}
+
+    expected = {'action':'redir_opt','redir_opt':'tunnel','tunid':10}
+
+    CA.add_action_values_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_action_values_to_acl_adds_redirect_with_tunnel_group_correctly():
+
+    ace_values = ['redirect','tunnel-group','tungroup','other_value']
+    ace_object = {}
+
+    expected = {'action':'redir_opt','redir_opt':'tunnel-group','tungrpname':'tungroup'}
+
+    CA.add_action_values_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_action_values_to_acl_adds_redirect_with_esi_group_with_direction_correctly():
+
+    ace_values = ['redirect','group','esigroup','direction','forward','other_value']
+    ace_object = {}
+
+    expected = {'action':'redir_opt','redir_opt':'esi-group','group':'esigroup','dir':'forward'}
+
+    CA.add_action_values_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+
+def test_add_action_values_to_acl_adds_route_src_nat_correctly():
+
+    ace_values = ['route','src-nat','esigroup','direction','forward','other_value']
+    ace_object = {}
+
+    expected = {'action':'route','src-nat-route':True}
+
+    CA.add_action_values_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_action_values_to_acl_adds_route_dst_nat_with_ip_correctly():
+
+    ace_values = ['route','dst-nat','ip','4.4.4.4','forward','other_value']
+    ace_object = {}
+
+    expected = {'action':'route','dst-nat-route':True,'routednatip':'4.4.4.4'}
+
+    CA.add_action_values_to_ace_object(ace_values,ace_object)
+    
+    assert expected == ace_object
+
+
+def test_add_action_values_to_acl_adds_route_dst_nat_with_name_correctly():
+
+    ace_values = ['route','dst-nat','name','google.com','forward','other_value']
+    ace_object = {}
+
+    expected = {'action':'route','dst-nat-route':True,'routednathostname':'google.com'}
+
+    CA.add_action_values_to_ace_object(ace_values,ace_object)
+    
+    assert expected == ace_object
+
+def test_add_action_values_to_acl_returns_empty_array_without_extended_options():
+
+    ace_values = ['redirect','group','esigroup','direction','forward']
+    ace_object = {}
+
+    generated = CA.add_action_values_to_ace_object(ace_values,ace_object)
+
+    assert [] == generated
+
+def test_add_extended_action_values_to_acl_adds_a_time_range_correctly():
+
+    ace_values = ['time-range','after-lunch']
+    ace_object = {}
+
+    expected = {'trname':'after-lunch'}
+    CA.add_extended_action_values_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_extended_action_values_to_acl_adds_a_queue_correctly():
+
+    ace_values = ['queue','high']
+    ace_object = {}
+
+    expected = {'queue-type':'high', 'queue':True}
+    CA.add_extended_action_values_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_extended_action_values_to_acl_adds_a_tos_value_correctly():
+
+    ace_values = ['tos','46']
+    ace_object = {}
+
+    expected = {'tosstr':46}
+    CA.add_extended_action_values_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_extended_action_values_to_acl_adds_a_dot1p_value_correctly():
+
+    ace_values = ['priority-802.1p','7']
+    ace_object = {}
+
+    expected = {'prio8021p':7}
+    CA.add_extended_action_values_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+
+def test_add_extended_action_values_to_acl_adds_multiple_values_correctly():
+
+    ace_values = ['priority-802.1p','7','time-range','lunch','log']
+    ace_object = {}
+
+    expected = {'prio8021p':7, 'trname':'lunch','log':True}
+    CA.add_extended_action_values_to_ace_object(ace_values,ace_object)
+    
+    assert expected == ace_object
+
+def test_add_service_values_to_acl_adds_any_service_correctly():
+
+    ace_values = ['any','other_values']
+    ace_object = {}
+
+    expected = {'service_app':'service','service-any':True,'svc':'service-any'}
+    CA.add_service_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_service_values_to_acl_adds_udp_with_port_correctly():
+
+    ace_values = ['udp','44','other_values']
+    ace_object = {}
+
+    expected = {'service_app':'service','proto':'udp','svc':'tcp_udp','port1':44,'port':'range'}
+    CA.add_service_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_service_values_to_acl_adds_udp_with_port_range_correctly():
+
+    ace_values = ['udp','44','60','other_values']
+    ace_object = {}
+
+    expected = {'service_app':'service','proto':'udp','svc':'tcp_udp','port1':44,'port2':60,'port':'range'}
+    CA.add_service_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_service_values_to_acl_adds_tcp_with_port_correctly():
+
+    ace_values = ['tcp','45','other_values']
+    ace_object = {}
+
+    expected = {'service_app':'service','proto':'tcp','svc':'tcp_udp','port1':45,'port':'range'}
+    CA.add_service_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_service_values_to_acl_adds_tcp_with_port_range_correctly():
+
+    ace_values = ['tcp','45','70','other_values']
+    ace_object = {}
+
+    expected = {'service_app':'service','proto':'tcp','svc':'tcp_udp','port1':45,'port2':70,'port':'range'}
+    CA.add_service_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_service_values_to_acl_adds_service_name_correctly():
+
+    ace_values = ['svc-some-service','other_values']
+    ace_object = {}
+
+    expected = {'service_app':'service','svc':'service-name','service-name':'svc-some-service'}
+    CA.add_service_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_service_values_to_acl_adds_protocol_correctly():
+
+    ace_values = ['17','other_values']
+    ace_object = {}
+
+    expected = {'service_app':'service','svc':'protocol','protocol':17}
+    CA.add_service_to_ace_object(ace_values,ace_object)
+
+    assert expected == ace_object
+
+def test_add_aces_to_acl_produces_acl_correctly():
+
+    ace = "user host 10.10.10.100 any permit log"
+    
+    expected = {'suser':True,'src':'suser','dipaddr':'10.10.10.100','dst':'dhost','service_app':'service','svc':'service-any','service-any':True,'action':'permit','permit':True,'log':True}
+    generated = CA.translate_ace_to_api_values(ace)
+
+    assert expected == generated
+
+def test_add_aces_to_acl_produces_acl_correctly_02():
+
+    ace = "network 192.168.1.0/24 any udp 68 deny log time-range lunch mirror"
+    
+    expected = {'snetwork':'192.168.1.0','src':'snetwork','snetmask':'255.255.255.0','dany':True,'dst':'dany','service_app':'service','svc':'tcp_udp','proto':'udp','port1':68,'port':'range','action':'deny','deny':True,'log':True,'trname':'lunch','mirror':True}
+    generated = CA.translate_ace_to_api_values(ace)
+
+    assert expected == generated

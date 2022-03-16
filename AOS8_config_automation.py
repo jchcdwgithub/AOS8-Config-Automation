@@ -1,4 +1,5 @@
 from fnmatch import translate
+from msilib.schema import Error
 from optparse import Values
 import string
 from tkinter import W
@@ -225,11 +226,11 @@ def build_profiles_from_ordered_list(ordered_profiles):
     for profile_name in profile_names:
       if len(profile_name.split(',')) < 2:
         node = DEFAULT_PATH
-        if '_prof' in profile_type:
+        if '_prof' in profile_type or '_group' in profile_type:
           profile_name += f'_{profile_type}'
       else:
         name,node = profile_name.split(',')
-        if '_prof' in profile_type:
+        if '_prof' in profile_type or '_group' in profile_type:
           profile_name = f'{name}_{profile_type}'
         else:
           profile_name = name
@@ -399,6 +400,7 @@ def add_src_dst_values_to_ace_object(ace_values,ace_object,src_dst):
   """ Given a list of ACE values, extract the source information, add them to the ace_object and return a truncated list of ACE values. """
   allowed_values = set(['host','user','alias','network','role','localip','any'])
   src_value = ace_values[0]
+  alias_prefix = 'src' if src_dst == 's' else 'dst'
   values_to_remove = 1
 
   if src_value not in allowed_values:
@@ -408,33 +410,32 @@ def add_src_dst_values_to_ace_object(ace_values,ace_object,src_dst):
     values_to_remove += 1
     if is_valid_ip_address(ace_values[values_to_remove-1]):
       ace_object[f'{src_dst}ipaddr'] = ace_values[values_to_remove-1]
-      ace_object['src'] = f'{src_dst}host'
+      ace_object[alias_prefix] = f'{src_dst}host'
     else:
       print("Invalid host IP address for source value in ACE. Fix and try again.")
       exit()
   elif src_value == 'user':
-    ace_object['src'] = f'{src_dst}user'
+    ace_object[alias_prefix] = f'{src_dst}user'
     ace_object[f'{src_dst}user'] = True
   elif src_value == 'any':
-    ace_object['src'] = f'{src_dst}any'
+    ace_object[alias_prefix] = f'{src_dst}any'
     ace_object[f'{src_dst}any'] = True
   elif src_value == 'alias':
-    ace_object['src'] = f'{src_dst}alias'
-    alias_prefix = 'src' if src_dst == 's' else 'dst'
+    ace_object[alias_prefix] = f'{src_dst}alias'
     ace_object[f'{alias_prefix}alias'] = ace_values[values_to_remove]
     values_to_remove += 1
   elif src_value == 'role':
-    ace_object['src'] = f'{src_dst}userrole'
+    ace_object[alias_prefix] = f'{src_dst}userrole'
     ace_object[f'{src_dst}urname'] = ace_values[values_to_remove]
     values_to_remove += 1
   elif src_value == 'localip':
-    ace_object['src'] = f'{src_dst}localip'
+    ace_object[alias_prefix] = f'{src_dst}localip'
     ace_object[f'{src_dst}localip'] = True
   else:
     if len(ace_values[values_to_remove].split('.')) == 4:
       ipaddr,netmask = ace_values[values_to_remove].split('/')
       if is_valid_ip_address(ipaddr):
-        ace_object['src'] = f'{src_dst}network'
+        ace_object[alias_prefix] = f'{src_dst}network'
         ace_object[f'{src_dst}network'] = ipaddr 
         ace_object[f'{src_dst}netmask'] = convert_subnetmask(netmask)
         values_to_remove += 1
@@ -534,8 +535,8 @@ def add_action_values_to_ace_object(ace_values,ace_object):
     ace_object['src-nat'] = True
     if values_to_remove < len(ace_values):
       if ace_values[values_to_remove] == 'pool':
-        ace_object['poolname'] = ace_values[values_to_remove]
         values_to_remove += 1
+        ace_object['poolname'] = ace_values[values_to_remove]
   elif action_value == 'redirect':
     ace_object['action'] = 'redir_opt'
     redir_opt = ace_values[values_to_remove]
@@ -544,7 +545,7 @@ def add_action_values_to_ace_object(ace_values,ace_object):
       tunnel_id = ace_values[values_to_remove]
       if tunnel_id.isdigit():
         tunnel_id = int(tunnel_id)
-        if tunnel_id > 1 and tunnel_id <= 500:
+        if tunnel_id >= 1 and tunnel_id <= 500:
           ace_object['tunid'] = tunnel_id
           ace_object['redir_opt'] = redir_opt
           values_to_remove += 1
@@ -574,8 +575,31 @@ def add_action_values_to_ace_object(ace_values,ace_object):
           else:
             print("Must specify forward, reverse or both after direction. Fix and try again.")
             exit()
+  elif action_value == 'route':
+    nat_type = ace_values[values_to_remove]
+    if nat_type != 'src-nat' and nat_type != 'dst-nat':
+      print('Route action must be specified with either dst-nat + ip/name or src-nat.')
+      exit()
+    values_to_remove += 1
+    ace_object['action'] = 'route'
+    if nat_type == 'dst-nat':
+      try:
+        name_or_ip = ace_values[values_to_remove]
+        values_to_remove += 1
+        value = ace_values[values_to_remove]
+        if name_or_ip == 'name':
+          ace_object['routednathostname'] = value
+        elif name_or_ip == 'ip' and is_valid_ip_address(value):
+          ace_object['routednatip'] = value
+        else:
+          raise ValueError
+      except:
+        print('route dst-nat must be followed by ip x.x.x.x or name hostname.')
+        exit()
+    nat_type_name = 'dst' if nat_type == 'dst-nat' else 'src'
+    ace_object[f'{nat_type_name}-nat-route'] = True
   else:
-    print("Invalid action. Specify permit, deny, redirect, src-nat or dst-nat.")
+    print("Invalid action. Specify permit, deny, redirect, src-nat, dst-nat, route src-nat or route dst-nat.")
       
   if values_to_remove == len(ace_values):
     return []
@@ -595,15 +619,15 @@ def add_service_to_ace_object(ace_values,ace_object):
     proto = ace_values[values_to_remove]
     if proto.isdigit():
       proto = int(proto)
-      if proto > 1 and proto <= 255:
+      if proto >= 1 and proto <= 65535:
         ace_object['port'] = 'range'
         ace_object['port1'] = proto
         values_to_remove += 1
         poss_port_range = ace_values[values_to_remove]
         if poss_port_range.isdigit():
           poss_port_range = int(poss_port_range)
-          if poss_port_range > 1 and poss_port_range <= 255:
-            if poss_port_range < proto:
+          if poss_port_range >= 1 and poss_port_range <= 65535:
+            if poss_port_range > proto:
               ace_object['port2'] = poss_port_range
               values_to_remove += 1
             else:
@@ -618,13 +642,21 @@ def add_service_to_ace_object(ace_values,ace_object):
         print("Port must be a number from 1 to 255. Fix and try again.")
     else:
       print("Port number or range must be specified.")
+  elif proto_or_service.isdigit():
+    protocol = int(proto_or_service)
+    if protocol >= 1 and protocol <= 255:
+      ace_object['svc'] = 'protocol'
+      ace_object['protocol'] = protocol
+    else:
+      print('IP protocol must be a number between 1 and 255. Fix and try again.')
+      exit()
   elif proto_or_service == 'any':
     ace_object['service-any'] = True
     ace_object['svc'] = 'service-any'
-  elif proto_or_service == 'service':
+  elif is_service_name(proto_or_service):
     ace_object['svc'] = 'service-name'
     #double check that service exists on the network.
-    ace_object['service-name'] = ace_values[values_to_remove]
+    ace_object['service-name'] = ace_values[values_to_remove-1]
   elif proto_or_service == 'icmp':
     #fill in later.
     print('icmp.')
@@ -634,18 +666,30 @@ def add_service_to_ace_object(ace_values,ace_object):
   
   return ace_values[values_to_remove:]
 
+def is_service_name(service):
+  """ Checks for a name that starts with svc- or sys-svc- """
+  start_pattern = re.compile(r'^svc-')
+  system_defined_start = re.compile(r'^sys-svc-')
+
+  if start_pattern.match(service) is not None or system_defined_start.match(service) is not None:
+    return True
+  else:
+    #check that service exists on the network and return false if it doesn't.
+    return False
+
 def add_extended_action_values_to_ace_object(ace_values,ace_object):
   """ Add the extended actions to the ace object. """
-  allowed_extended_actions = set(['blacklist','prio8021p','disable-scanning','tos','time-range','queue','log','mirror'])
+  allowed_extended_actions = set(['blacklist','priority-802.1p','disable-scanning','tos','time-range','queue','log','mirror'])
   
   ext_action = ace_values[0]
   current_index = 1
 
   if ext_action not in allowed_extended_actions:
-    print("Invalid extended action specified. Allowed are blacklist, prio8021p, disable-scanning, tos, time-range, queue, log, mirror")
+    print("Invalid extended action specified. Allowed are blacklist, priority-802.1p, disable-scanning, tos, time-range, queue, log, mirror")
   else:
     if ext_action == 'time-range':
       ace_object['trname'] = ace_values[current_index]
+      current_index += 1
       if current_index < len(ace_values):
         return add_extended_action_values_to_ace_object(ace_values[current_index:],ace_object)
     elif ext_action == 'queue':
@@ -674,12 +718,13 @@ def add_extended_action_values_to_ace_object(ace_values,ace_object):
         exit()
       if current_index < len(ace_values):
         return add_extended_action_values_to_ace_object(ace_values[current_index:],ace_object)
-    elif ext_action == '802.1p':
+    elif ext_action == 'priority-802.1p':
       dot1p_value = ace_values[current_index]
       if dot1p_value.isdigit():
         dot1p = int(dot1p_value)
         if dot1p >= 0 and dot1p <= 7:
           ace_object['prio8021p'] = dot1p
+          current_index += 1
         else:
           print("802.1p value must be between 0 and 7. Fix and try again.")
           exit()
@@ -690,7 +735,6 @@ def add_extended_action_values_to_ace_object(ace_values,ace_object):
         exit()
     else:
       ace_object[ext_action] = True
-      current_index += 1
       if current_index < len(ace_values):
         return add_extended_action_values_to_ace_object(ace_values[current_index:],ace_object)
 
@@ -749,6 +793,9 @@ def add_array_attribute_to_profiles(full_attribute_name,profiles):
                     profile[attribute_name].append({required_property:attribute_item})
                   else:
                     raise ValueError(f'Invalid value. {required_property} is incorrectly configured.')
+              elif len(attribute_list) == 1:
+                attribute_item = attribute_list[0]
+                profile[attribute_name].append({required_property:attribute_item})
 
 def remove_empty_objects_that_are_not_booleans(full_attribute_name,attributes,profiles):
   """ Removes any attributes that were left empty in the table. """
