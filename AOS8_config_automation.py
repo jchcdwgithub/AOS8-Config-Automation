@@ -29,7 +29,14 @@ CONFIG_HISTORY = []
 
 TABLE_COLUMNS = {}
 OBJECT_IDENTIFIERS = {}
-SPECIAL_COLUMNS = {'VLAN Name','5 GHz Channel Width','Role ACLs','ACEs'}
+SPECIAL_COLUMNS = {'vlan_name.name':'process_vlan_name_func',
+                   'ap_a_radio_prof.channel_width':'process_5_width_func',
+                   'role.role__acl.pname':'add_acls_func',
+                   'acl_sess.acl_sess__v4policy.ace':'process_acl_sess_func',
+                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dns.address':'process_dhcp_pool_dns_ips',
+                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dft_rtr.address':'process_dhcp_pool_dhcp_ips'}
+
+DEVICE_DICTIONARY = {'pwkinf302p':'/md/ATC/peewaukee','MM-HQ-01':'/mm/mynode', 'WC-HQ-01':'/md/ATC/HQ', 'WC-HQ-02':'/md/ATC/HQ','MM-SMIT-01':'/md/ATC/SMIT'}
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -344,7 +351,7 @@ def add_string_attribute_to_profiles(full_attribute_name,attributes,profiles):
         try:
           api_string = data_structures.BOOLEAN_DICT[attribute]
         except KeyError:
-          print(f'Value not defined in BOOLEAN_DICT. Please add and try again.')
+          print(f'Value {attribute} not defined in BOOLEAN_DICT when building {full_attribute_name}. Please add and try again.')
           exit()
         if string_is_in_enumerated_property_list(prof_name,attribute_name,property_name,api_string):
           profile[attribute_name][property_name] = api_string
@@ -1113,6 +1120,34 @@ def extract_numbers_from_attribute(attribute):
   else:
     return extracted_numbers
 
+# Device configuration specifics
+def inventory_devices_in_network():
+  """ Perform a query of the hierarchy and search for devices in the network. Return a dictionary of device name to MAC. """
+
+  response = get_hierarchy()
+  
+  if response.status_code == 200:
+    devices = {}
+    hierarchy = response.json()
+    populate_devices_dict(hierarchy, devices,'')
+    return devices
+  else:
+    return {}
+
+def populate_devices_dict(hierarchy, devices_dict,current_node):
+  """ Recursively build a device to MAC dictionary from the hierarchy given. """
+
+  if hierarchy['device_count'] > 0 and len(hierarchy['devices']) == 0:
+    if hierarchy['name'] != '/':
+      current_node += f'/{hierarchy["name"]}'
+    for childnode in hierarchy['childnodes']:
+      populate_devices_dict(childnode,devices_dict,current_node)
+  elif hierarchy['device_count'] > 0 and len(hierarchy['devices']) > 0:
+    for device in hierarchy['devices']:
+      devices_dict[device['name']] = f'{current_node}/{device["mac"]}'
+  else:
+    return 
+
 def is_nested_profile(profile_attribute):
   """ If an attribute points to another profile then it is a nested profile. Returns True or False. """
 
@@ -1782,16 +1817,20 @@ def build_tables_columns_dict(tables):
   for table in tables:
     table_columns = [column for column in table.columns]
     for column in table_columns:
-      if column.cells[0].text == 'Node':
+      if column.cells[0].text == 'Node' or column.cells[0].text == 'Device':
         node_column = column.cells[1:]
         table_columns = remove_node_column(table)
         table_columns = add_node_info_to_profile_name(node_column, table_columns)
     
     for column in table_columns:
       if column.cells[0].text not in TABLE_COLUMNS.keys():
-        attribute_names = data_structures.COL_TO_ATTR[column.cells[0].text]
-        for attribute_name in attribute_names:
-          TABLE_COLUMNS[attribute_name] = [sanitize_white_spaces(cell.text) for cell in column.cells[1:]]
+        try:
+          attribute_names = data_structures.COL_TO_ATTR[column.cells[0].text]
+          for attribute_name in attribute_names:
+            TABLE_COLUMNS[attribute_name] = [sanitize_white_spaces(cell.text) for cell in column.cells[1:]]
+        except KeyError:
+          print(f"Your column {column.cells[0].text} is mistyped or the attribute is not currently supported. Delete the column or add the necessary information to the COL_TO_ATTR data structure in the data_structures.py file.")
+          exit()
 
 def remove_node_column(table):
   """ Removes the node column from the table. """
@@ -1799,7 +1838,7 @@ def remove_node_column(table):
   table_columns = []
   
   for column in table.columns:
-    if column.cells[0].text != 'Node':
+    if column.cells[0].text != 'Node' and column.cells[0].text != 'Device':
       table_columns.append(column)
   
   return table_columns
@@ -1821,15 +1860,22 @@ def add_entries_to_object_identifiers():
 
 def add_node_info_to_profile_name(node_column, table_columns):
   """ Adds the node information to the profile names in the table. """
-  
+
   for column in table_columns:
     node_info_added = False
-    for attribute in data_structures.COL_TO_ATTR[column.cells[0].text]:
-      attribute_name = attribute.split('.')[0]
-      if attribute == OBJECT_IDENTIFIERS[attribute_name] and not node_info_added:
-        for profile,node in zip(column.cells[1:],node_column):
-          profile.text += ',' + node.text
-        node_info_added = True
+    try:
+      for attribute in data_structures.COL_TO_ATTR[column.cells[0].text]:
+        attribute_name = attribute.split('.')[0]
+        if attribute == OBJECT_IDENTIFIERS[attribute_name] and not node_info_added:
+          for profile,node in zip(column.cells[1:],node_column):
+            if node.text in DEVICE_DICTIONARY:
+              node_name = DEVICE_DICTIONARY[node.text]
+            else:
+              node_name = node.text
+            profile.text += ',' + node_name
+          node_info_added = True
+    except KeyError:
+      print(f"Your column {column.cells[0].text} is mistyped or the attribute is not currently supported. Delete the column or add the necessary information to the COL_TO_ATTR data structure in the data_structures.py file.")
   
   return table_columns
   
