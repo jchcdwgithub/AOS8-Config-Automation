@@ -93,7 +93,7 @@ COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.pro
                "2.4 GHz Maximum": ["ap_g_radio_prof.eirp_max.eirp-max"],
                "5 GHz Minimum": ["ap_a_radio_prof.eirp_min.eirp-min"],
                "5 GHz Maximum": ["ap_a_radio_prof.eirp_max.eirp-max"],
-               "5 GHz Channel Width": ["ap_a_radio_prof.channel_width.width"],
+               "5 GHz Channel Width": ["reg_domain_prof.channel_width.width"],
                "2.4 GHz Channels": ["reg_domain_prof.valid_11b_channel.valid-11g-channel"],
                "5 GHz Channels": ["reg_domain_prof.valid_11a_channel.valid-11a-channel"],
                "2.4 GHz AM Scan Prof":['ap_g_radio.am_scan_prof.profile-name'],
@@ -146,7 +146,10 @@ BOOLEAN_DICT = {'Beacon':'ba', 'Probe':'pr', 'Low Data': 'ldata', 'High Data': '
                 'WPA2-AES':'wpa2-aes',
                 'WPA2-PSK-AES':'wpa2-psk-aes',
                 'Trunk':'trunk',
-                'Access':'Access'}
+                'Access':'Access',
+                '40 MHz':'40mhz',
+                '80 MHz':'80mhz',
+                '160 MHz':'160mhz'}
 
 DEPENDENCY_DICT = {'ap_g_radio_prof':'dot11g_prof', 
                    'ap_a_radio_prof':'dot11a_prof',

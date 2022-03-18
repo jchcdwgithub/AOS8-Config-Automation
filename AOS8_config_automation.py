@@ -268,7 +268,8 @@ def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
   """ Checks against the API that the attributes in the column are correct and adds them to the provided profiles. """
   
   if full_attribute_name in SPECIAL_COLUMNS:
-    SPECIAL_COLUMNS[full_attribute_name](profiles)
+    profiles = SPECIAL_COLUMNS[full_attribute_name](profiles)
+    return
   elif len(full_attribute_name.split('.')) < 3:
     attribute_type = get_attribute_type(full_attribute_name)
   else:
@@ -346,6 +347,79 @@ def add_string_attribute_to_profiles(full_attribute_name,attributes,profiles):
         else:
           exit()
 
+def add_wide_5ghz_channels(profiles):
+  """ Processes the 5ghz channel width property and produces the list of bonded channels for the corresponding bonded channel attribute
+      in the SSID profile."""
+
+  width_dict = {'40mhz':False,'80mhz':False,'160mhz':False}
+  widths_column = TABLE_COLUMNS['reg_domain_prof.channel_width.width']
+
+  width_profiles = []
+  for width in widths_column:
+    if width in data_structures.BOOLEAN_DICT:
+      width_value = data_structures.BOOLEAN_DICT[width]
+      width_dict[width_value] = True
+  
+  if width_dict['40mhz'] or width_dict['80mhz'] or width_dict['160mhz']:
+    try:
+      wide_20 = TABLE_COLUMNS['reg_domain_prof.valid_11a_channel.valid-11a-channel']
+    except KeyError:
+      print('Must define an allowed 20 MHz channel column to use the 5 GHz Channel Width column.')
+      exit()
+  
+  if width_dict['40mhz']:
+    wide_40 = build_xmhz_channel_width_profiles('40mhz',widths_column,wide_20)
+    width_profiles.append(wide_40)
+
+  if width_dict['80mhz']:
+    wide_80 = build_xmhz_channel_width_profiles('80mhz',widths_column,wide_20)
+    width_profiles.append(wide_80)
+  
+  if width_dict['160mhz']:
+    wide_160 = build_xmhz_channel_width_profiles('160mhz',widths_column,wide_20)
+    width_profiles.append(wide_160)
+
+  return width_profiles
+
+def build_xmhz_channel_width_profiles(channel_width,widths_column,wide_20):
+  """ Returns a set of profiles given the channel_width and widths_column. channel_width is 40mhz, 80mhz or 160mhz. """
+
+  chan_width_names = {'40mhz':['reg_domain_prof.valid_11a_40mhz_chan_pair_nd.valid-11a-40mhz-channel-pair-nd',2],
+                      '80mhz':['reg_domain_prof.valid_11a_80mhz_chan_group.valid-11a-80mhz-channel-group',4],
+                      '160mhz':['reg_domain_prof.valid_11a_160mhz_chan_group.valid-11a-160mhz-channel-group',8]}
+  
+  chan_width_prof_name = chan_width_names[channel_width][0]
+  step = chan_width_names[channel_width][1]
+  wide_xmhz = {chan_width_prof_name:[]}
+  pairs = make_pairs(wide_20,step)
+  for width,pair in zip(widths_column,pairs):
+    if data_structures.BOOLEAN_DICT[width] == channel_width:
+      wide_xmhz[chan_width_prof_name].append(pair)
+    else:
+      wide_xmhz[chan_width_prof_name].append('')
+  
+  return wide_xmhz
+
+
+def make_pairs(wide_20,step):
+  """ Given an array of comma separated 20 MHz channels, return a list of x MHz pairs where x is defined by
+      the step size. 2 is 40 MHz, 4 is 80 MHz, 8 is 160 MHz. """
+  
+  pairs = []
+
+  for channels in wide_20:
+    channels_20 = channels.replace(' ','').split(',')
+    current = 0
+    next = step-1
+    ties = []
+    while current < len(channels_20)-1:
+      ties.append(f"{channels_20[current]}-{channels_20[next]}")
+      current += step
+      next += step
+    pairs.append(ties)
+
+  return pairs   
+
 def add_acls_to_role_profiles(profiles,attributes=[]):
   """ Special method for adding ACLs to user roles. """
   
@@ -358,6 +432,8 @@ def add_acls_to_role_profiles(profiles,attributes=[]):
         print('ACLs must be specified as either std, ext or session ACLS. ex. session ACL1, session ACL2, etc.')
         exit()
       profile['role__acl'].append({'pname':acl_name})
+  
+  return profiles
 
 def add_addresses_to_dhcp_pool(profiles):
   """ DNS and DHCP addresses have special names in the API when adding more than one address.
@@ -379,6 +455,8 @@ def add_addresses_to_dhcp_pool(profiles):
           else:
             address_name = 'address'
           profile[f'ip_dhcp_pool_cfg__{attribute}'].append({address_name:address})
+  
+  return profiles
 
 def build_session_acl_objects(profiles):
   """ Build session ACL objects from the TABLE_COLUMN dictionary. """
@@ -387,6 +465,8 @@ def build_session_acl_objects(profiles):
   for aces,profile in zip(aces_list,profiles):
     profile ['acc_sess__v4policy']= []
     add_entries_to_session_acl(aces,profile['acl_sess__v4policy'])
+  
+  return profiles
 
 def add_entries_to_session_acl(aces,acl):
   """ Add the ace to the ACL """
@@ -774,6 +854,8 @@ def add_vlan_name_association(profiles):
       if id_node == name_node:
         profile['name'] = vname
         profile['vlan-ids'] = vid
+  
+  return profiles
 
 def add_array_attribute_to_profiles(full_attribute_name,profiles):
   """ Adds an array attribute to the profile. """
@@ -1738,12 +1820,8 @@ def sanitize_white_spaces(text):
   return text
 
 SPECIAL_COLUMNS = {'vlan_name_id.name':add_vlan_name_association,
-                   'ap_a_radio_prof.channel_width':'process_5_width_func',
+                   'ap_a_radio_prof.channel_width':add_wide_5ghz_channels,
                    'role.role__acl.pname':add_acls_to_role_profiles,
                    'acl_sess.acl_sess__v4policy.ace':build_session_acl_objects,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dns.address': add_addresses_to_dhcp_pool,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dft_rtr.address': add_addresses_to_dhcp_pool}
-
-def add_wide_5ghz_channels(profiles):
-  """ Processes the 5ghz channel width property and produces the list of bonded channels for the corresponding bonded channel attribute
-      in the SSID profile."""
