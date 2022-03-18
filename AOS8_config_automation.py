@@ -1,6 +1,7 @@
 from fnmatch import translate
 from msilib.schema import Error
 from optparse import Values
+import profile
 import string
 from tkinter import W
 from tkinter.font import names
@@ -29,12 +30,6 @@ CONFIG_HISTORY = []
 
 TABLE_COLUMNS = {}
 OBJECT_IDENTIFIERS = {}
-SPECIAL_COLUMNS = {'vlan_name.name':'process_vlan_name_func',
-                   'ap_a_radio_prof.channel_width':'process_5_width_func',
-                   'role.role__acl.pname':'add_acls_func',
-                   'acl_sess.acl_sess__v4policy.ace':'process_acl_sess_func',
-                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dns.address':'process_dhcp_pool_dns_ips',
-                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dft_rtr.address':'process_dhcp_pool_dhcp_ips'}
 
 DEVICE_DICTIONARY = {'pwkinf302p':'/md/ATC/peewaukee','MM-HQ-01':'/mm/mynode', 'WC-HQ-01':'/md/ATC/HQ', 'WC-HQ-02':'/md/ATC/HQ','MM-SMIT-01':'/md/ATC/SMIT'}
 
@@ -291,7 +286,9 @@ def get_object_name(object,object_ids):
 def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
   """ Checks against the API that the attributes in the column are correct and adds them to the provided profiles. """
   
-  if len(full_attribute_name.split('.')) < 3:
+  if full_attribute_name in SPECIAL_COLUMNS:
+    SPECIAL_COLUMNS[full_attribute_name](profiles)
+  elif len(full_attribute_name.split('.')) < 3:
     attribute_type = get_attribute_type(full_attribute_name)
   else:
     prof_name,attribute,_ = full_attribute_name.split('.')
@@ -326,7 +323,7 @@ def add_integer_attribute_to_profiles(full_attribute_name,attributes,profiles):
     attribute_number = extract_numbers_from_attribute(attribute)[0] 
     if attribute_number.isdigit():
       attribute_value = int(attribute_number)
-      if is_valid_string_or_number(prof_name,attribute_name,attribute_value,property_name=property_name,type="integer"):
+      if is_valid_string_or_number(full_attribute_name,attribute_value,type="integer"):
         if property_name != '':
           profile[attribute_name][property_name] = attribute_value
         else:
@@ -346,21 +343,21 @@ def add_string_attribute_to_profiles(full_attribute_name,attributes,profiles):
   
   prof_name,attribute_name,property_name = full_attribute_name.split('.')
 
-  if property_name != '' and is_enumerated_property(prof_name,attribute_name,property_name):
+  if property_name != '' and is_enumerated_property(full_attribute_name):
       for profile,attribute in zip(profiles,attributes):
         try:
           api_string = data_structures.BOOLEAN_DICT[attribute]
         except KeyError:
           print(f'Value {attribute} not defined in BOOLEAN_DICT when building {full_attribute_name}. Please add and try again.')
           exit()
-        if string_is_in_enumerated_property_list(prof_name,attribute_name,property_name,api_string):
+        if string_is_in_enumerated_property_list(full_attribute_name,api_string):
           profile[attribute_name][property_name] = api_string
         else:
           raise ValueError(f'Invalid value {attribute} in {prof_name}. Fix and try again.')
   else:
     for profile,attribute in zip(profiles,attributes):
       if attribute != '':
-        if is_valid_string_or_number(prof_name,attribute_name,attribute,property_name=property_name):
+        if is_valid_string_or_number(full_attribute_name,attribute):
           if property_name != '':
            profile[attribute_name][property_name] = attribute
           else:
@@ -368,19 +365,47 @@ def add_string_attribute_to_profiles(full_attribute_name,attributes,profiles):
         else:
           exit()
 
-def build_session_acl_object():
+def add_acls_to_role_profiles(profiles,attributes=[]):
+  """ Special method for adding ACLs to user roles. """
+  
+  for attribute,profile in zip(attributes,profiles):
+    acls = attribute.replace(', ',',').split(',')
+    for acl in acls:
+      try:
+        _,acl_name = acl.split(' ')
+      except:
+        print('ACLs must be specified as either std, ext or session ACLS. ex. session ACL1, session ACL2, etc.')
+        exit()
+      profile['role__acl'].append({'pname':acl_name})
+
+def add_addresses_to_dhcp_pool(profiles):
+  """ DNS and DHCP addresses have special names in the API when adding more than one address.
+      address:DNS1, address2:DNS2, etc. Up to 6 addresses can be added to the arrays. The attributes
+      list contains the name of the addresses to configure: dns, dft_rtr, etc. """
+  
+  attributes = ['dns','dft_rtr']
+
+  for attribute in attributes:
+    attr_name = f'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__{attribute}.address'
+    if attr_name in TABLE_COLUMNS[attr_name]:
+      addresses = TABLE_COLUMNS[attr_name]
+  
+      for profile,address in zip(profiles,addresses):
+        address_list = address.replace(', ',',').split(',')
+        for number,address in enumerate(address_list,start=1):
+          if number != 1:
+            address_name = f'address{number}'
+          else:
+            address_name = 'address'
+          profile[f'ip_dhcp_pool_cfg__{attribute}'].append({address_name:address})
+
+def build_session_acl_objects(profiles):
   """ Build session ACL objects from the TABLE_COLUMN dictionary. """
 
-  acl_objects = []
-
-  acl_names = TABLE_COLUMNS['acl_sess.accname']
   aces_list = TABLE_COLUMNS['acl_sess.acl_sess__v4policy']
-  for acl_name,aces in zip(acl_names,aces_list):
-    current_acl_object = {'accname':acl_name, 'acc_sess__v4policy':[]}
-    add_entries_to_session_acl(aces,current_acl_object['acl_sess__v4policy'])
-    acl_objects.append(current_acl_object)
-  
-  return acl_objects
+  for aces,profile in zip(aces_list,profiles):
+    profile ['acc_sess__v4policy']= []
+    add_entries_to_session_acl(aces,profile['acl_sess__v4policy'])
 
 def add_entries_to_session_acl(aces,acl):
   """ Add the ace to the ACL """
@@ -842,7 +867,10 @@ def is_valid_string_or_number_in_array(full_attribute_name,attribute,type='strin
   attribute_len = 0
 
   if type == 'string':
-    attribute_len = len(attribute)
+    if is_enumerated_property(full_attribute_name):
+      return string_is_in_enumerated_property_list(full_attribute_name,attribute)
+    else:
+      attribute_len = len(attribute)
   else:
     attribute_len = int(attribute)
 
@@ -959,7 +987,7 @@ def attribute_is_valid(full_attribute_name,attribute):
   
   attribute_type = get_attribute_type(full_attribute_name)
 
-  return is_valid_string_or_number(prof_name,attribute_name,attribute,property_name=property_name,type=attribute_type)
+  return is_valid_string_or_number(full_attribute_name,attribute,type=attribute_type)
 
 def add_boolean_attributes_to_profile(prof_name,attribute_name,attribute,profile):
   """ Adds the boolean values to the attribute object in the profile. """
@@ -1008,51 +1036,75 @@ def add_string_attribute(profile_name,attribute_name,attributes,profiles):
   """ Adds non-nested string attributes to the profiles. """
 
   for attribute,profile in zip(attributes,profiles):
-    if is_valid_string_or_number(profile_name,attribute_name,attribute):
+    if is_valid_string_or_number(f'{profile_name}.{attribute_name}',attribute):
       profile[attribute_name] = attribute
     else:
       exit()
 
-def is_valid_string_or_number(profile_name,attribute_name,attribute,property_name="",type="string"):
+def is_valid_string_or_number(full_attribute_name,attribute,type="string"):
   """ Checks the API reference to ensure that the input is valid. """
   
-  min_len = get_attribute_min_len(profile_name,attribute_name,property_name)
-  max_len = get_attribute_max_len(profile_name,attribute_name,property_name)
+  min_len = get_attribute_min_len(full_attribute_name)
+  max_len = get_attribute_max_len(full_attribute_name)
 
   if type == "string":
-    current_len = len(attribute)
+    if is_enumerated_property(full_attribute_name):
+      return string_is_in_enumerated_property_list(full_attribute_name,attribute)
+    else:
+      current_len = len(attribute)
+  elif type == 'integer':
+    current_len = int(attribute)
   else:
-    current_len = attribute
+    print(f"in is_valid_string_or_number: type {type} is not supported. Choose from string or integer.")
+    exit()
   
   return current_len >= min_len and current_len <= max_len
 
-def get_attribute_min_len(profile_name,attribute_name,property_name=""):
+def get_attribute_min_len(full_attribute_name):
   """ Returns the minimal value for an attribute, property_name should exist for nested attributes. """
 
+  names = full_attribute_name.split('.')
+  property_name = ''
+  if len(names) == 3:
+    profile_name,attribute_name,property_name = names
+  else:
+    profile_name,attribute_name = names
+
   if property_name != "":
     for ref in API_REF:
       if profile_name in ref["definitions"]:
         if get_attribute_type(profile_name+'.'+attribute_name) == 'array':
-          return ref["definitions"][profile_name]["properties"][attribute_name]["items"]["properties"][property_name]["minimum"]
-        return ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["minimum"]
+          min_len = ref["definitions"][profile_name]["properties"][attribute_name]["items"]["properties"][property_name]["minimum"]
+        min_len = ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["minimum"]
   else:
     for ref in API_REF:
       if profile_name in ref["definitions"]:
-        return ref["definitions"][profile_name]["properties"][attribute_name]["minimum"]
+        min_len = ref["definitions"][profile_name]["properties"][attribute_name]["minimum"]
+  
+  return min_len
 
-def get_attribute_max_len(profile_name,attribute_name,property_name=""):
+def get_attribute_max_len(full_attribute_name):
   """ Returns the maximum value for an attribute, property_name should exist for nested attributes. """
 
+  names = full_attribute_name.split('.')
+  property_name = ''
+  if len(names) == 3:
+    profile_name,attribute_name,property_name = names
+  else:
+    profile_name,attribute_name = names
+
   if property_name != "":
     for ref in API_REF:
       if profile_name in ref["definitions"]:
         if get_attribute_type(profile_name+'.'+attribute_name) == 'array':
-          return ref["definitions"][profile_name]["properties"][attribute_name]["items"]["properties"][property_name]["maximum"]
-        return ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["maximum"]
+          max_len = ref["definitions"][profile_name]["properties"][attribute_name]["items"]["properties"][property_name]["maximum"]
+        max_len = ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["maximum"]
   else:
     for ref in API_REF:
       if profile_name in ref["definitions"]:
-        return ref["definitions"][profile_name]["properties"][attribute_name]["maximum"]
+        max_len = ref["definitions"][profile_name]["properties"][attribute_name]["maximum"]
+  
+  return max_len
 
 def attribute_has_properties(full_attribute_name):
   """ Checks whether the attribute has a properties key. Returns True if it does. """
@@ -1077,22 +1129,40 @@ def get_object_property_name(full_attribute_name):
   
   return []
 
-def is_enumerated_property(profile_name,attribute_name,property_name):
+def is_enumerated_property(full_attribute_name):
   """ Returns true if the property is an enumerated property. """
+  names = full_attribute_name.split('.')
+  property_name = ''
+  if len(names) == 3:
+    property_name = names[2]
+  profile_name,attribute_name = names[0],names[1]
 
   for ref in API_REF:
     if profile_name in ref["definitions"]:
-      return "enum" in ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name].keys()
+      if property_name != '':
+        if get_attribute_type(f'{profile_name}.{attribute_name}') == 'array':
+          return 'enum' in ref['definitions'][profile_name]["properties"][attribute_name]['items']['properties'][property_name]
+        else:
+          return "enum" in ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name].keys()
+      else:
+        return 'enum' in ref['definitions'][profile_name]['properties'][attribute_name]
 
-def string_is_in_enumerated_property_list(profile_name,attribute_name,property_name,string):
+def string_is_in_enumerated_property_list(full_attribute_name,string):
   """ Validates whether the string is an allowed value for an enumerated object. """
 
+  names = full_attribute_name.split('.')
+  property_name = ''
+  if len(names) == 3:
+    property_name = names[2]
+  profile_name,attribute_name = names[0],names[1]
   for ref in API_REF:
     if profile_name in ref["definitions"]:
-      return string in ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["enum"]
-
-def validate_attribute(full_attribute_name):
-  """ Checks against the API_REF that the configured attribute is acceptable i.e. between a certain number range or is not a string that's too long, etc."""
+      if property_name != '':
+        if get_attribute_type(f'{profile_name}.{attribute_name}') == 'array':
+          return string in ref['definitions'][profile_name]['properties'][attribute_name]['items']['properties'][property_name]['enum']
+        return string in ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["enum"]
+      else:
+        return string in ref['definitions'][profile_name]['properties'][attribute_name]['enum']
 
 def get_attribute_type(full_attribute_name):
   """ Returns the type of the attribute as checked against the API_REF. """
@@ -1100,13 +1170,20 @@ def get_attribute_type(full_attribute_name):
   if len(full_attribute_name.split('.')) < 3:
     full_attribute_name += '.'
   profile_name,attribute_name,property_name = full_attribute_name.split('.')
+  if property_name != '':
+    is_array = get_attribute_type(f'{profile_name}.{attribute_name}') == 'array'
 
   for ref in API_REF:
     if profile_name in ref['definitions']:
+      type = ''
       if property_name != '':
-        return ref['definitions'][profile_name]['properties'][attribute_name]['properties'][property_name]['type']
+        if is_array:
+          type = ref['definitions'][profile_name]['properties'][attribute_name]['items']['properties'][property_name]['type']
+        else:
+          type = ref['definitions'][profile_name]['properties'][attribute_name]['properties'][property_name]['type'] 
       else: 
-        return ref['definitions'][profile_name]['properties'][attribute_name]['type']
+        type = ref['definitions'][profile_name]['properties'][attribute_name]['type']
+      return type
 
 def extract_numbers_from_attribute(attribute):
   """ For integer attributes, remove any text that might have been included i.e. units like dBm. """
@@ -1147,6 +1224,76 @@ def populate_devices_dict(hierarchy, devices_dict,current_node):
       devices_dict[device['name']] = f'{current_node}/{device["mac"]}'
   else:
     return 
+
+def get_column_errors():
+  """ Goes through the columns in the TABLE_COLUMNS and returns a list of errors that need to be fixed before the configuration objects
+      will be built. """
+
+  errors = []
+  for table_column in TABLE_COLUMNS:
+    if get_attribute_type(table_column) != 'boolean': 
+      column_title = TABLE_COLUMNS[table_column][0]
+      current_column = {column_title:[]}
+      names = table_column.split('.')
+      prof_name = names[0]
+      for row,possible_list in enumerate(TABLE_COLUMNS[table_column][1:]):
+        if table_column == OBJECT_IDENTIFIERS[prof_name]:
+          data = possible_list.replace(' ','').split(',')[:-1]
+        else:
+          data = possible_list.replace(' ','').split(',')
+        
+        if get_attribute_type(table_column) == 'object':
+          for col,datum in enumerate(data):
+            if not is_valid_object(table_column,datum):
+              current_column[column_title].append([row,col,datum])
+        
+        else:
+          for col,datum in enumerate(data):
+            if datum.isdigit():
+              type = 'integer'
+            else:
+              type = 'string'
+              if datum in data_structures.BOOLEAN_DICT:
+                datum = data_structures.BOOLEAN_DICT[datum]
+            if not is_valid_string_or_number(table_column,datum,type=type):
+              current_column[column_title].append([row,col,datum])
+        if len(current_column[column_title]) != 0:
+          errors.append(current_column)
+  
+  return errors
+
+def validate_COL_TO_ATTR_dict():
+  """ Checks whether the COL_TO_ATTR dictionary contains endpoints in the API or not. """
+
+  incorrect_api_path = {}
+
+  for column_title in data_structures.COL_TO_ATTR:
+    for assoc in data_structures.COL_TO_ATTR[column_title]:
+      try:
+        get_attribute_type(assoc)
+      except KeyError:
+        incorrect_api_path[column_title] = data_structures.COL_TO_ATTR[column_title]
+
+  return incorrect_api_path
+
+def remove_column_headers_from_columns_table():
+  """ Column headers are required for the error checking in the get_column_errors function. Remove them for the rest of the program. """
+
+  for column in TABLE_COLUMNS:
+    TABLE_COLUMNS[column] = TABLE_COLUMNS[column][1:]
+
+def is_valid_object(attribute,full_attribute_name):
+  """ For objects for which the full attribute name is not three deep because the objects are booleans. We need to check the object list 
+      similarly to enumerated types. """
+
+  prof_name,attribute_name = full_attribute_name.split('.')
+  for ref in API_REF:
+    if prof_name in ref['definitions']:
+      if not 'properties' in ref['definitions'][prof_name]['properties'][attribute_name]:
+        result = True
+      else:
+        result = attribute in ref['definitions'][prof_name]['properties'][attribute_name]['properties']
+      return result
 
 def is_nested_profile(profile_attribute):
   """ If an attribute points to another profile then it is a nested profile. Returns True or False. """
@@ -1827,7 +1974,7 @@ def build_tables_columns_dict(tables):
         try:
           attribute_names = data_structures.COL_TO_ATTR[column.cells[0].text]
           for attribute_name in attribute_names:
-            TABLE_COLUMNS[attribute_name] = [sanitize_white_spaces(cell.text) for cell in column.cells[1:]]
+            TABLE_COLUMNS[attribute_name] = [sanitize_white_spaces(cell.text) for cell in column.cells]
         except KeyError:
           print(f"Your column {column.cells[0].text} is mistyped or the attribute is not currently supported. Delete the column or add the necessary information to the COL_TO_ATTR data structure in the data_structures.py file.")
           exit()
@@ -2041,3 +2188,10 @@ def sanitize_white_spaces(text):
   text = text.replace('\n',' ')
 
   return text
+
+SPECIAL_COLUMNS = {'vlan_name.name':'process_vlan_name_func',
+                   'ap_a_radio_prof.channel_width':'process_5_width_func',
+                   'role.role__acl.pname':add_acls_to_role_profiles,
+                   'acl_sess.acl_sess__v4policy.ace':build_session_acl_objects,
+                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dns.address': add_addresses_to_dhcp_pool,
+                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dft_rtr.address': add_addresses_to_dhcp_pool}

@@ -37,6 +37,7 @@ def test_get_columns_from_tables_returns_all_columns():
                 "ssid_prof.a_tx_rates":["12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54"]}
     
     CA.build_tables_columns_dict(tables)    
+    CA.remove_column_headers_from_columns_table()
 
     assert expected == CA.TABLE_COLUMNS
 
@@ -54,6 +55,7 @@ def test_build_tables_columns_dict_builds_comma_separated_name_node_pairs():
     
     CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(tables)
+    CA.remove_column_headers_from_columns_table()
 
     assert expected == CA.TABLE_COLUMNS
 
@@ -63,6 +65,7 @@ def test_get_profiles_to_be_configured_returns_correct_dictionary():
     tables = Document('../Radio Testing Tables.docx').tables
     CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(tables)
+    CA.add_entries_to_object_identifiers()
 
     expected = {"ap_g_radio_prof":["profile-name","eirp_min.eirp-min","eirp_max.eirp-max"],
                 "ap_a_radio_prof":["profile-name","eirp_min.eirp-min","eirp_max.eirp-max"],
@@ -70,7 +73,6 @@ def test_get_profiles_to_be_configured_returns_correct_dictionary():
                 "reg_domain_prof":["profile-name","valid_11b_channel.valid-11g-channel","valid_11a_channel.valid-11a-channel"],
                 "ssid_prof":["profile-name","essid.essid","g_basic_rates","g_tx_rates","a_basic_rates","a_tx_rates"]}
     
-    CA.add_entries_to_object_identifiers()
     generated = CA.get_profiles_to_be_configured()
 
     assert expected == generated
@@ -154,146 +156,127 @@ def test_is_enum_returns_true_for_enumerated_properties():
     attribute_name = "anqp_nwk_auth_type"
     property_name = CA.get_object_property_name(profile_name+'.'+attribute_name)[0]
 
-    Result = CA.is_enumerated_property(profile_name,attribute_name,property_name)
+    Result = CA.is_enumerated_property(f'{profile_name}.{attribute_name}.{property_name}')
 
     assert Result == True
 
 def test_is_enum_returns_false_for_other_properties():
 
-    profile_name = "virtual_ap"
-    attribute_name = "aaa_prof"
-    property_name = "profile-name"
+    full_attribute_name = "virtual_ap.aaa_prof.profile-name"
 
-    Result = CA.is_enumerated_property(profile_name,attribute_name,property_name)
+    Result = CA.is_enumerated_property(full_attribute_name)
+
+    assert Result == False 
 
 def test_string_is_in_enumerated_properties_list_returns_true_for_strings_in_list():
 
-    profile_name = "anqp_nwk_auth_prof"
-    attribute_name = "anqp_nwk_auth_type"
-    property_name = "anqp_nwk_auth_type"
+    profile_name = "anqp_nwk_auth_prof.anqp_nwk_auth_type.anqp_nwk_auth_type"
     test_string = "http-https-redirection"
 
-    Result = CA.string_is_in_enumerated_property_list(profile_name,attribute_name,property_name,test_string)
+    Result = CA.string_is_in_enumerated_property_list(profile_name,test_string)
 
     assert Result == True 
 
 def test_string_is_in_enumerated_properties_list_returns_false_for_strings_not_in_list():
 
-    profile_name = "anqp_nwk_auth_prof"
-    attribute_name = "anqp_nwk_auth_type"
-    property_name = "anqp_nwk_auth_type"
+    profile_name = "anqp_nwk_auth_prof.anqp_nwk_auth_type.anqp_nwk_auth_type"
     test_string = "aruba-central"
 
-    Result = CA.string_is_in_enumerated_property_list(profile_name,attribute_name,property_name,test_string)
+    Result = CA.string_is_in_enumerated_property_list(profile_name,test_string)
 
     assert Result == False
 
 def test_get_attribute_min_len_returns_correct_minimum_number_for_non_nested_string():
 
-    profile_name = "ap_mesh_radio_prof"
-    attribute_name = "profile-name"
+    profile_name = "ap_mesh_radio_prof.profile-name"
     
     expected = 1
 
-    generated = CA.get_attribute_min_len(profile_name,attribute_name)
+    generated = CA.get_attribute_min_len(profile_name)
 
     assert expected == generated
 
 def test_get_attribute_max_len_returns_correct_maximum_number_for_non_nested_string():
 
-    profile_name = "ap_mesh_radio_prof"
-    attribute_name = "profile-name"
+    profile_name = "ap_mesh_radio_prof.profile-name"
     
     expected = 256
 
-    generated = CA.get_attribute_max_len(profile_name,attribute_name)
+    generated = CA.get_attribute_max_len(profile_name)
 
     assert expected == generated
 
 def test_get_attribute_min_len_returns_correct_minimum_number_for_nested_string():
 
-    profile_name = "ap_mesh_radio_prof"
-    attribute_name = "mesh_allowed_vlans"
-    property_name = "vlan-list"
+    profile_name = "ap_mesh_radio_prof.mesh_allowed_vlans.vlan-list"
     
     expected = 1
 
-    generated = CA.get_attribute_min_len(profile_name,attribute_name,property_name)
+    generated = CA.get_attribute_min_len(profile_name)
 
     assert expected == generated
 
 def test_get_attribute_max_len_returns_correct_maximum_number_for_nested_string():
 
-    profile_name = "ap_mesh_radio_prof"
-    attribute_name = "mesh_allowed_vlans"
-    property_name = "vlan-list"
+    profile_name = "ap_mesh_radio_prof.mesh_allowed_vlans.vlan-list"
     
     expected = 256
 
-    generated = CA.get_attribute_max_len(profile_name,attribute_name,property_name)
+    generated = CA.get_attribute_max_len(profile_name)
 
     assert expected == generated
 
 def test_is_valid_string_returns_true_for_string_length_check():
 
-    profile_name = "ap_mesh_radio_prof"
-    attribute_name = "profile-name"
+    profile_name = "ap_mesh_radio_prof.profile-name"
     string = "some_profile_name"
 
-    Result = CA.is_valid_string_or_number(profile_name,attribute_name,string)
+    Result = CA.is_valid_string_or_number(profile_name,string)
 
     assert Result == True
 
 def test_is_valid_string_returns_false_for_null_string_length_check():
 
-    profile_name = "ap_mesh_radio_prof"
-    attribute_name = "profile-name"
+    profile_name = "ap_mesh_radio_prof.profile-name"
     string = ""
 
-    Result = CA.is_valid_string_or_number(profile_name,attribute_name,string)
+    Result = CA.is_valid_string_or_number(profile_name,string)
 
     assert Result == False
 
 def test_is_valid_string_returns_false_for_too_long_string_length_check():
 
-    profile_name = "ap_mesh_radio_prof"
-    attribute_name = "profile-name"
+    profile_name = "ap_mesh_radio_prof.profile-name"
     string = "a"*257
 
-    Result = CA.is_valid_string_or_number(profile_name,attribute_name,string)
+    Result = CA.is_valid_string_or_number(profile_name,string)
 
     assert Result == False
 
 def test_is_valid_string_returns_true_for_nested_string_length_check():
 
-    profile_name = "ap_mesh_radio_prof"
-    attribute_name = "mesh_allowed_vlans"
-    property_name = "vlan-list"
+    profile_name = "ap_mesh_radio_prof.mesh_allowed_vlans.vlan-list"
     string = "WIRELESS"
 
-    Result = CA.is_valid_string_or_number(profile_name,attribute_name,string,property_name=property_name)
+    Result = CA.is_valid_string_or_number(profile_name,string)
 
     assert Result == True
 
 def test_is_valid_string_returns_false_for_null_nested_string_length_check():
 
-    profile_name = "ap_mesh_radio_prof"
-    attribute_name = "mesh_allowed_vlans"
-    property_name = "vlan-list"
+    profile_name = "ap_mesh_radio_prof.mesh_allowed_vlans.vlan-list"
     string = ""
 
-    Result = CA.is_valid_string_or_number(profile_name,attribute_name,string,property_name=property_name)
+    Result = CA.is_valid_string_or_number(profile_name,string)
 
     assert Result == False
 
 def test_is_valid_string_returns_false_for_too_long_nested_string_length_check():
 
-    profile_name = "ap_mesh_radio_prof"
-    attribute_name = "mesh_allowed_vlans"
-    property_name = "vlan-list"
+    profile_name = "ap_mesh_radio_prof.mesh_allowed_vlans.vlan-list"
     string = "a"*257
 
-    Result = CA.is_valid_string_or_number(profile_name,attribute_name,string,property_name=property_name)
+    Result = CA.is_valid_string_or_number(profile_name,string)
 
     assert Result == False
 
@@ -345,31 +328,25 @@ def test_property_is_in_properties_returns_false_for_a_nonexisting_property():
 
 def test_is_valid_string_or_number_returns_true_for_number_in_bound():
 
-    profile_name = "ap_g_radio_prof"
-    attribute_name = "max_distance"
-    property_name = "maximum-distance"
+    profile_name = "ap_g_radio_prof.max_distance.maximum-distance"
 
-    Result = CA.is_valid_string_or_number(profile_name,attribute_name,100,property_name=property_name,type="integer")
+    Result = CA.is_valid_string_or_number(profile_name,100,type="integer")
 
     assert Result == True
 
 def test_is_valid_string_or_number_returns_false_for_number_too_big():
 
-    profile_name = "ap_g_radio_prof"
-    attribute_name = "max_distance"
-    property_name = "maximum-distance"
+    profile_name = "ap_g_radio_prof.max_distance.maximum-distance"
 
-    Result = CA.is_valid_string_or_number(profile_name,attribute_name,1000000,property_name=property_name,type="integer")
+    Result = CA.is_valid_string_or_number(profile_name,1000000,type="integer")
 
     assert Result == False
 
 def test_is_valid_string_or_number_returns_false_for_number_too_small():
 
-    profile_name = "ap_g_radio_prof"
-    attribute_name = "max_distance"
-    property_name = "maximum-distance"
+    profile_name = "ap_g_radio_prof.max_distance.maximum-distance"
 
-    Result = CA.is_valid_string_or_number(profile_name,attribute_name,-1,property_name=property_name,type="integer")
+    Result = CA.is_valid_string_or_number(profile_name,-1,type="integer")
 
     assert Result == False
 
@@ -450,6 +427,7 @@ def test_add_object_attribute_to_profiles_correctly_adds_an_enumerated_string_co
 
     CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(Document('../Extension Testing Tables.docx').tables)
+    CA.remove_column_headers_from_columns_table()
     CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
     assert 'best-effort' == profiles[0]['wmm_eap_ac']['wmm_ac']
@@ -463,6 +441,7 @@ def test_add_object_attribute_to_profiles_adds_string_to_object_attribute():
 
     CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(Document('../Extension Testing Tables.docx').tables)
+    CA.remove_column_headers_from_columns_table()
     CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
     assert 'HQ' == profiles[0]['dot11a_prof']['profile-name']
@@ -560,6 +539,7 @@ def test_add_array_attribute_correctly_adds_attributes():
 
     CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(Document('../Extension Testing Tables.docx').tables)
+    CA.remove_column_headers_from_columns_table()
 
     profiles = [{}]
 
@@ -589,6 +569,7 @@ def test_add_dependencies_to_table_columns_dict_adds_dependent_profiles():
 
     CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(Document('../Radio Testing Tables.docx').tables)
+    CA.remove_column_headers_from_columns_table()
     profiles = CA.get_profiles_to_be_configured()
     CA.build_profiles_dependencies(profiles)
 
@@ -618,6 +599,7 @@ def test_add_dependencies_to_table_columns_dict_adds_new_profiles_to_profiles_to
 
     CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(Document('../Radio Testing Tables.docx').tables)
+    CA.remove_column_headers_from_columns_table()
     profiles = CA.get_profiles_to_be_configured()
     CA.build_profiles_dependencies(profiles)
 
@@ -627,6 +609,7 @@ def test_build_ordered_configuration_list_builds_list_correctly():
 
     CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(Document('../Radio Testing Tables.docx').tables)
+    CA.remove_column_headers_from_columns_table()
     profiles = CA.get_profiles_to_be_configured()
     CA.build_profiles_dependencies(profiles)
     
@@ -1010,3 +993,171 @@ def test_add_aces_to_acl_produces_acl_correctly_02():
     generated = CA.translate_ace_to_api_values(ace)
 
     assert expected == generated
+
+def test_get_column_errors_processes_single_integer_value_in_range_correctly():
+
+    doc = Document()
+    table = doc.add_table(cols=1,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'Int VLAN ID'
+    cells[1].text = '20'
+
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict([table])
+    generated = CA.get_column_errors()
+
+    assert [] == generated
+
+def test_get_column_errors_processes_single_integer_value_out_of_range_correctly():
+
+    doc = Document()
+    table = doc.add_table(cols=2,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'Node'
+    cells[1].text = '/md/America/East'
+    cells = table.columns[1].cells
+    cells[0].text = 'Int VLAN ID'
+    cells[1].text = '4098'
+
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict([table])
+    generated = CA.get_column_errors()
+
+    assert [{"Int VLAN ID":[[0, 0,'4098']]}] == generated
+
+def test_get_column_errors_processes_single_string_value_correctly():
+
+    doc = Document()
+    table = doc.add_table(cols=2,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'Node'
+    cells[1].text = '/md/America/East'
+    cells = table.columns[1].cells
+    cells[0].text = 'DHCP Pool Name'
+    cells[1].text = 'Some_Name'
+
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict([table])
+    generated = CA.get_column_errors()
+
+    assert [] == generated
+
+def test_get_column_errors_processes_multiple_string_values_correctly():
+
+    doc = Document()
+    table = doc.add_table(cols=2,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'Node'
+    cells[1].text = '/md/America/East'
+    cells = table.columns[1].cells
+    cells[0].text = 'SG Server Name'
+    cells[1].text = 'Server1, Server2, Server3'
+
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict([table])
+    generated = CA.get_column_errors()
+
+    assert [] == generated
+
+def test_get_column_errors_catches_invalid_string_in_multiple_string_values_correctly():
+
+    doc = Document()
+    table = doc.add_table(cols=2,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'Node'
+    cells[1].text = '/md/America/East'
+    cells = table.columns[1].cells
+    cells[0].text = 'SG Server Name'
+    cells[1].text = 'Server1'*40 + ', Server2, Server3'
+
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict([table])
+    generated = CA.get_column_errors()
+
+    assert [{'SG Server Name':[[0, 0, 'Server1'*40]]}] == generated
+
+def test_get_column_errors_catches_invalid_strings_in_multiple_string_values_correctly():
+
+    doc = Document()
+    table = doc.add_table(cols=2,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'Node'
+    cells[1].text = '/md/America/East'
+    cells = table.columns[1].cells
+    cells[0].text = 'SG Server Name'
+    cells[1].text = 'Server1'*40 + ', Server2'
+    cells[1].text += ', '+'Server3'*40
+
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict([table])
+    generated = CA.get_column_errors()
+
+    assert [{'SG Server Name':[[0, 0, 'Server1'*40],[0, 2, 'Server3'*40]]}] == generated
+
+def test_string_is_in_enumerated_list_checks_for_attributes_two_deep():
+
+    full_attribute_name = 'radius_attr.attr_type'
+    
+    Result = CA.string_is_in_enumerated_property_list(full_attribute_name,'ipaddr')
+
+    assert Result == True
+
+def test_string_is_in_enumerated_list_checks_for_attributes_three_deep():
+
+    full_attribute_name = 'mgmt_auth_profile.mgmt_default_role.aaa_auth_mgmt_default_role'
+    
+    Result = CA.string_is_in_enumerated_property_list(full_attribute_name,'guest-provisioning')
+
+    assert Result == True
+
+def test_get_column_skips_empty_object_attributes():
+
+    doc = Document()
+    table = doc.add_table(cols=2,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'Node'
+    cells[1].text = '/md/America/East'
+    cells = table.columns[1].cells
+    cells[0].text = 'MFP/PMF'
+    cells[1].text = 'True'
+
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict([table])
+    generated = CA.get_column_errors()
+
+    assert [] == generated
+
+def test_get_column_errors_skips_boolean_attributes():
+
+    doc = Document()
+    table = doc.add_table(cols=2,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'Node'
+    cells[1].text = '/md/America/East'
+    cells = table.columns[1].cells
+    cells[0].text = 'MFP/PMF'
+    cells[1].text = 'True'
+
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict([table])
+    generated = CA.get_column_errors()
+
+    assert [] == generated
+
+def test_is_valid_object_returns_true_booleans_in_object():
+
+    full_attribute_name = 'ssid_prof.a_basic_rates'
+    attribute = '6'
+
+    Result = CA.is_valid_object(attribute,full_attribute_name)
+
+    assert Result == True
+
+def test_is_valid_object_returns_true_for_empty_objects():
+
+    full_attribute_name = 'ssid_prof.okc_enable'
+    attribute = 'True'
+
+    Result = CA.is_valid_object(attribute,full_attribute_name)
+
+    assert Result == True
