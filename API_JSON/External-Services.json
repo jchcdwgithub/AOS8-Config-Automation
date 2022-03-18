@@ -1,0 +1,2721 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0",
+        "title": "ArubaOS JSON API Specification"
+    },
+    "basePath": "/v1/configuration",
+    "tags": [
+        {
+            "name": "External Services",
+            "description": "Manage External Services objects"
+        }
+    ],
+    "paths": {
+        "/object": {},
+        "/object/cpnw_websocket_prof": {
+            "get": {
+                "summary": "Cpnw Websocket Profile",
+                "description": "Gets configuration for cpnw_websocket_prof",
+                "tags": [
+                    "External-Services"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/cpnw_websocket_prof"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Cpnw Websocket Profile",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type cpnw_websocket_prof",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "External-Services"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes cpnw_websocket_prof",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cpnw_websocket_prof"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/esi_parser_rule": {
+            "get": {
+                "summary": "Esi Parser Rule",
+                "description": "Gets configuration for esi_parser_rule",
+                "tags": [
+                    "External-Services"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/esi_parser_rule"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Esi Parser Rule",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type esi_parser_rule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "External-Services"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes esi_parser_rule",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/esi_parser_rule"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/pan_options": {
+            "get": {
+                "summary": "Pan Options",
+                "description": "Gets configuration for pan_options",
+                "tags": [
+                    "External-Services"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/pan_options"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Pan Options",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type pan_options",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "External-Services"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes pan_options",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pan_options"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/active_pan": {
+            "get": {
+                "summary": "Active Pan",
+                "description": "Gets configuration for active_pan",
+                "tags": [
+                    "External-Services"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/active_pan"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Active Pan",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type active_pan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "External-Services"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes active_pan",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/active_pan"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/xml_api_client_prof": {
+            "get": {
+                "summary": "Xml Api Client Profile",
+                "description": "Gets configuration for xml_api_client_prof",
+                "tags": [
+                    "External-Services"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/xml_api_client_prof"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Xml Api Client Profile",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type xml_api_client_prof",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "External-Services"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes xml_api_client_prof",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/xml_api_client_prof"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/rfc3576_client_prof": {
+            "get": {
+                "summary": "Rfc3576 Client Profile",
+                "description": "Gets configuration for rfc3576_client_prof",
+                "tags": [
+                    "External-Services"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/rfc3576_client_prof"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Rfc3576 Client Profile",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type rfc3576_client_prof",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "External-Services"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes rfc3576_client_prof",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rfc3576_client_prof"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/esi_parser_domain": {
+            "get": {
+                "summary": "Esi Parser Domain",
+                "description": "Gets configuration for esi_parser_domain",
+                "tags": [
+                    "External-Services"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/esi_parser_domain"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Esi Parser Domain",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type esi_parser_domain",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "External-Services"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes esi_parser_domain",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/esi_parser_domain"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/pan_prof": {
+            "get": {
+                "summary": "Pan Profile",
+                "description": "Gets configuration for pan_prof",
+                "tags": [
+                    "External-Services"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pan_prof"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Pan Profile",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type pan_prof",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "External-Services"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes pan_prof",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pan_prof"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/esi_server": {
+            "get": {
+                "summary": "Esi Server",
+                "description": "Gets configuration for esi_server",
+                "tags": [
+                    "External-Services"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/esi_server"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Esi Server",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type esi_server",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "External-Services"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes esi_server",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/esi_server"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/esi_ping": {
+            "get": {
+                "summary": "Esi Ping",
+                "description": "Gets configuration for esi_ping",
+                "tags": [
+                    "External-Services"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/esi_ping"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Esi Ping",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type esi_ping",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "External-Services"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes esi_ping",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/esi_ping"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/cppm_prof": {
+            "get": {
+                "summary": "ClearPass Profile",
+                "description": "Gets configuration for cppm_prof",
+                "tags": [
+                    "External-Services"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/cppm_prof"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "ClearPass Profile",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type cppm_prof",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "External-Services"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes cppm_prof",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cppm_prof"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/esi_group": {
+            "get": {
+                "summary": "Esi Group",
+                "description": "Gets configuration for esi_group",
+                "tags": [
+                    "External-Services"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/esi_group"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Esi Group",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type esi_group",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "External-Services"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes esi_group",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/esi_group"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/esi_parser_rule_test": {
+            "post": {
+                "summary": "Esi Parser Rule Test",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type esi_parser_rule_test",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "External-Services"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes esi_parser_rule_test",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/esi_parser_rule_test"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        }
+    },
+    "definitions": {
+        "esi_group": {
+            "type": "object",
+            "required": [
+                "group_inst"
+            ],
+            "properties": {
+                "group_inst": {
+                    "description": "Specify ESI group configuration",
+                    "type": "string",
+                    "maximum": 50,
+                    "minimum": 1
+                },
+                "esi_group__server": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "server"
+                        ],
+                        "properties": {
+                            "server": {
+                                "description": "Add or remove server to server group",
+                                "type": "string",
+                                "maximum": 256,
+                                "minimum": 1
+                            }
+                        }
+                    }
+                },
+                "esi_group__ping": {
+                    "type": "object",
+                    "required": [
+                        "ping"
+                    ],
+                    "properties": {
+                        "ping": {
+                            "description": "Specify ping checking attributes. Only one set is allowed",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                }
+            }
+        },
+        "rfc3576_client_prof": {
+            "type": "object",
+            "required": [
+                "server_ip"
+            ],
+            "properties": {
+                "server_ip": {
+                    "description": "IP address of RFC 3576 RADIUS server",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "rfc3576_secret": {
+                    "type": "object",
+                    "required": [
+                        "key"
+                    ],
+                    "properties": {
+                        "key": {
+                            "description": "Shared secret (text string)",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "rfc3576_radsec_enable": {
+                    "type": "object"
+                },
+                "replay_protect": {
+                    "type": "object"
+                },
+                "event_timestamp_check": {
+                    "type": "object"
+                },
+                "window_duration": {
+                    "type": "object",
+                    "required": [
+                        "WindowDuration"
+                    ],
+                    "properties": {
+                        "WindowDuration": {
+                            "description": "Number in seconds. Range: 1-600 secs. Default: 300 secs.",
+                            "type": "integer",
+                            "maximum": 600,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "rfc3576_client_prof_clone": {
+                    "type": "object",
+                    "required": [
+                        "source"
+                    ],
+                    "properties": {
+                        "source": {
+                            "description": "Name of RFC 3576 Server to copy",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                }
+            }
+        },
+        "esi_parser_rule": {
+            "type": "object",
+            "required": [
+                "rule-name"
+            ],
+            "properties": {
+                "rule-name": {
+                    "description": "ESI parser rule name",
+                    "type": "string",
+                    "maximum": 50,
+                    "minimum": 1
+                },
+                "esi_parser_rule__conditions": {
+                    "type": "object",
+                    "required": [
+                        "cond-expr"
+                    ],
+                    "properties": {
+                        "cond-expr": {
+                            "description": "The regex pattern that uniquely identifies the syslog",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "esi_parser_rule__match": {
+                    "type": "object",
+                    "required": [
+                        "addr_type",
+                        "user-expr"
+                    ],
+                    "properties": {
+                        "addr_type": {
+                            "enum": [
+                                "mac",
+                                "ipaddr",
+                                "user"
+                            ],
+                            "type": "string"
+                        },
+                        "user-expr": {
+                            "description": "The regex pattern that uniquely identifies the user",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "esi_parser_rule__set": {
+                    "type": "object",
+                    "required": [
+                        "blacklist",
+                        "nrole"
+                    ],
+                    "properties": {
+                        "nrole": {
+                            "description": "The role to move user to",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        },
+                        "blacklist": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "esi_parser_rule__domain": {
+                    "type": "object",
+                    "required": [
+                        "domain-name"
+                    ],
+                    "properties": {
+                        "domain-name": {
+                            "description": "ESI parser domain",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "esi_parser_rule__position": {
+                    "type": "object",
+                    "required": [
+                        "pos"
+                    ],
+                    "properties": {
+                        "pos": {
+                            "description": "Rule's priority position (1 being highest)",
+                            "type": "string",
+                            "maximum": 32,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "esi_parser_rule__test": {
+                    "type": "object",
+                    "required": [
+                        "syslog",
+                        "filename"
+                    ],
+                    "properties": {
+                        "syslog": {
+                            "description": "Syslog message to test against",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        },
+                        "filename": {
+                            "description": "File name to test against",
+                            "type": "string",
+                            "maximum": 64,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "esi_parser_rule__enable": {
+                    "type": "object"
+                }
+            }
+        },
+        "esi_parser_rule_test": {
+            "type": "object",
+            "required": [
+                "syslog",
+                "filename"
+            ],
+            "properties": {
+                "syslog": {
+                    "description": "Syslog message to test against",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "filename": {
+                    "description": "File name to test against",
+                    "type": "string",
+                    "maximum": 64,
+                    "minimum": 1
+                }
+            }
+        },
+        "cppm_prof": {
+            "type": "object",
+            "properties": {
+                "cppm_enable": {
+                    "type": "object"
+                },
+                "cfg_cppms": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "username",
+                            "passwd",
+                            "host",
+                            "portnum"
+                        ],
+                        "properties": {
+                            "host": {
+                                "description": "IP address/hostname of CPPM IF-MAP Server",
+                                "type": "string",
+                                "maximum": 256,
+                                "minimum": 1
+                            },
+                            "portnum": {
+                                "description": "Port number of CPPM IF-MAP Server (1 ~ 65535)",
+                                "type": "integer",
+                                "maximum": 65535,
+                                "minimum": 1
+                            },
+                            "username": {
+                                "description": "The username in CPPM IF-MAP Server (1 ~ 255 bytes in length)",
+                                "type": "string",
+                                "maximum": 256,
+                                "minimum": 1
+                            },
+                            "passwd": {
+                                "description": "The password of the username in CPPM IF-MAP Server (6 ~ 100 bytes in length)",
+                                "type": "string",
+                                "maximum": 256,
+                                "minimum": 1
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "active_pan": {
+            "type": "object",
+            "properties": {
+                "active_prof": {
+                    "type": "object",
+                    "required": [
+                        "profile"
+                    ],
+                    "properties": {
+                        "profile": {
+                            "description": "Currently active Palo Alto Networks Profile",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                }
+            }
+        },
+        "cpnw_websocket_prof": {
+            "type": "object",
+            "properties": {
+                "cpnw_ws_enable": {
+                    "type": "object"
+                },
+                "primary": {
+                    "type": "object",
+                    "required": [
+                        "username",
+                        "passwd",
+                        "host",
+                        "portnum"
+                    ],
+                    "properties": {
+                        "host": {
+                            "description": "IP address/hostname",
+                            "type": "string",
+                            "maximum": 64,
+                            "minimum": 1
+                        },
+                        "portnum": {
+                            "description": "port number between 1 & 65535. Default: 443.",
+                            "type": "integer",
+                            "maximum": 65535,
+                            "minimum": 1
+                        },
+                        "username": {
+                            "description": "The username of the user who can perform actions on Server (length of 1 ~ 255 bytes)",
+                            "type": "string",
+                            "maximum": 255,
+                            "minimum": 1
+                        },
+                        "passwd": {
+                            "description": "The password of the user who can perform actions on Server (length of 6 ~ 100 bytes)",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "secondary": {
+                    "type": "object",
+                    "required": [
+                        "username",
+                        "passwd",
+                        "host",
+                        "portnum"
+                    ],
+                    "properties": {
+                        "host": {
+                            "description": "IP address/hostname",
+                            "type": "string",
+                            "maximum": 64,
+                            "minimum": 1
+                        },
+                        "portnum": {
+                            "description": "port number between 1 & 65535. Default: 443.",
+                            "type": "integer",
+                            "maximum": 65535,
+                            "minimum": 1
+                        },
+                        "username": {
+                            "description": "The username of the user who can perform actions on Server (length of 1 ~ 255 bytes)",
+                            "type": "string",
+                            "maximum": 255,
+                            "minimum": 1
+                        },
+                        "passwd": {
+                            "description": "The password of the user who can perform actions on Server (length of 6 ~ 100 bytes)",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                }
+            }
+        },
+        "pan_options": {
+            "type": "object",
+            "properties": {
+                "pan_portal_ip": {
+                    "type": "object",
+                    "required": [
+                        "passwd",
+                        "uname",
+                        "host",
+                        "cacert_name"
+                    ],
+                    "properties": {
+                        "host": {
+                            "description": "IP address/hostname of Portal",
+                            "type": "string",
+                            "maximum": 64,
+                            "minimum": 1
+                        },
+                        "cacert_name": {
+                            "description": "Trusted CA cert for Portal",
+                            "type": "string",
+                            "maximum": 64,
+                            "minimum": 1
+                        },
+                        "uname": {
+                            "description": "Username for the Satellite (Max 64 bytes)",
+                            "type": "string",
+                            "maximum": 64,
+                            "minimum": 1
+                        },
+                        "passwd": {
+                            "description": "Password for the Satellite (Max 64 bytes)",
+                            "type": "string",
+                            "maximum": 64,
+                            "minimum": 1
+                        }
+                    }
+                }
+            }
+        },
+        "esi_ping": {
+            "type": "object",
+            "required": [
+                "ping_inst"
+            ],
+            "properties": {
+                "ping_inst": {
+                    "description": "Specify ping health check configuration",
+                    "type": "string",
+                    "maximum": 50,
+                    "minimum": 1
+                },
+                "esi_ping__frequency": {
+                    "type": "object",
+                    "required": [
+                        "frequency_inst"
+                    ],
+                    "properties": {
+                        "frequency_inst": {
+                            "description": "Specify ping frequency in seconds (1-65535), default 5",
+                            "type": "integer",
+                            "maximum": 65535,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "esi_ping__timeout": {
+                    "type": "object",
+                    "required": [
+                        "timeout_inst"
+                    ],
+                    "properties": {
+                        "timeout_inst": {
+                            "description": "Specify ping timeout in seconds (1-65535), default 2",
+                            "type": "integer",
+                            "maximum": 65535,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "esi_ping__retry_count": {
+                    "type": "object",
+                    "required": [
+                        "retry-count_inst"
+                    ],
+                    "properties": {
+                        "retry-count_inst": {
+                            "description": "Specify ping retry count (1-65535), default 2",
+                            "type": "integer",
+                            "maximum": 65535,
+                            "minimum": 1
+                        }
+                    }
+                }
+            }
+        },
+        "xml_api_client_prof": {
+            "type": "object",
+            "required": [
+                "server_id"
+            ],
+            "properties": {
+                "server_id": {
+                    "description": "IP address of XML API server",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "secret": {
+                    "type": "object",
+                    "required": [
+                        "key"
+                    ],
+                    "properties": {
+                        "key": {
+                            "description": "Pre-Shared Key",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "xml_authenticated_role": {
+                    "type": "object",
+                    "required": [
+                        "default-authenticated-role"
+                    ],
+                    "properties": {
+                        "default-authenticated-role": {
+                            "description": "Assign default role for users after XML server authorization",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "xml_api_client_prof_clone": {
+                    "type": "object",
+                    "required": [
+                        "source"
+                    ],
+                    "properties": {
+                        "source": {
+                            "description": "Name of XML API Server to copy",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                }
+            }
+        },
+        "esi_server": {
+            "type": "object",
+            "required": [
+                "server_inst"
+            ],
+            "properties": {
+                "server_inst": {
+                    "description": "Specify ESI server configuration",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "esi_server__trusted_ip_addr": {
+                    "type": "object",
+                    "required": [
+                        "trusted-ip-addr_inst"
+                    ],
+                    "properties": {
+                        "health-check": {
+                            "type": "boolean"
+                        },
+                        "trusted-ip-addr_inst": {
+                            "description": "Specify server IP Address on trusted network",
+                            "type": "string"
+                        }
+                    }
+                },
+                "esi_server__untrusted_ip_addr": {
+                    "type": "object",
+                    "required": [
+                        "untrusted-ip-addr_inst"
+                    ],
+                    "properties": {
+                        "health-check": {
+                            "type": "boolean"
+                        },
+                        "untrusted-ip-addr_inst": {
+                            "description": "Specify server IP Address on untrusted network",
+                            "type": "string"
+                        }
+                    }
+                },
+                "esi_server__trusted_port": {
+                    "type": "object",
+                    "required": [
+                        "trusted-slot-port"
+                    ],
+                    "properties": {
+                        "trusted-slot-port": {
+                            "description": "Interface in <slot>/<port> format",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "esi_server__untrusted_port": {
+                    "type": "object",
+                    "required": [
+                        "untrusted-slot-port"
+                    ],
+                    "properties": {
+                        "untrusted-slot-port": {
+                            "description": "Interface in <slot>/<port> format",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "esi_server__mode": {
+                    "type": "object",
+                    "required": [
+                        "op_mode"
+                    ],
+                    "properties": {
+                        "op_mode": {
+                            "enum": [
+                                "bridge",
+                                "route",
+                                "nat"
+                            ],
+                            "type": "string"
+                        }
+                    }
+                },
+                "esi_server__dport": {
+                    "type": "object",
+                    "required": [
+                        "tcp-udp-port"
+                    ],
+                    "properties": {
+                        "tcp-udp-port": {
+                            "description": "NAT destination TCP/UDP port",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                }
+            }
+        },
+        "pan_prof": {
+            "type": "object",
+            "required": [
+                "profile-name"
+            ],
+            "properties": {
+                "profile-name": {
+                    "description": "Profile name",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "cfg_firewalls": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "username",
+                            "passwd",
+                            "host",
+                            "portnum"
+                        ],
+                        "properties": {
+                            "host": {
+                                "description": "IP address/hostname of Palo Alto Networks Firewall",
+                                "type": "string",
+                                "maximum": 256,
+                                "minimum": 1
+                            },
+                            "portnum": {
+                                "description": "Port number of Palo Alto Networks Firewall (1 ~ 65535)",
+                                "type": "integer",
+                                "maximum": 65535,
+                                "minimum": 1
+                            },
+                            "username": {
+                                "description": "The username in Palo Alto Networks Firewall (1 ~ 255 bytes in length)",
+                                "type": "string",
+                                "maximum": 256,
+                                "minimum": 1
+                            },
+                            "passwd": {
+                                "description": "The password of the username in Palo Alto Networks Firewall (6 ~ 100 bytes in length)",
+                                "type": "string",
+                                "maximum": 256,
+                                "minimum": 1
+                            }
+                        }
+                    }
+                },
+                "pan_prof_clone": {
+                    "type": "object",
+                    "required": [
+                        "source"
+                    ],
+                    "properties": {
+                        "source": {
+                            "description": "Name of Palo Alto Networks Servers Profile to copy",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                }
+            }
+        },
+        "esi_parser_domain": {
+            "type": "object",
+            "required": [
+                "domain-name"
+            ],
+            "properties": {
+                "domain-name": {
+                    "description": "ESI parser domain name",
+                    "type": "string",
+                    "maximum": 50,
+                    "minimum": 1
+                },
+                "esi_parser_domain_server": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "ipaddr"
+                        ],
+                        "properties": {
+                            "ipaddr": {
+                                "description": "ESI server management IP address",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "esi_parser_domain_peer": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "peer-ip"
+                        ],
+                        "properties": {
+                            "peer-ip": {
+                                "description": "Peer controller IP address",
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

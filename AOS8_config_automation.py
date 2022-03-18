@@ -762,6 +762,19 @@ def add_acls_to_role(full_attribute_name,profiles):
       acl_type,pname = acl.split(' ')
       profile['role__acl'].append({'pname':pname,'acl_type':acl_type}) 
 
+def add_vlan_name_association(profiles):
+  """ Make the VLAN name to ID associations if the IDs exist and have the same node information. """
+
+  if 'vlan_id.id' in TABLE_COLUMNS:
+    vlan_ids = TABLE_COLUMNS['vlan_id.id']
+    vlan_names = TABLE_COLUMNS['vlan_name.name']
+    for vlan_id,vlan_name,profile in zip(vlan_ids,vlan_names,profiles):
+      vid,id_node = vlan_id.split(',')
+      vname,name_node = vlan_name.split('.')
+      if id_node == name_node:
+        profile['name'] = vname
+        profile['vlan-ids'] = vid
+
 def add_array_attribute_to_profiles(full_attribute_name,profiles):
   """ Adds an array attribute to the profile. """
 
@@ -1724,9 +1737,13 @@ def sanitize_white_spaces(text):
 
   return text
 
-SPECIAL_COLUMNS = {'vlan_name.name':'process_vlan_name_func',
+SPECIAL_COLUMNS = {'vlan_name_id.name':add_vlan_name_association,
                    'ap_a_radio_prof.channel_width':'process_5_width_func',
                    'role.role__acl.pname':add_acls_to_role_profiles,
                    'acl_sess.acl_sess__v4policy.ace':build_session_acl_objects,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dns.address': add_addresses_to_dhcp_pool,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dft_rtr.address': add_addresses_to_dhcp_pool}
+
+def add_wide_5ghz_channels(profiles):
+  """ Processes the 5ghz channel width property and produces the list of bonded channels for the corresponding bonded channel attribute
+      in the SSID profile."""

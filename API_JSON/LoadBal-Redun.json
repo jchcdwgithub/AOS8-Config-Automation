@@ -1,0 +1,4164 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0",
+        "title": "ArubaOS JSON API Specification"
+    },
+    "basePath": "/v1/configuration",
+    "tags": [
+        {
+            "name": "Load Balancing & Redundancy",
+            "description": "Manage Load Balancing & Redundancy objects"
+        }
+    ],
+    "paths": {
+        "/object/cluster_debug_saac_active_aac": {
+            "post": {
+                "summary": "Cluster Debug Saac Active Aac",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type cluster_debug_saac_active_aac",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes cluster_debug_saac_active_aac",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cluster_debug_saac_active_aac"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object": {},
+        "/object/vrrp6": {
+            "get": {
+                "summary": "VRRP6",
+                "description": "Get detailed configuration of a VRRP ID.",
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/vrrp6"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "VRRP6",
+                "description": "Create a new IPv6 VRRP Instance and update its parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Create a new IPv6 VRRP Instance and update its parameters.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/vrrp6"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/initiate_cluster_upgrade_tftp": {
+            "post": {
+                "summary": "Initiate Cluster Upgrade TFTP",
+                "description": "Initiate live upgrade for a given cluster using tftp for image copy from image server.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Initiate live upgrade for a given cluster using tftp for image copy from image server.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/initiate_cluster_upgrade_tftp"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/sched_cluster_upgrade": {
+            "post": {
+                "summary": "Sched Cluster Upgrade",
+                "description": "Schedule cluster live upgrade for a given cluster name on the configured time.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Schedule cluster live upgrade for a given cluster name on the configured time.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sched_cluster_upgrade"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/cluster_membership_profile": {
+            "get": {
+                "summary": "Cluster Membership Profile",
+                "description": "Get cluster group membership configuration.",
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/cluster_membership_profile"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Cluster Membership Profile",
+                "description": "Add cluster group membership for the controller.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Add cluster group membership for the controller.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cluster_membership_profile"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/cluster_prof": {
+            "get": {
+                "summary": "Cluster Profile",
+                "description": "Get cluster profile configuration.",
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/cluster_prof"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Cluster Profile",
+                "description": "Create or update a cluster profile with the given name.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Create or update a cluster profile with the given name.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cluster_prof"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/cluster_debug_bucketmap": {
+            "post": {
+                "summary": "Cluster Debug Bucketmap",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type cluster_debug_bucketmap",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes cluster_debug_bucketmap",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cluster_debug_bucketmap"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/auth_surv_server_cert": {
+            "get": {
+                "summary": "Authentication Surv Server Cert",
+                "description": "Gets configuration for auth_surv_server_cert",
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/auth_surv_server_cert"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Authentication Surv Server Cert",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type auth_surv_server_cert",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes auth_surv_server_cert",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth_surv_server_cert"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/start_vlan_probe": {
+            "post": {
+                "summary": "Start VLAN Probe",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type start_vlan_probe",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes start_vlan_probe",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/start_vlan_probe"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/cluster_debug_saac_ap_mac": {
+            "post": {
+                "summary": "Cluster Debug Saac AP MAC",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type cluster_debug_saac_ap_mac",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes cluster_debug_saac_ap_mac",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cluster_debug_saac_ap_mac"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ap_partition_complete": {
+            "post": {
+                "summary": "AP Partition Complete",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ap_partition_complete",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ap_partition_complete",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ap_partition_complete"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/cluster_debug_saac_ap_group": {
+            "post": {
+                "summary": "Cluster Debug Saac AP Group",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type cluster_debug_saac_ap_group",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes cluster_debug_saac_ap_group",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cluster_debug_saac_ap_group"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/mas_red": {
+            "get": {
+                "summary": "Mas Red",
+                "description": "Gets configuration for mas_red",
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/mas_red"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Mas Red",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type mas_red",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes mas_red",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mas_red"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/initiate_cluster_upgrade_fs_scp": {
+            "post": {
+                "summary": "Initiate Cluster Upgrade File Server SCP",
+                "description": "Initiate live upgrade for a given cluster using scp for image copy from image server.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Initiate live upgrade for a given cluster using scp for image copy from image server.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/initiate_cluster_upgrade_fs_scp"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ha_group_prof": {
+            "get": {
+                "summary": "Ha Group Profile",
+                "description": "Gets configuration for ha_group_prof",
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ha_group_prof"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Ha Group Profile",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ha_group_prof",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ha_group_prof",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ha_group_prof"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/cluster_debug_saac_apgroup_aac": {
+            "post": {
+                "summary": "Cluster Debug Saac Apgroup Aac",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type cluster_debug_saac_apgroup_aac",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes cluster_debug_saac_apgroup_aac",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cluster_debug_saac_apgroup_aac"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/file_syncing_prof": {
+            "get": {
+                "summary": "File Syncing Profile",
+                "description": "Gets configuration for file_syncing_prof",
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/file_syncing_prof"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "File Syncing Profile",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type file_syncing_prof",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes file_syncing_prof",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/file_syncing_prof"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/auth_surv_cache_lifetime": {
+            "get": {
+                "summary": "Authentication Surv Cache Lifetime",
+                "description": "Gets configuration for auth_surv_cache_lifetime",
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/auth_surv_cache_lifetime"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Authentication Surv Cache Lifetime",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type auth_surv_cache_lifetime",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes auth_surv_cache_lifetime",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth_surv_cache_lifetime"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/auth_surv_enable": {
+            "get": {
+                "summary": "Authentication Surv Enable",
+                "description": "Gets configuration for auth_surv_enable",
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/auth_surv_enable"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Authentication Surv Enable",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type auth_surv_enable",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes auth_surv_enable",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth_surv_enable"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/initiate_cluster_upgrade": {
+            "post": {
+                "summary": "Initiate Cluster Upgrade",
+                "description": "Initiate live upgrade for a given cluster name.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Initiate live upgrade for a given cluster name.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/initiate_cluster_upgrade"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/abort_cluster_upgrade": {
+            "post": {
+                "summary": "Abort Cluster Upgrade",
+                "description": "Abort the ongoing cluster live upgrade for a given cluster name.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Abort the ongoing cluster live upgrade for a given cluster name.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/abort_cluster_upgrade"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/vrrp": {
+            "get": {
+                "summary": "VRRP",
+                "description": "Get detailed configuration of a VRRP ID.",
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/vrrp"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "VRRP",
+                "description": "Create a new IPv4 VRRP Instance and update its parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Create a new IPv4 VRRP Instance and update its parameters.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/vrrp"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/initiate_cluster_upgrade_fs_ftp": {
+            "post": {
+                "summary": "Initiate Cluster Upgrade File Server FTP",
+                "description": "Initiate live upgrade for a given cluster using ftp for image copy from image server.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Initiate live upgrade for a given cluster using ftp for image copy from image server.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/initiate_cluster_upgrade_fs_ftp"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/group_membership": {
+            "get": {
+                "summary": "Group Membership",
+                "description": "Get HA group membership configuration.",
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/group_membership"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Group Membership",
+                "description": "Add HA group membership for the controller.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Add HA group membership for the controller.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/group_membership"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/cluster_vlanprobe": {
+            "get": {
+                "summary": "Cluster Vlanprobe",
+                "description": "Gets configuration for cluster_vlanprobe",
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/cluster_vlanprobe"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Cluster Vlanprobe",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type cluster_vlanprobe",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoadBal-Redun"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes cluster_vlanprobe",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cluster_vlanprobe"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        }
+    },
+    "definitions": {
+        "ha_group_prof": {
+            "type": "object",
+            "required": [
+                "profile-name"
+            ],
+            "properties": {
+                "profile-name": {
+                    "description": "Profile name",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "preemption": {
+                    "type": "object"
+                },
+                "ha_on_blms": {
+                    "type": "object"
+                },
+                "oversubscription": {
+                    "type": "object"
+                },
+                "statesync": {
+                    "type": "object"
+                },
+                "psk": {
+                    "type": "object",
+                    "required": [
+                        "pre-shared-key"
+                    ],
+                    "properties": {
+                        "pre-shared-key": {
+                            "description": "Pre-shared key for secure tunnel between HA controllers (Length: 8-32)",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "inter_ctrlr_hbt": {
+                    "type": "object"
+                },
+                "hbt_threshold": {
+                    "type": "object",
+                    "required": [
+                        "heartbeat-threshold"
+                    ],
+                    "properties": {
+                        "heartbeat-threshold": {
+                            "description": "Inter-controller heartbeat threshold. Range 3 to 10. Default 5.",
+                            "type": "integer",
+                            "maximum": 10,
+                            "minimum": 3
+                        }
+                    }
+                },
+                "hbt_interval": {
+                    "type": "object",
+                    "required": [
+                        "heartbeat-interval"
+                    ],
+                    "properties": {
+                        "heartbeat-interval": {
+                            "description": "Inter-controller heartbeat interval. Range 100 to 1000ms. Default 100ms.",
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 100
+                        }
+                    }
+                },
+                "ha_controller": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "ip"
+                        ],
+                        "properties": {
+                            "role": {
+                                "type": "boolean"
+                            },
+                            "ha_role": {
+                                "enum": [
+                                    "dual",
+                                    "active",
+                                    "standby"
+                                ],
+                                "type": "string"
+                            },
+                            "ip": {
+                                "description": "Controller IPv4 Address (Should be the controller-ip)",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "ha_controller_v6": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "ipv6"
+                        ],
+                        "properties": {
+                            "role": {
+                                "type": "boolean"
+                            },
+                            "ha_role": {
+                                "enum": [
+                                    "dual",
+                                    "active",
+                                    "standby"
+                                ],
+                                "type": "string"
+                            },
+                            "ipv6": {
+                                "description": "Controller IPv6 Address (Should be the controller-ip)",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "ha_group_prof_clone": {
+                    "type": "object",
+                    "required": [
+                        "source"
+                    ],
+                    "properties": {
+                        "source": {
+                            "description": "Name of HA group information to copy",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                }
+            }
+        },
+        "initiate_cluster_upgrade_fs_ftp": {
+            "type": "object",
+            "required": [
+                "profile",
+                "version_string",
+                "imagepath",
+                "imagehost",
+                "passwd",
+                "uname"
+            ],
+            "properties": {
+                "partition_id": {
+                    "description": "Image to be copied onto partition 0 or 1",
+                    "type": "string",
+                    "maximum": 1,
+                    "minimum": 0
+                },
+                "ap_preload_batch_size": {
+                    "description": "Number of APs doing simultaneous image preload",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "profile": {
+                    "description": "Name of Cluster Profile",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "version_string": {
+                    "description": "Target image version e.g. 8.1.0.0_XXXXX",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "uname": {
+                    "description": "Username on fileserver",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "passwd": {
+                    "description": "Password on fileserver",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "imagehost": {
+                    "description": "IPv4/IPv6 address of Image server",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "imagepath": {
+                    "description": "Image path on the fileserver, use '.' to specify default path",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "cluster_debug_saac_active_aac": {
+            "type": "object",
+            "required": [
+                "active_aac",
+                "active_aac_v6",
+                "new_standby_aac_v6",
+                "new_standby_aac"
+            ],
+            "properties": {
+                "active_aac": {
+                    "description": "IP Address of Active AAC",
+                    "type": "string"
+                },
+                "active_aac_v6": {
+                    "description": "IPv6 Address of Active AAC",
+                    "type": "string"
+                },
+                "new_standby_aac": {
+                    "description": "IP Address of New Standby AAC",
+                    "type": "string"
+                },
+                "new_standby_aac_v6": {
+                    "description": "IPv6 Address of New Standby AAC",
+                    "type": "string"
+                }
+            }
+        },
+        "vrrp6": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "description": "<1-255> Virtual Router ID",
+                    "type": "integer",
+                    "maximum": 255,
+                    "minimum": 1
+                },
+                "vrrp6_ip": {
+                    "type": "object",
+                    "required": [
+                        "ipv6-addr"
+                    ],
+                    "properties": {
+                        "ipv6-addr": {
+                            "description": "IPv6 address",
+                            "type": "string"
+                        }
+                    }
+                },
+                "vrrp6_desc": {
+                    "type": "object",
+                    "required": [
+                        "text"
+                    ],
+                    "properties": {
+                        "text": {
+                            "description": "Text description (up to 80 characters in quote)",
+                            "type": "string",
+                            "maximum": 80,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "vrrp6_preempt": {
+                    "type": "object",
+                    "properties": {
+                        "seconds": {
+                            "description": "Delay in seconds (0-60)",
+                            "type": "integer",
+                            "maximum": 60,
+                            "minimum": 0
+                        }
+                    }
+                },
+                "vrrp6_priority": {
+                    "type": "object",
+                    "required": [
+                        "level"
+                    ],
+                    "properties": {
+                        "level": {
+                            "description": "<1-255> priority level for VRRP router",
+                            "type": "integer",
+                            "maximum": 255,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "vrrp6_adv_interval": {
+                    "type": "object",
+                    "required": [
+                        "interval"
+                    ],
+                    "properties": {
+                        "interval": {
+                            "description": "<1-60> interval unit in seconds.",
+                            "type": "integer",
+                            "maximum": 60,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "vrrp6_shut": {
+                    "type": "object"
+                },
+                "vrrp6_vlan": {
+                    "type": "object",
+                    "required": [
+                        "vlanid"
+                    ],
+                    "properties": {
+                        "vlanid": {
+                            "description": "<1-4094> vlan id",
+                            "type": "integer",
+                            "maximum": 4094,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "vrrp6_track_uptime": {
+                    "type": "object",
+                    "required": [
+                        "duration",
+                        "value"
+                    ],
+                    "properties": {
+                        "duration": {
+                            "description": "Elapsed time in minutes before tracking takes effect (0-1440)",
+                            "type": "integer",
+                            "maximum": 1440,
+                            "minimum": 0
+                        },
+                        "value": {
+                            "description": "Add value to priority (0-255)",
+                            "type": "integer",
+                            "maximum": 255,
+                            "minimum": 0
+                        }
+                    }
+                },
+                "vrrp6_track_master": {
+                    "type": "object",
+                    "required": [
+                        "vrid",
+                        "value"
+                    ],
+                    "properties": {
+                        "vrid": {
+                            "description": "Virtual Router ID in which to track its MASTER state",
+                            "type": "integer",
+                            "maximum": 255,
+                            "minimum": 1
+                        },
+                        "value": {
+                            "description": "Add value to priority (0-255)",
+                            "type": "integer",
+                            "maximum": 255,
+                            "minimum": 0
+                        }
+                    }
+                },
+                "vrrp6_track_vlan": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "vlanId",
+                            "value"
+                        ],
+                        "properties": {
+                            "vlanId": {
+                                "description": "vlan id used for tracking changes",
+                                "type": "integer",
+                                "maximum": 4094,
+                                "minimum": 1
+                            },
+                            "value": {
+                                "description": "priority value from 0-255",
+                                "type": "integer",
+                                "maximum": 255,
+                                "minimum": 0
+                            }
+                        }
+                    }
+                },
+                "vrrp6_track_intf": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "value",
+                            "slot/module/port"
+                        ],
+                        "properties": {
+                            "slot/module/port": {
+                                "description": "Interface in <slot>/<module>/<port> format",
+                                "type": "string",
+                                "maximum": 256,
+                                "minimum": 1
+                            },
+                            "value": {
+                                "description": "value of priority between 0-255",
+                                "type": "integer",
+                                "maximum": 255,
+                                "minimum": 0
+                            }
+                        }
+                    }
+                },
+                "vrrp6_holdtime": {
+                    "type": "object",
+                    "properties": {
+                        "secs": {
+                            "description": "Time in seconds (30-120). Default value is 45.",
+                            "type": "integer",
+                            "maximum": 120,
+                            "minimum": 30
+                        }
+                    }
+                }
+            }
+        },
+        "cluster_debug_saac_apgroup_aac": {
+            "type": "object",
+            "required": [
+                "active_aac",
+                "new_standby_aac",
+                "active_aac_v6",
+                "new_standby_aac_v6",
+                "ap_group"
+            ],
+            "properties": {
+                "active_aac": {
+                    "description": "IP Address of Active AAC",
+                    "type": "string"
+                },
+                "active_aac_v6": {
+                    "description": "IPv6 Address of Active AAC",
+                    "type": "string"
+                },
+                "new_standby_aac": {
+                    "description": "IP Address of New Standby AAC",
+                    "type": "string"
+                },
+                "new_standby_aac_v6": {
+                    "description": "IPv6 Address of New Standby AAC",
+                    "type": "string"
+                },
+                "ap_group": {
+                    "description": "AP Group Name",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "auth_surv_server_cert": {
+            "type": "object",
+            "required": [
+                "server-cert-name"
+            ],
+            "properties": {
+                "server-cert-name": {
+                    "description": "Name of the Server Certificate",
+                    "type": "string",
+                    "maximum": 31,
+                    "minimum": 1
+                }
+            }
+        },
+        "mas_red": {
+            "type": "object",
+            "properties": {
+                "mas_red_master_vrrp": {
+                    "type": "object",
+                    "required": [
+                        "id"
+                    ],
+                    "properties": {
+                        "id": {
+                            "description": "Master Switch virtual router id (1-255)",
+                            "type": "integer",
+                            "maximum": 255,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "mas_red_master_vrrp_ip6": {
+                    "type": "object",
+                    "required": [
+                        "id"
+                    ],
+                    "properties": {
+                        "id": {
+                            "description": "Master Switch Virtual Router Id (1-255)",
+                            "type": "integer",
+                            "maximum": 255,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "mas_red_peer_ip": {
+                    "type": "object",
+                    "required": [
+                        "ca",
+                        "ipaddr",
+                        "custom-mac",
+                        "key",
+                        "sc",
+                        "factory-mac"
+                    ],
+                    "properties": {
+                        "key": {
+                            "description": "IPSEC key of length up to 64 bytes",
+                            "type": "string",
+                            "maximum": 64,
+                            "minimum": 6
+                        },
+                        "factory-mac": {
+                            "description": "Peer's MAC address",
+                            "type": "string"
+                        },
+                        "suite-b": {
+                            "type": "boolean"
+                        },
+                        "gcm_type": {
+                            "enum": [
+                                "gcm128",
+                                "gcm256"
+                            ],
+                            "type": "string"
+                        },
+                        "custom-mac": {
+                            "description": "Peer's MAC address",
+                            "type": "string"
+                        },
+                        "ca": {
+                            "description": "CA Certificate Name in Trusted Certificate Store",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        },
+                        "sc": {
+                            "description": "Server Certificate Name in Server Certificate Store",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        },
+                        "ipaddr": {
+                            "description": "ip address",
+                            "type": "string"
+                        }
+                    }
+                },
+                "mas_red_peer_ip6": {
+                    "type": "object",
+                    "required": [
+                        "ca",
+                        "ipv6-addr",
+                        "custom-mac",
+                        "key",
+                        "sc",
+                        "factory-mac"
+                    ],
+                    "properties": {
+                        "key": {
+                            "description": "IPSEC key of length up to 64 bytes",
+                            "type": "string",
+                            "maximum": 64,
+                            "minimum": 6
+                        },
+                        "factory-mac": {
+                            "description": "Peer's MAC address",
+                            "type": "string"
+                        },
+                        "suite-b": {
+                            "type": "boolean"
+                        },
+                        "gcm_type": {
+                            "enum": [
+                                "gcm128",
+                                "gcm256"
+                            ],
+                            "type": "string"
+                        },
+                        "custom-mac": {
+                            "description": "Peer's MAC address",
+                            "type": "string"
+                        },
+                        "ca": {
+                            "description": "CA Certificate Name in Trusted Certificate Store",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        },
+                        "sc": {
+                            "description": "Server Certificate Name in Server Certificate Store",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        },
+                        "ipv6-addr": {
+                            "description": "IPV6",
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "file_syncing_prof": {
+            "type": "object",
+            "properties": {
+                "file_syncing_enable": {
+                    "type": "object"
+                },
+                "file_sync_time": {
+                    "type": "object",
+                    "required": [
+                        "sync-time"
+                    ],
+                    "properties": {
+                        "sync-time": {
+                            "description": "Time between file syncs. The value must be in the range [30-180] minutes, Default: 30",
+                            "type": "integer",
+                            "maximum": 180,
+                            "minimum": 30
+                        }
+                    }
+                }
+            }
+        },
+        "vrrp": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "description": "<1-255> Virtual Router ID",
+                    "type": "integer",
+                    "maximum": 255,
+                    "minimum": 1
+                },
+                "vrrp_ip": {
+                    "type": "object",
+                    "required": [
+                        "ipaddr"
+                    ],
+                    "properties": {
+                        "ipaddr": {
+                            "description": "A.B.C.D  IP address",
+                            "type": "string"
+                        }
+                    }
+                },
+                "vrrp_desc": {
+                    "type": "object",
+                    "required": [
+                        "text"
+                    ],
+                    "properties": {
+                        "text": {
+                            "description": "Text description (up to 80 characters in quote)",
+                            "type": "string",
+                            "maximum": 80,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "vrrp_auth": {
+                    "type": "object",
+                    "required": [
+                        "password"
+                    ],
+                    "properties": {
+                        "password": {
+                            "description": "Password of length up to 8 characters",
+                            "type": "string",
+                            "maximum": 8,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "vrrp_preempt": {
+                    "type": "object",
+                    "properties": {
+                        "seconds": {
+                            "description": "Delay in seconds (0-60)",
+                            "type": "integer",
+                            "maximum": 60,
+                            "minimum": 0
+                        }
+                    }
+                },
+                "vrrp_priority": {
+                    "type": "object",
+                    "required": [
+                        "level"
+                    ],
+                    "properties": {
+                        "level": {
+                            "description": "<1-255> priority level for VRRP router",
+                            "type": "integer",
+                            "maximum": 255,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "vrrp_adv_interval": {
+                    "type": "object",
+                    "required": [
+                        "interval"
+                    ],
+                    "properties": {
+                        "interval": {
+                            "description": "<1-60> interval unit in seconds.",
+                            "type": "integer",
+                            "maximum": 60,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "vrrp_shut": {
+                    "type": "object"
+                },
+                "vrrp_vlan": {
+                    "type": "object",
+                    "required": [
+                        "vlanid"
+                    ],
+                    "properties": {
+                        "vlanid": {
+                            "description": "<1-4094> vlan id",
+                            "type": "integer",
+                            "maximum": 4094,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "vrrp_track_uptime": {
+                    "type": "object",
+                    "required": [
+                        "duration",
+                        "value"
+                    ],
+                    "properties": {
+                        "duration": {
+                            "description": "Elapsed time in minutes before tracking takes effect (0-1440)",
+                            "type": "integer",
+                            "maximum": 1440,
+                            "minimum": 0
+                        },
+                        "value": {
+                            "description": "Add value to priority (0-255)",
+                            "type": "integer",
+                            "maximum": 255,
+                            "minimum": 0
+                        }
+                    }
+                },
+                "vrrp_track_master": {
+                    "type": "object",
+                    "required": [
+                        "vrid",
+                        "value"
+                    ],
+                    "properties": {
+                        "vrid": {
+                            "description": "Virtual Router ID in which to track its MASTER state",
+                            "type": "integer",
+                            "maximum": 255,
+                            "minimum": 1
+                        },
+                        "value": {
+                            "description": "Add value to priority (0-255)",
+                            "type": "integer",
+                            "maximum": 255,
+                            "minimum": 0
+                        }
+                    }
+                },
+                "vrrp_track_vlan": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "vlanId",
+                            "value"
+                        ],
+                        "properties": {
+                            "vlanId": {
+                                "description": "vlan id used for tracking changes",
+                                "type": "integer",
+                                "maximum": 4094,
+                                "minimum": 1
+                            },
+                            "value": {
+                                "description": "priority value from 0-255",
+                                "type": "integer",
+                                "maximum": 255,
+                                "minimum": 0
+                            }
+                        }
+                    }
+                },
+                "vrrp_track_intf": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "value",
+                            "slot/module/port"
+                        ],
+                        "properties": {
+                            "slot/module/port": {
+                                "description": "Interface in <slot>/<module>/<port> format",
+                                "type": "string",
+                                "maximum": 256,
+                                "minimum": 1
+                            },
+                            "value": {
+                                "description": "value of priority between 0-255",
+                                "type": "integer",
+                                "maximum": 255,
+                                "minimum": 0
+                            }
+                        }
+                    }
+                },
+                "vrrp_holdtime": {
+                    "type": "object",
+                    "properties": {
+                        "secs": {
+                            "description": "Time in seconds (30-120). Default value is 45.",
+                            "type": "integer",
+                            "maximum": 120,
+                            "minimum": 30
+                        }
+                    }
+                }
+            }
+        },
+        "initiate_cluster_upgrade_fs_scp": {
+            "type": "object",
+            "required": [
+                "profile",
+                "version_string",
+                "imagepath",
+                "imagehost",
+                "passwd",
+                "uname"
+            ],
+            "properties": {
+                "partition_id": {
+                    "description": "Image to be copied onto partition 0 or 1",
+                    "type": "string",
+                    "maximum": 1,
+                    "minimum": 0
+                },
+                "ap_preload_batch_size": {
+                    "description": "Number of APs doing simultaneous image preload",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "profile": {
+                    "description": "Name of Cluster Profile",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "version_string": {
+                    "description": "Target image version e.g. 8.1.0.0_XXXXX",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "uname": {
+                    "description": "Username on fileserver",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "passwd": {
+                    "description": "Password on fileserver",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "imagehost": {
+                    "description": "IPv4/IPv6 address of Image server",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "imagepath": {
+                    "description": "Image path on the fileserver, use '.' to specify default path",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "group_membership": {
+            "type": "object",
+            "required": [
+                "group-membership"
+            ],
+            "properties": {
+                "group-membership": {
+                    "description": "HA group to which this controller belongs",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "cluster_debug_saac_ap_mac": {
+            "type": "object",
+            "required": [
+                "ap_mac",
+                "new_standby_aac_v6",
+                "new_standby_aac"
+            ],
+            "properties": {
+                "new_standby_aac": {
+                    "description": "IP Address of New Standby AAC",
+                    "type": "string"
+                },
+                "new_standby_aac_v6": {
+                    "description": "IPv6 Address of New Standby AAC",
+                    "type": "string"
+                },
+                "ap_mac": {
+                    "description": "Mac Address of the AP",
+                    "type": "string"
+                }
+            }
+        },
+        "ap_partition_complete": {
+            "type": "object",
+            "required": [
+                "profile"
+            ],
+            "properties": {
+                "profile": {
+                    "description": "Name of Cluster Profile",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "cluster_membership_profile": {
+            "type": "object",
+            "required": [
+                "profile"
+            ],
+            "properties": {
+                "profile": {
+                    "description": "Cluster Profile Name",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "auth_surv_cache_lifetime": {
+            "type": "object",
+            "required": [
+                "lifetime"
+            ],
+            "properties": {
+                "lifetime": {
+                    "description": "Lifetime in hours for Cached access credential. Valid range is 1-168 hours. Default is 24 hours",
+                    "type": "string",
+                    "maximum": 168,
+                    "minimum": 1
+                }
+            }
+        },
+        "cluster_prof": {
+            "type": "object",
+            "required": [
+                "profile-name"
+            ],
+            "properties": {
+                "profile-name": {
+                    "description": "Profile name",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "cluster_controller": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "ip",
+                            "vrrp_vlan",
+                            "vrrp_ip"
+                        ],
+                        "properties": {
+                            "prio": {
+                                "description": "Priority value [1-255]",
+                                "type": "integer",
+                                "maximum": 255,
+                                "minimum": 1
+                            },
+                            "mcast_vlan": {
+                                "description": "VLAN id",
+                                "type": "integer",
+                                "maximum": 4094,
+                                "minimum": 0
+                            },
+                            "vrrp_ip": {
+                                "description": "VRRP IP of the controller",
+                                "type": "string"
+                            },
+                            "vrrp_vlan": {
+                                "description": "VLAN id",
+                                "type": "integer",
+                                "maximum": 4094,
+                                "minimum": 0
+                            },
+                            "group_id": {
+                                "description": "group id, ranging from 1 to 12",
+                                "type": "integer",
+                                "maximum": 12,
+                                "minimum": 0
+                            },
+                            "rap_public_ip": {
+                                "description": "IP Address of RAP for cluster behind NAT",
+                                "type": "string"
+                            },
+                            "ip": {
+                                "description": "Controller IPv4 Address (Should be the controller-ip)",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "cluster_controller_v6": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "vrrp_ip_v6",
+                            "vrrp_vlan_v6",
+                            "ipv6"
+                        ],
+                        "properties": {
+                            "prio": {
+                                "description": "Priority value [1-255]",
+                                "type": "integer",
+                                "maximum": 255,
+                                "minimum": 1
+                            },
+                            "mcast_vlan": {
+                                "description": "VLAN id",
+                                "type": "integer",
+                                "maximum": 4094,
+                                "minimum": 0
+                            },
+                            "vrrp_ip_v6": {
+                                "description": "VRRP IP of the controller",
+                                "type": "string"
+                            },
+                            "vrrp_vlan_v6": {
+                                "description": "VLAN id",
+                                "type": "integer",
+                                "maximum": 4094,
+                                "minimum": 0
+                            },
+                            "group_id": {
+                                "description": "group id, ranging from 1 to 12",
+                                "type": "integer",
+                                "maximum": 12,
+                                "minimum": 0
+                            },
+                            "ipv6": {
+                                "description": "Controller IPv6 Address (Should be the controller-ip)",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "redundancy": {
+                    "type": "object"
+                },
+                "vrrp_info": {
+                    "type": "object",
+                    "required": [
+                        "vrrp_id"
+                    ],
+                    "properties": {
+                        "vrrp_passphrase": {
+                            "description": "VRRP Passphrase string",
+                            "type": "string",
+                            "maximum": 8,
+                            "minimum": 1
+                        },
+                        "vrrp_id": {
+                            "description": "VRRP ID value",
+                            "type": "integer",
+                            "maximum": 255,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "act_cl_rebal_act_load_perc": {
+                    "type": "object",
+                    "required": [
+                        "active-client-rebalance-threshold"
+                    ],
+                    "properties": {
+                        "active-client-rebalance-threshold": {
+                            "description": "Redistribute active client load when active load on any cluster node is beyond this configured percentage. Default active client rebalance threshold is 20.",
+                            "type": "integer",
+                            "maximum": 99,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "sby_cl_rebal_tot_load_perc": {
+                    "type": "object",
+                    "required": [
+                        "standby-client-rebalance-threshold"
+                    ],
+                    "properties": {
+                        "standby-client-rebalance-threshold": {
+                            "description": "Redistribute standby client load when total load on any cluster node is beyond this configured percentage. Default standby client rebalance threshold is 40.",
+                            "type": "integer",
+                            "maximum": 99,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "unbalance_threshold": {
+                    "type": "object",
+                    "required": [
+                        "unbalance-threshold"
+                    ],
+                    "properties": {
+                        "unbalance-threshold": {
+                            "description": "The minimum difference in load percentage between max loaded cluster node and min loaded cluster node to let load balancing algorithm kick in",
+                            "type": "integer",
+                            "maximum": 99,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "heartbeat_threshold": {
+                    "type": "object",
+                    "required": [
+                        "heartbeat-threshold"
+                    ],
+                    "properties": {
+                        "heartbeat-threshold": {
+                            "description": "Cluster will wait for heartbeat threshold time (ms) before declaring a peer cluster node as dead.",
+                            "type": "integer",
+                            "maximum": 65535,
+                            "minimum": 0
+                        }
+                    }
+                },
+                "ap_load_balancing": {
+                    "type": "object"
+                },
+                "active_ap_rebal_threshold": {
+                    "type": "object",
+                    "required": [
+                        "active-ap-rebalance-threshold-percentage"
+                    ],
+                    "properties": {
+                        "active-ap-rebalance-threshold-percentage": {
+                            "description": "Active AP rebalancing will kick in once this rebalance threshold is hit on any controller. Default Active AP rebalance threshold is 20.",
+                            "type": "integer",
+                            "maximum": 99,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "active_ap_unbal_threshold": {
+                    "type": "object",
+                    "required": [
+                        "active-ap-unbalance-threshold-percentage"
+                    ],
+                    "properties": {
+                        "active-ap-unbalance-threshold-percentage": {
+                            "description": "Active AP rebalancing will kick in once rebalance threshold is hit on any controller and the difference between the max and min loaded controller is more than this unbalance threshold percentage.",
+                            "type": "integer",
+                            "maximum": 99,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "active_ap_rebal_count": {
+                    "type": "object",
+                    "required": [
+                        "active-ap-rebalance-ap-count"
+                    ],
+                    "properties": {
+                        "active-ap-rebalance-ap-count": {
+                            "description": "The number of APs considered to be rebalanced if Active AP rebalance kicks in. Default AP rebalance count is 50.",
+                            "type": "integer",
+                            "maximum": 200,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "active_ap_rebal_timer": {
+                    "type": "object",
+                    "required": [
+                        "active-ap-rebalance-timer"
+                    ],
+                    "properties": {
+                        "active-ap-rebalance-timer": {
+                            "description": "Timer ,in minutes, to kick-in the active ap rebalancing operation.",
+                            "type": "integer",
+                            "maximum": 20,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "cluster_prof_clone": {
+                    "type": "object",
+                    "required": [
+                        "source"
+                    ],
+                    "properties": {
+                        "source": {
+                            "description": "Name of Classic Controller Cluster Profile to copy",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                }
+            }
+        },
+        "cluster_debug_bucketmap": {
+            "type": "object",
+            "required": [
+                "essid_name",
+                "standby_uac_idx",
+                "active_uac_idx",
+                "buck_idx"
+            ],
+            "properties": {
+                "essid_name": {
+                    "description": "Essid Name",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "buck_idx": {
+                    "description": "index",
+                    "type": "string",
+                    "maximum": 255,
+                    "minimum": 0
+                },
+                "active_uac_idx": {
+                    "description": "Index of UAC in Bucket-Map's UAC List",
+                    "type": "string",
+                    "maximum": 11,
+                    "minimum": 0
+                },
+                "standby_uac_idx": {
+                    "description": "Index of UAC in Bucket-Map's UAC List or -1 if no standby desired",
+                    "type": "integer",
+                    "maximum": 11,
+                    "minimum": -1
+                }
+            }
+        },
+        "initiate_cluster_upgrade_tftp": {
+            "type": "object",
+            "required": [
+                "profile",
+                "version_string",
+                "imagepath",
+                "imagehost"
+            ],
+            "properties": {
+                "partition_id": {
+                    "description": "Image to be copied onto partition 0 or 1",
+                    "type": "string",
+                    "maximum": 1,
+                    "minimum": 0
+                },
+                "ap_preload_batch_size": {
+                    "description": "Number of APs doing simultaneous image preload",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "profile": {
+                    "description": "Name of Cluster Profile",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "version_string": {
+                    "description": "Target image version e.g. 8.1.0.0_XXXXX",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "imagehost": {
+                    "description": "IPv4/IPv6 address of Image server",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "imagepath": {
+                    "description": "Image path on the fileserver, use '.' to specify default path",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "cluster_debug_saac_ap_group": {
+            "type": "object",
+            "required": [
+                "new_standby_aac",
+                "new_standby_aac_v6",
+                "ap_group"
+            ],
+            "properties": {
+                "new_standby_aac": {
+                    "description": "IP Address of New Standby AAC",
+                    "type": "string"
+                },
+                "new_standby_aac_v6": {
+                    "description": "IPv6 Address of New Standby AAC",
+                    "type": "string"
+                },
+                "ap_group": {
+                    "description": "AP Group Name",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "initiate_cluster_upgrade": {
+            "type": "object",
+            "required": [
+                "profile",
+                "version_string"
+            ],
+            "properties": {
+                "partition_id": {
+                    "description": "Image to be copied onto partition 0 or 1",
+                    "type": "string",
+                    "maximum": 1,
+                    "minimum": 0
+                },
+                "ap_preload_batch_size": {
+                    "description": "Number of APs doing simultaneous image preload",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "profile": {
+                    "description": "Name of Cluster Profile",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "version_string": {
+                    "description": "Target image version e.g. 8.1.0.0_XXXXX",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "sched_cluster_upgrade": {
+            "type": "object",
+            "required": [
+                "profile",
+                "version_string",
+                "sched",
+                "mm",
+                "month",
+                "ss",
+                "hh",
+                "year",
+                "day"
+            ],
+            "properties": {
+                "sched": {
+                    "description": "Schedule the cluster upgrade",
+                    "enum": [
+                        "schedule",
+                        "re-schedule"
+                    ],
+                    "type": "string"
+                },
+                "profile": {
+                    "description": "Name of Cluster Profile",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "version_string": {
+                    "description": "Target image version e.g. 8.1.0.0_XXXXX",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "year": {
+                    "description": "Year of scheduling.",
+                    "type": "string",
+                    "minimum": 1900
+                },
+                "month": {
+                    "description": "Month of scheduling. Accepted range of values 1-12.",
+                    "type": "string",
+                    "maximum": 12,
+                    "minimum": 1
+                },
+                "day": {
+                    "description": "Day of scheduling. Accepted range of values 1-31",
+                    "type": "string",
+                    "maximum": 31,
+                    "minimum": 1
+                },
+                "hh": {
+                    "description": "Hour of scheduling in 24 hour format. Accepted range of values 0-23",
+                    "type": "string",
+                    "maximum": 23,
+                    "minimum": 0
+                },
+                "mm": {
+                    "description": "Minute of scheduling. Accepted range of values 0-59",
+                    "type": "string",
+                    "maximum": 59,
+                    "minimum": 0
+                },
+                "ss": {
+                    "description": "Second of scheduling. Accepted range of values 0-59",
+                    "type": "string",
+                    "maximum": 59,
+                    "minimum": 0
+                },
+                "partition_id": {
+                    "description": "Image to be copied onto partition 0 or 1",
+                    "type": "string",
+                    "maximum": 1,
+                    "minimum": 0
+                },
+                "ap_preload_batch_size": {
+                    "description": "Number of APs doing simultaneous image preload",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "cluster_vlanprobe": {
+            "type": "object",
+            "required": [
+                "excludevlan"
+            ],
+            "properties": {
+                "excludevlan": {
+                    "description": "List of exception VLANs seperated by comma(,), range by (-). Max string length: 256",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "abort_cluster_upgrade": {
+            "type": "object",
+            "required": [
+                "profile",
+                "sched"
+            ],
+            "properties": {
+                "sched": {
+                    "description": "cluster upgrade",
+                    "enum": [
+                        "upgrade",
+                        "scheduled-upgrade"
+                    ],
+                    "type": "string"
+                },
+                "profile": {
+                    "description": "Name of Cluster Profile",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "auth_surv_enable": {
+            "type": "object"
+        },
+        "start_vlan_probe": {
+            "type": "object"
+        }
+    }
+}

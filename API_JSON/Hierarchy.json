@@ -1,0 +1,1050 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0",
+        "title": "ArubaOS JSON API Specification"
+    },
+    "basePath": "/v1/configuration",
+    "tags": [
+        {
+            "name": "Hierarchy Management",
+            "description": "Manage Hierarchy Management objects"
+        }
+    ],
+    "paths": {
+        "/object": {},
+        "/object/configuration_purge_pending": {
+            "post": {
+                "summary": "Configuration Purge Pending",
+                "description": "Cleans up any pending configurations on a node in the configuration hierarchy",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hierarchy"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Cleans up any pending configurations on a node in the configuration hierarchy",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/configuration_purge_pending"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/configuration_device_filename": {
+            "post": {
+                "summary": "Configuration Device Filename",
+                "description": "Maps a device to an existing node in the configuration hierarchy with a initial configuration file for the node",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hierarchy"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Maps a device to an existing node in the configuration hierarchy with a initial configuration file for the node",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/configuration_device_filename"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/configuration_node_rename": {
+            "post": {
+                "summary": "Configuration Node Rename",
+                "description": "Renames a node path to the specified new name",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hierarchy"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Renames a node path to the specified new name",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/configuration_node_rename"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/configuration_node": {
+            "post": {
+                "summary": "Configuration Node",
+                "description": "Configures a node in the configuration hierarchy. Node name and location are specified by the node-path, which can be an absolute path from the root node or relative path from the current node",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hierarchy"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Configures a node in the configuration hierarchy. Node name and location are specified by the node-path, which can be an absolute path from the root node or relative path from the current node",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/configuration_node"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/configuration_device_move": {
+            "post": {
+                "summary": "Configuration Device Move",
+                "description": "Moves the device to the specified configuration path of the destination node",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hierarchy"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Moves the device to the specified configuration path of the destination node",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/configuration_device_move"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/configuration_node_clone": {
+            "post": {
+                "summary": "Configuration Node Clone",
+                "description": "Copies an existing node's configuration to a new node. The source and destination node names and locations are specified by the source-path and node-path, respectively.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hierarchy"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Copies an existing node's configuration to a new node. The source and destination node names and locations are specified by the source-path and node-path, respectively.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/configuration_node_clone"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/configuration_node_filename": {
+            "post": {
+                "summary": "Configuration Node Filename",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type configuration_node_filename",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hierarchy"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes configuration_node_filename",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/configuration_node_filename"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/configuration_auto_prov": {
+            "post": {
+                "summary": "Configuration Auto Provisioning",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type configuration_auto_prov",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hierarchy"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes configuration_auto_prov",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/configuration_auto_prov"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/reload_device": {
+            "post": {
+                "summary": "Reload a managed device",
+                "description": "Reload a managed device by device-mac",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hierarchy"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Reload a managed device by device-mac",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/reload_device"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/configuration_device": {
+            "post": {
+                "summary": "Configuration Device",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type configuration_device",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hierarchy"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes configuration_device",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/configuration_device"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/node_hierarchy": {
+            "get": {
+                "summary": "Configuration node hierarchy",
+                "description": "Get configuration node hierarchy of system",
+                "tags": [
+                    "Hierarchy"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/config_node_replace_cfg_reboot": {
+            "post": {
+                "summary": "Config Node Replace Cfg Reboot",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type config_node_replace_cfg_reboot",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hierarchy"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes config_node_replace_cfg_reboot",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/config_node_replace_cfg_reboot"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/configuration_node_move": {
+            "post": {
+                "summary": "Configuration Node Move",
+                "description": "Moves an existing user-created node in the hierarchy to the specified destination node",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hierarchy"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Moves an existing user-created node in the hierarchy to the specified destination node",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/configuration_node_move"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        }
+    },
+    "definitions": {
+        "configuration_node_move": {
+            "type": "object",
+            "required": [
+                "node-path",
+                "dest-path"
+            ],
+            "properties": {
+                "node-path": {
+                    "description": "Path of Source configuration node",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "dest-path": {
+                    "description": "Path of Destination configuration node",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "configuration_auto_prov": {
+            "type": "object",
+            "required": [
+                "node-path"
+            ],
+            "properties": {
+                "node-path": {
+                    "description": "Config-path for the device",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "configuration_device_filename": {
+            "type": "object",
+            "required": [
+                "dev-model",
+                "config-path",
+                "mac-address",
+                "filename"
+            ],
+            "properties": {
+                "dev-model": {
+                    "enum": [
+                        "A7005",
+                        "A7008",
+                        "A7010",
+                        "A7024",
+                        "A7030",
+                        "A7205",
+                        "A7210",
+                        "A7220",
+                        "A7240",
+                        "A7240XM",
+                        "MC-VA",
+                        "A7280",
+                        "A9004",
+                        "A9004-LTE",
+                        "A9012"
+                    ],
+                    "type": "string"
+                },
+                "mac-address": {
+                    "description": "MAC address of the device to be added",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "config-path": {
+                    "description": "Full path of configuration node to be used for device.",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "filename": {
+                    "description": "Initial Configuration file for the device copied to flash using copy command",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "reload_device": {
+            "type": "object",
+            "required": [
+                "device-mac"
+            ],
+            "properties": {
+                "reset": {
+                    "type": "boolean"
+                },
+                "device-mac": {
+                    "description": "Device MAC address",
+                    "type": "string"
+                }
+            }
+        },
+        "configuration_node": {
+            "type": "object",
+            "required": [
+                "node-path"
+            ],
+            "properties": {
+                "node-path": {
+                    "description": "Path of configuration node",
+                    "type": "string",
+                    "maximum": 223,
+                    "minimum": 1
+                }
+            }
+        },
+        "configuration_node_clone": {
+            "type": "object",
+            "required": [
+                "node-path",
+                "source-path"
+            ],
+            "properties": {
+                "node-path": {
+                    "description": "Path of new configuration node",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "source-path": {
+                    "description": "Path of Source configuration node",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "config_node_replace_cfg_reboot": {
+            "type": "object",
+            "required": [
+                "file-name1",
+                "file-name2",
+                "config-path2",
+                "config-path1"
+            ],
+            "properties": {
+                "file-name2": {
+                    "description": "Name of the additional configuration file in flash",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "config-path2": {
+                    "description": "Corresponding config path where file-name2 will be applied",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "file-name1": {
+                    "description": "Name of the configuration file in flash",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "config-path1": {
+                    "description": "Corresponding config path where file-name1 will be applied",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "configuration_node_filename": {
+            "type": "object",
+            "required": [
+                "node-path",
+                "filename"
+            ],
+            "properties": {
+                "node-path": {
+                    "description": "Path of configuration node",
+                    "type": "string",
+                    "maximum": 223,
+                    "minimum": 1
+                },
+                "filename": {
+                    "description": "Node configuration file copied to flash using copy command",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "configuration_node_rename": {
+            "type": "object",
+            "required": [
+                "old-path",
+                "new-path"
+            ],
+            "properties": {
+                "old-path": {
+                    "description": "Path of configuration node",
+                    "type": "string",
+                    "maximum": 223,
+                    "minimum": 1
+                },
+                "new-path": {
+                    "description": "New name of configuration node",
+                    "type": "string",
+                    "maximum": 223,
+                    "minimum": 1
+                }
+            }
+        },
+        "configuration_device_move": {
+            "type": "object",
+            "required": [
+                "mac-address",
+                "dest-path"
+            ],
+            "properties": {
+                "mac-address-2": {
+                    "description": "MAC address of the new replaced device",
+                    "type": "string"
+                },
+                "mac-address": {
+                    "description": "MAC address of the device to be added",
+                    "type": "string"
+                },
+                "dest-path": {
+                    "description": "Path of Destination configuration node",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "configuration_purge_pending": {
+            "type": "object",
+            "properties": {
+                "node-path": {
+                    "description": "Full pathname of the configuration node to be purged",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "configuration_device": {
+            "type": "object",
+            "required": [
+                "dev-model",
+                "mac-address"
+            ],
+            "properties": {
+                "dev-model": {
+                    "enum": [
+                        "A7005",
+                        "A7008",
+                        "A7010",
+                        "A7024",
+                        "A7030",
+                        "A7205",
+                        "A7210",
+                        "A7220",
+                        "A7240",
+                        "A7240XM",
+                        "MC-VA",
+                        "A7280",
+                        "A9004",
+                        "A9004-LTE",
+                        "A9012"
+                    ],
+                    "type": "string"
+                },
+                "mac-address": {
+                    "description": "MAC address of the device to be added",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "config-path": {
+                    "description": "Full path of configuration node to be used for device.",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        }
+    }
+}

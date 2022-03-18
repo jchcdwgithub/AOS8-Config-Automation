@@ -1,0 +1,4758 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0",
+        "title": "ArubaOS JSON API Specification"
+    },
+    "basePath": "/v1/configuration",
+    "tags": [
+        {
+            "name": "Pools",
+            "description": "Manage Pools objects"
+        }
+    ],
+    "paths": {
+        "/object/ipv6_dhcp_excld_addr_cfg": {
+            "get": {
+                "summary": "IPv6 Dhcp Excld Addr Cfg",
+                "description": "Gets configuration for ipv6_dhcp_excld_addr_cfg",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ipv6_dhcp_excld_addr_cfg"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IPv6 Dhcp Excld Addr Cfg",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ipv6_dhcp_excld_addr_cfg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ipv6_dhcp_excld_addr_cfg",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ipv6_dhcp_excld_addr_cfg"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object": {},
+        "/object/ip_dhcp_opt82": {
+            "get": {
+                "summary": "IP Dhcp Opt82",
+                "description": "Gets configuration for ip_dhcp_opt82",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_opt82"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IP Dhcp Opt82",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ip_dhcp_opt82",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ip_dhcp_opt82",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_opt82"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/l2tp_local_pool": {
+            "get": {
+                "summary": "L2tp Local Pool",
+                "description": "Gets configuration for l2tp_local_pool",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/l2tp_local_pool"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "L2tp Local Pool",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type l2tp_local_pool",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes l2tp_local_pool",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/l2tp_local_pool"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ip_dhcp_lb_cfg": {
+            "get": {
+                "summary": "IP Dhcp Lb Cfg",
+                "description": "Gets configuration for ip_dhcp_lb_cfg",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_lb_cfg"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IP Dhcp Lb Cfg",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ip_dhcp_lb_cfg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ip_dhcp_lb_cfg",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_lb_cfg"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/pptp_local_pool": {
+            "get": {
+                "summary": "Pptp Local Pool",
+                "description": "Gets configuration for pptp_local_pool",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pptp_local_pool"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Pptp Local Pool",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type pptp_local_pool",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes pptp_local_pool",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pptp_local_pool"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ip_dhcp_ping_check_cfg": {
+            "get": {
+                "summary": "IP Dhcp Ping Check Cfg",
+                "description": "Gets configuration for ip_dhcp_ping_check_cfg",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_ping_check_cfg"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IP Dhcp Ping Check Cfg",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ip_dhcp_ping_check_cfg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ip_dhcp_ping_check_cfg",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_ping_check_cfg"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ip_dhcp_adaptive": {
+            "get": {
+                "summary": "IP Dhcp Adaptive",
+                "description": "Gets configuration for ip_dhcp_adaptive",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_adaptive"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IP Dhcp Adaptive",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ip_dhcp_adaptive",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ip_dhcp_adaptive",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_adaptive"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/srv_dhcp_cfg": {
+            "get": {
+                "summary": "Srv Dhcp Cfg",
+                "description": "Gets configuration for srv_dhcp_cfg",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/srv_dhcp_cfg"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Srv Dhcp Cfg",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type srv_dhcp_cfg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes srv_dhcp_cfg",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/srv_dhcp_cfg"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/tun_pool": {
+            "get": {
+                "summary": "Tunnel Pool",
+                "description": "Gets configuration for tun_pool",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/tun_pool"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Tunnel Pool",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type tun_pool",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes tun_pool",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/tun_pool"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/srv_dhcpv6_cfg": {
+            "get": {
+                "summary": "Srv Dhcpv6 Cfg",
+                "description": "Gets configuration for srv_dhcpv6_cfg",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/srv_dhcpv6_cfg"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Srv Dhcpv6 Cfg",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type srv_dhcpv6_cfg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes srv_dhcpv6_cfg",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/srv_dhcpv6_cfg"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ip_ddns_server_interval": {
+            "get": {
+                "summary": "IP Ddns Server Interval",
+                "description": "Gets configuration for ip_ddns_server_interval",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/ip_ddns_server_interval"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IP Ddns Server Interval",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ip_ddns_server_interval",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ip_ddns_server_interval",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ip_ddns_server_interval"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ipv6_dhcp_pool_cfg": {
+            "get": {
+                "summary": "IPv6 Dhcp Pool Cfg",
+                "description": "Gets configuration for ipv6_dhcp_pool_cfg",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ipv6_dhcp_pool_cfg"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IPv6 Dhcp Pool Cfg",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ipv6_dhcp_pool_cfg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ipv6_dhcp_pool_cfg",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ipv6_dhcp_pool_cfg"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ip_ddns_server_manual_cfg": {
+            "post": {
+                "summary": "IP Ddns Server Manual Cfg",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ip_ddns_server_manual_cfg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ip_ddns_server_manual_cfg",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ip_ddns_server_manual_cfg"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ip_dhcp_rsvd_addr_cfg": {
+            "get": {
+                "summary": "IP Dhcp Rsvd Addr Cfg",
+                "description": "Gets configuration for ip_dhcp_rsvd_addr_cfg",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ip_dhcp_rsvd_addr_cfg"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IP Dhcp Rsvd Addr Cfg",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ip_dhcp_rsvd_addr_cfg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ip_dhcp_rsvd_addr_cfg",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_rsvd_addr_cfg"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/vlan_pool": {
+            "get": {
+                "summary": "VLAN Pool",
+                "description": "Gets configuration for vlan_pool",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/vlan_pool"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "VLAN Pool",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type vlan_pool",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes vlan_pool",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/vlan_pool"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ip_dhcp_excld_addr_cfg": {
+            "get": {
+                "summary": "IP Dhcp Excld Addr Cfg",
+                "description": "Gets configuration for ip_dhcp_excld_addr_cfg",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ip_dhcp_excld_addr_cfg"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IP Dhcp Excld Addr Cfg",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ip_dhcp_excld_addr_cfg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ip_dhcp_excld_addr_cfg",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_excld_addr_cfg"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ip_dhcp_pool_cfg": {
+            "get": {
+                "summary": "IP Dhcp Pool Cfg",
+                "description": "Gets configuration for ip_dhcp_pool_cfg",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ip_dhcp_pool_cfg"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IP Dhcp Pool Cfg",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ip_dhcp_pool_cfg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ip_dhcp_pool_cfg",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_pool_cfg"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ip_dhcp_dfl_pool_cfg": {
+            "get": {
+                "summary": "IP Dhcp Dfl Pool Cfg",
+                "description": "Gets configuration for ip_dhcp_dfl_pool_cfg",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_dfl_pool_cfg"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IP Dhcp Dfl Pool Cfg",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ip_dhcp_dfl_pool_cfg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ip_dhcp_dfl_pool_cfg",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_dfl_pool_cfg"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/nat_pool_1to1": {
+            "get": {
+                "summary": "Nat Pool 1to1",
+                "description": "Gets configuration for nat_pool_1to1",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/nat_pool_1to1"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Nat Pool 1to1",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type nat_pool_1to1",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes nat_pool_1to1",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/nat_pool_1to1"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ip_ddns_server_key_pool_cfg": {
+            "get": {
+                "summary": "IP Ddns Server Key Pool Cfg",
+                "description": "Gets configuration for ip_ddns_server_key_pool_cfg",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ip_ddns_server_key_pool_cfg"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IP Ddns Server Key Pool Cfg",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ip_ddns_server_key_pool_cfg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ip_ddns_server_key_pool_cfg",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ip_ddns_server_key_pool_cfg"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ip_dhcp_increase_lease_limit": {
+            "get": {
+                "summary": "IP Dhcp Increase Lease Limit",
+                "description": "Gets configuration for ip_dhcp_increase_lease_limit",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_increase_lease_limit"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IP Dhcp Increase Lease Limit",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ip_dhcp_increase_lease_limit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ip_dhcp_increase_lease_limit",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_increase_lease_limit"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/nat_pool": {
+            "get": {
+                "summary": "Nat Pool",
+                "description": "Gets configuration for nat_pool",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/nat_pool"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Nat Pool",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type nat_pool",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes nat_pool",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/nat_pool"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ip_dhcp_opt82_web": {
+            "get": {
+                "summary": "IP Dhcp Opt82 Web",
+                "description": "Gets configuration for ip_dhcp_opt82_web",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_opt82_web"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IP Dhcp Opt82 Web",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ip_dhcp_opt82_web",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ip_dhcp_opt82_web",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ip_dhcp_opt82_web"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/l2tp_local_pool_ipv6": {
+            "get": {
+                "summary": "L2tp Local Pool IPv6",
+                "description": "Gets configuration for l2tp_local_pool_ipv6",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/l2tp_local_pool_ipv6"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "L2tp Local Pool IPv6",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type l2tp_local_pool_ipv6",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes l2tp_local_pool_ipv6",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/l2tp_local_pool_ipv6"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        },
+        "/object/ip_ddns_server_ctrl_cfg": {
+            "get": {
+                "summary": "IP Ddns Server Controller Cfg",
+                "description": "Gets configuration for ip_ddns_server_ctrl_cfg",
+                "tags": [
+                    "Pools"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "description": "Object name for field to sort on. Preceeding '-' indicates descending order",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "sort"
+                    },
+                    {
+                        "description": "Object name for field for which only count will be  returned rather than data",
+                        "required": false,
+                        "maximum": 512,
+                        "in": "query",
+                        "type": "string",
+                        "name": "count"
+                    },
+                    {
+                        "description": "1-based offset to start from (Paginate). It should be multiple of limit (below) + 1",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "offset"
+                    },
+                    {
+                        "description": "Number of records to fetch (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "limit"
+                    },
+                    {
+                        "description": "Last total number of records returned (Paginate)",
+                        "required": false,
+                        "maximum": 65536,
+                        "in": "query",
+                        "type": "integer",
+                        "name": "total"
+                    },
+                    {
+                        "description": "JSON filter expression specifying the items to return",
+                        "required": false,
+                        "maximum": 1024,
+                        "in": "query",
+                        "type": "string",
+                        "name": "filter"
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "schema": {
+                            "$ref": "#/definitions/ip_ddns_server_ctrl_cfg"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                }
+            },
+            "post": {
+                "summary": "IP Ddns Server Controller Cfg",
+                "description": "Create a new instance or update existing instance or delete parts of the instance or full object of type ip_ddns_server_ctrl_cfg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pools"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "415": {
+                        "description": "Unsupported Type"
+                    }
+                },
+                "parameters": [
+                    {
+                        "description": "Hierarchy path",
+                        "default": "/md",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "query",
+                        "type": "string",
+                        "name": "config_path"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Creates/Updates/Deletes ip_ddns_server_ctrl_cfg",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ip_ddns_server_ctrl_cfg"
+                        }
+                    },
+                    {
+                        "name": "X-CSRF-Token",
+                        "required": true,
+                        "maximum": 256,
+                        "minimum": 1,
+                        "in": "header",
+                        "type": "string",
+                        "description": "X-CSRF-Token"
+                    }
+                ]
+            }
+        }
+    },
+    "definitions": {
+        "ip_dhcp_excld_addr_cfg": {
+            "type": "object",
+            "required": [
+                "var1"
+            ],
+            "properties": {
+                "var2": {
+                    "description": "Configure DHCP excluded address high range",
+                    "type": "string"
+                },
+                "var1": {
+                    "description": "Configure DHCP excluded address low range",
+                    "type": "string"
+                }
+            }
+        },
+        "l2tp_local_pool_ipv6": {
+            "type": "object",
+            "required": [
+                "pool_name_v6",
+                "pool_start_addressv6"
+            ],
+            "properties": {
+                "pool_end_addressv6": {
+                    "description": "Configure the end address of the local pool",
+                    "type": "string"
+                },
+                "pool_name_v6": {
+                    "description": "Configure local IP pool's name",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "pool_start_addressv6": {
+                    "description": "Configure the start address of the local pool",
+                    "type": "string"
+                }
+            }
+        },
+        "pptp_local_pool": {
+            "type": "object",
+            "required": [
+                "pool_name",
+                "pool_start_address"
+            ],
+            "properties": {
+                "pool_end_address": {
+                    "description": "Configure the end address of the local pool",
+                    "type": "string"
+                },
+                "pool_name": {
+                    "description": "Configure local IP pool's name",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "pool_start_address": {
+                    "description": "Configure the start address of the local pool",
+                    "type": "string"
+                }
+            }
+        },
+        "ip_dhcp_opt82_web": {
+            "type": "object",
+            "required": [
+                "xml_file_name"
+            ],
+            "properties": {
+                "xml_file_name": {
+                    "description": "XML file name specifying option-82 information. This file should be uploaded to flash before executing this command.",
+                    "type": "string",
+                    "maximum": 65,
+                    "minimum": 1
+                }
+            }
+        },
+        "ip_dhcp_opt82": {
+            "type": "object",
+            "required": [
+                "xml_file_name"
+            ],
+            "properties": {
+                "xml_file_name": {
+                    "description": "XML file name specifying option-82 information. This file should be uploaded to flash before executing this command.",
+                    "type": "string",
+                    "maximum": 65,
+                    "minimum": 1
+                }
+            }
+        },
+        "ip_dhcp_increase_lease_limit": {
+            "type": "object"
+        },
+        "ip_dhcp_pool_cfg": {
+            "type": "object",
+            "required": [
+                "pool_name"
+            ],
+            "properties": {
+                "pool_name": {
+                    "description": "Configure DHCP Pool's name",
+                    "type": "string",
+                    "maximum": 127,
+                    "minimum": 1
+                },
+                "ip_dhcp_pool_cfg__domain_name": {
+                    "type": "object",
+                    "required": [
+                        "domain"
+                    ],
+                    "properties": {
+                        "domain": {
+                            "description": "Configure DHCP Domain Name",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "ip_dhcp_pool_cfg__dns": {
+                    "type": "object",
+                    "required": [
+                        "address1",
+                        "import",
+                        "switch-ip"
+                    ],
+                    "properties": {
+                        "address2": {
+                            "description": "Configure DHCP DNS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address3": {
+                            "description": "Configure DHCP DNS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address4": {
+                            "description": "Configure DHCP DNS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address5": {
+                            "description": "Configure DHCP DNS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address6": {
+                            "description": "Configure DHCP DNS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address7": {
+                            "description": "Configure DHCP DNS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address8": {
+                            "description": "Configure DHCP DNS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address1": {
+                            "description": "Configure DHCP DNS server address",
+                            "type": "string"
+                        },
+                        "import": {
+                            "type": "boolean"
+                        },
+                        "switch-ip": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "ip_dhcp_pool_cfg__netbios": {
+                    "type": "object",
+                    "required": [
+                        "address1",
+                        "import"
+                    ],
+                    "properties": {
+                        "address2": {
+                            "description": "Configure DHCP NETBIOS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address3": {
+                            "description": "Configure DHCP NETBIOS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address4": {
+                            "description": "Configure DHCP NETBIOS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address5": {
+                            "description": "Configure DHCP NETBIOS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address6": {
+                            "description": "Configure DHCP NETBIOS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address7": {
+                            "description": "Configure DHCP NETBIOS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address8": {
+                            "description": "Configure DHCP NETBIOS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address1": {
+                            "description": "Configure DHCP NETBIOS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "import": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "ip_dhcp_pool_cfg__def_rtr": {
+                    "type": "object",
+                    "required": [
+                        "address"
+                    ],
+                    "properties": {
+                        "address2": {
+                            "description": "Configure DHCP default router address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address3": {
+                            "description": "Configure DHCP default router address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address4": {
+                            "description": "Configure DHCP default router address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address5": {
+                            "description": "Configure DHCP default router address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address6": {
+                            "description": "Configure DHCP default router address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address7": {
+                            "description": "Configure DHCP default router address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address8": {
+                            "description": "Configure DHCP default router address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address": {
+                            "description": "Configure DHCP default router address [address2 ... address8]",
+                            "type": "string"
+                        }
+                    }
+                },
+                "ip_dhcp_pool_cfg__lease": {
+                    "type": "object",
+                    "required": [
+                        "var1",
+                        "var3",
+                        "var2"
+                    ],
+                    "properties": {
+                        "var4": {
+                            "description": "Configure DHCP lease seconds(15-59)",
+                            "type": "integer",
+                            "maximum": 59,
+                            "minimum": 0
+                        },
+                        "var1": {
+                            "description": "Configure DHCP lease days(0-364)",
+                            "type": "integer",
+                            "maximum": 364,
+                            "minimum": 0
+                        },
+                        "var2": {
+                            "description": "Configure DHCP lease hours(0-23)",
+                            "type": "integer",
+                            "maximum": 23,
+                            "minimum": 0
+                        },
+                        "var3": {
+                            "description": "Configure DHCP lease minutes(0-59)",
+                            "type": "integer",
+                            "maximum": 59,
+                            "minimum": 0
+                        }
+                    }
+                },
+                "ip_dhcp_pool_cfg__net": {
+                    "type": "object",
+                    "required": [
+                        "subnet",
+                        "prefix",
+                        "mask"
+                    ],
+                    "properties": {
+                        "mask": {
+                            "description": "Configure DHCP network mask",
+                            "type": "string"
+                        },
+                        "prefix": {
+                            "description": "Configure DHCP network prefix",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        },
+                        "subnet": {
+                            "description": "Configure DHCP network number",
+                            "type": "string"
+                        }
+                    }
+                },
+                "ip_dhcp_pool_cfg__opt": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "code",
+                            "ipaddr",
+                            "str",
+                            "hexstr"
+                        ],
+                        "properties": {
+                            "ipaddr": {
+                                "description": "Specify address",
+                                "type": "string"
+                            },
+                            "str": {
+                                "description": "Specify string, Maximum allowed length is 254",
+                                "type": "string",
+                                "maximum": 254,
+                                "minimum": 1
+                            },
+                            "hexstr": {
+                                "description": "Specify string, Maximum allowed length is 22.",
+                                "type": "string",
+                                "maximum": 22,
+                                "minimum": 1
+                            },
+                            "code": {
+                                "description": "DHCP option code(range 0-254)",
+                                "type": "integer",
+                                "maximum": 254,
+                                "minimum": 0
+                            }
+                        }
+                    }
+                },
+                "ip_dhcp_pool_cfg__type": {
+                    "type": "object",
+                    "required": [
+                        "type"
+                    ],
+                    "properties": {
+                        "type": {
+                            "enum": [
+                                "public",
+                                "private",
+                                "ipupsell"
+                            ],
+                            "type": "string"
+                        }
+                    }
+                },
+                "ip_dhcp_pool_cfg__range": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "address1",
+                            "address2"
+                        ],
+                        "properties": {
+                            "address1": {
+                                "description": "Configure DHCP range start IP address",
+                                "type": "string"
+                            },
+                            "address2": {
+                                "description": "Configure DHCP range end IP address",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "ip_dhcp_pool_cfg__vendor_id": {
+                    "type": "object"
+                },
+                "dhcp_pool__dist_range": {
+                    "type": "object",
+                    "required": [
+                        "startip",
+                        "endip",
+                        "hosts"
+                    ],
+                    "properties": {
+                        "startip": {
+                            "description": "Address pool start IP address",
+                            "type": "string"
+                        },
+                        "endip": {
+                            "description": "Address pool end IP address",
+                            "type": "string"
+                        },
+                        "hosts": {
+                            "description": "Number of hosts",
+                            "type": "integer",
+                            "minimum": 4
+                        }
+                    }
+                }
+            }
+        },
+        "ip_ddns_server_key_pool_cfg": {
+            "type": "object",
+            "required": [
+                "pool_name",
+                "ipaddr",
+                "key_name"
+            ],
+            "properties": {
+                "ipaddr": {
+                    "description": "IP address",
+                    "type": "string"
+                },
+                "key_name": {
+                    "description": "Configure name of DDNS key in algo-name:keyname:keystring format",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "pool_name": {
+                    "description": "Enter DHCP pool name",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "tun_pool": {
+            "type": "object",
+            "required": [
+                "pool-name"
+            ],
+            "properties": {
+                "pool-name": {
+                    "description": "Name of the ip address pool",
+                    "type": "string",
+                    "maximum": 127,
+                    "minimum": 1
+                },
+                "tun_pool__dist_range": {
+                    "type": "object",
+                    "required": [
+                        "startip",
+                        "endip"
+                    ],
+                    "properties": {
+                        "startip": {
+                            "description": "Address pool start IP address",
+                            "type": "string"
+                        },
+                        "endip": {
+                            "description": "Address pool end IP address",
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "ip_dhcp_dfl_pool_cfg": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "type": {
+                    "enum": [
+                        "public",
+                        "private"
+                    ],
+                    "type": "string"
+                }
+            }
+        },
+        "srv_dhcpv6_cfg": {
+            "type": "object"
+        },
+        "ip_ddns_server_interval": {
+            "type": "object",
+            "required": [
+                "value"
+            ],
+            "properties": {
+                "value": {
+                    "description": "Configure DDNS timer interval. Min is 1 sec. Max is 86400 sec.",
+                    "type": "integer",
+                    "maximum": 86400,
+                    "minimum": 1
+                }
+            }
+        },
+        "ip_dhcp_rsvd_addr_cfg": {
+            "type": "object",
+            "required": [
+                "mac",
+                "ipv4"
+            ],
+            "properties": {
+                "name": {
+                    "description": "Hostname",
+                    "type": "string",
+                    "maximum": 63,
+                    "minimum": 1
+                },
+                "mac": {
+                    "description": "48-bit MAC address in <XX:XX:XX:XX:XX:XX> format",
+                    "type": "string"
+                },
+                "ipv4": {
+                    "description": "Configure IPv4 address in <A.B.C.D> format",
+                    "type": "string"
+                }
+            }
+        },
+        "vlan_pool": {
+            "type": "object",
+            "required": [
+                "pool-name"
+            ],
+            "properties": {
+                "pool-name": {
+                    "description": "Name of the IP address pool",
+                    "type": "string",
+                    "maximum": 127,
+                    "minimum": 1
+                },
+                "vlan_pool__dist_range": {
+                    "type": "object",
+                    "required": [
+                        "startip",
+                        "endip"
+                    ],
+                    "properties": {
+                        "startip": {
+                            "description": "Address pool start IP address",
+                            "type": "string"
+                        },
+                        "endip": {
+                            "description": "Address pool end IP address",
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "ip_dhcp_adaptive": {
+            "type": "object"
+        },
+        "nat_pool": {
+            "type": "object",
+            "required": [
+                "startip",
+                "endip",
+                "name"
+            ],
+            "properties": {
+                "dstip": {
+                    "description": "destination NAT IP address",
+                    "type": "string"
+                },
+                "static": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "description": "Pool name",
+                    "type": "string",
+                    "maximum": 63,
+                    "minimum": 1
+                },
+                "startip": {
+                    "description": "Start of source NAT range",
+                    "type": "string"
+                },
+                "endip": {
+                    "description": "End of source NAT range",
+                    "type": "string"
+                }
+            }
+        },
+        "nat_pool_1to1": {
+            "type": "object",
+            "properties": {
+                "nat_pool_sip_dip_range": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "dip",
+                            "cnt",
+                            "sip",
+                            "msk"
+                        ],
+                        "properties": {
+                            "sip": {
+                                "description": "Source IP address to NAT",
+                                "type": "string"
+                            },
+                            "dip": {
+                                "description": "Destination IP address to NAT",
+                                "type": "string"
+                            },
+                            "msk": {
+                                "description": "Specify a mask indicating which bits of IP address to use for range count",
+                                "type": "string"
+                            },
+                            "cnt": {
+                                "description": "Number of addresses for the range",
+                                "type": "string",
+                                "maximum": 512,
+                                "minimum": 1
+                            }
+                        }
+                    }
+                },
+                "nat_pool_sip_dip": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "sip",
+                            "dip"
+                        ],
+                        "properties": {
+                            "sip": {
+                                "description": "Source IP address to NAT",
+                                "type": "string"
+                            },
+                            "dip": {
+                                "description": "Destination IP address to NAT",
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "l2tp_local_pool": {
+            "type": "object",
+            "required": [
+                "pool_name",
+                "pool_start_address"
+            ],
+            "properties": {
+                "pool_end_address": {
+                    "description": "Configure the end address of the local pool",
+                    "type": "string"
+                },
+                "pool_name": {
+                    "description": "Configure local IP pool's name",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "pool_start_address": {
+                    "description": "Configure the start address of the local pool",
+                    "type": "string"
+                }
+            }
+        },
+        "ip_ddns_server_ctrl_cfg": {
+            "type": "object",
+            "required": [
+                "key_name",
+                "ipaddr"
+            ],
+            "properties": {
+                "ipaddr": {
+                    "description": "IP address",
+                    "type": "string"
+                },
+                "key_name": {
+                    "description": "Configure name of DDNS key in algo-name:keyname:keystring format",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "ip_dhcp_ping_check_cfg": {
+            "type": "object"
+        },
+        "ipv6_dhcp_pool_cfg": {
+            "type": "object",
+            "required": [
+                "pool_name"
+            ],
+            "properties": {
+                "pool_name": {
+                    "description": "Configure DHCPv6 pool's name",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "ipv6_dhcp_pool_cfg__net": {
+                    "type": "object",
+                    "required": [
+                        "prefix"
+                    ],
+                    "properties": {
+                        "prefix": {
+                            "description": "Configure DHCPv6 network prefix",
+                            "type": "string"
+                        }
+                    }
+                },
+                "ipv6_dhcp_pool_cfg__lease": {
+                    "type": "object",
+                    "required": [
+                        "var4",
+                        "var1",
+                        "var3",
+                        "var2"
+                    ],
+                    "properties": {
+                        "var1": {
+                            "description": "Configure DHCPv6 lease days(0-364)",
+                            "type": "integer",
+                            "maximum": 364,
+                            "minimum": 0
+                        },
+                        "var2": {
+                            "description": "Configure DHCPv6 lease hours(0-23)",
+                            "type": "integer",
+                            "maximum": 23,
+                            "minimum": 0
+                        },
+                        "var3": {
+                            "description": "Configure DHCPv6 lease minutes(0-59)",
+                            "type": "integer",
+                            "maximum": 59,
+                            "minimum": 0
+                        },
+                        "var4": {
+                            "description": "Configure DHCPv6 lease seconds(15-59)",
+                            "type": "integer",
+                            "maximum": 59,
+                            "minimum": 0
+                        }
+                    }
+                },
+                "ipv6_dhcp_pool_cfg__dns": {
+                    "type": "object",
+                    "required": [
+                        "address1",
+                        "switch-ipv6"
+                    ],
+                    "properties": {
+                        "address2": {
+                            "description": "Configure DHCPv6 DNS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address3": {
+                            "description": "Configure DHCPv6 DNS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address4": {
+                            "description": "Configure DHCPv6 DNS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address5": {
+                            "description": "Configure DHCPv6 DNS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address6": {
+                            "description": "Configure DHCPv6 DNS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address7": {
+                            "description": "Configure DHCPv6 DNS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address8": {
+                            "description": "Configure DHCPv6 DNS server address [address2 ... address8]",
+                            "type": "string"
+                        },
+                        "address1": {
+                            "description": "Configure DHCPv6 DNS server address",
+                            "type": "string"
+                        },
+                        "switch-ipv6": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "ipv6_dhcp_pool_cfg__domain_name": {
+                    "type": "object",
+                    "required": [
+                        "domain"
+                    ],
+                    "properties": {
+                        "domain": {
+                            "description": "Configure DHCPv6 Domain Name",
+                            "type": "string",
+                            "maximum": 256,
+                            "minimum": 1
+                        }
+                    }
+                },
+                "ipv6_dhcp_pool_cfg__opt": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "ip6addr",
+                            "code",
+                            "str"
+                        ],
+                        "properties": {
+                            "ip6addr": {
+                                "description": "IPv6 address",
+                                "type": "string"
+                            },
+                            "str": {
+                                "description": "Option string(Max 512 Characters allowed)",
+                                "type": "string",
+                                "maximum": 254,
+                                "minimum": 1
+                            },
+                            "code": {
+                                "description": "DHCPv6 option code(0-254)",
+                                "type": "integer",
+                                "maximum": 254,
+                                "minimum": 0
+                            }
+                        }
+                    }
+                },
+                "ipv6_dhcp_pool_cfg__prefer": {
+                    "type": "object",
+                    "required": [
+                        "value"
+                    ],
+                    "properties": {
+                        "value": {
+                            "description": "DHCPv6 server preference(1-255)",
+                            "type": "integer",
+                            "maximum": 255,
+                            "minimum": 1
+                        }
+                    }
+                }
+            }
+        },
+        "ip_ddns_server_manual_cfg": {
+            "type": "object",
+            "required": [
+                "key_name",
+                "ipaddr",
+                "host_name",
+                "hostip"
+            ],
+            "properties": {
+                "ipaddr": {
+                    "description": "IP address",
+                    "type": "string"
+                },
+                "host_name": {
+                    "description": "Please enter in hostname.domain-name format",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                },
+                "hostip": {
+                    "description": "IP address",
+                    "type": "string"
+                },
+                "key_name": {
+                    "description": "Configure name of DDNS key in algo-name:keyname:keystring format",
+                    "type": "string",
+                    "maximum": 256,
+                    "minimum": 1
+                }
+            }
+        },
+        "ipv6_dhcp_excld_addr_cfg": {
+            "type": "object",
+            "required": [
+                "var1"
+            ],
+            "properties": {
+                "var2": {
+                    "description": "Configure DHCPv6 excluded address high range",
+                    "type": "string"
+                },
+                "var1": {
+                    "description": "Configure DHCPv6 excluded address low range",
+                    "type": "string"
+                }
+            }
+        },
+        "srv_dhcp_cfg": {
+            "type": "object"
+        },
+        "ip_dhcp_lb_cfg": {
+            "type": "object",
+            "required": [
+                "type",
+                "option"
+            ],
+            "properties": {
+                "option": {
+                    "enum": [
+                        "strict",
+                        "round-robin"
+                    ],
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "public",
+                        "private",
+                        "ipupsell"
+                    ],
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
