@@ -167,12 +167,10 @@ def get_list_of_api_endpoints(ordered_profiles):
 def push_profiles_to_network(ordered_configuration_list, profiles):
   """ Given a list of profiles, push them to the network. """
 
-  object_ids = get_object_identifiers()
-
   for profile_api_endpoint,profile_list in zip(ordered_configuration_list,profiles):
     for profile in profile_list:
       node = profile.pop('node')
-      profile_name = get_object_name(profile,object_ids)
+      profile_name = get_object_name(profile)
       
       print(f"Pushing configuration object {profile_api_endpoint} {profile_name} to {node}:")
       pprint(profile)
@@ -259,11 +257,11 @@ def remove_nested_profile_from_profiles_to_configure(profile,profiles_to_configu
 
   profiles_to_configure.pop(profile,None)
 
-def get_object_name(object,object_ids):
+def get_object_name(object):
   """ Given an API object, return the ID for the object. """
   
   for attribute in object:
-    if attribute in object_ids:
+    if attribute in OBJECT_IDENTIFIERS:
       return attribute
 
 def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
@@ -1638,17 +1636,6 @@ def add_dependency_to_table_columns_dict(current_profile,other_profile):
           TABLE_COLUMNS[dynamic_profile_name].append(f'{name_without_node_info}_{other_profile}')
         else:
           TABLE_COLUMNS[dynamic_profile_name] = [f'{name_without_node_info}_{other_profile}'] 
-
-def get_object_identifier(object):
-  """ Given an API object, return a possible identifier. If object does not have an identifier, return an empty string. """
-
-  for ref in API_REF:
-    if object in ref['definitions']:
-      if 'required' in ref['definitions'][object]:
-        for possible_identifier in ref['definitions'][object]['required']:
-          if 'name' in possible_identifier:
-            return possible_identifier
-        return ''
 
 def get_profile_properties(profile):
   """ Returns properties of the profile from the API_REF dictionary. """
