@@ -269,7 +269,7 @@ def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
   
   if full_attribute_name in SPECIAL_COLUMNS:
     profiles = SPECIAL_COLUMNS[full_attribute_name](profiles)
-    return
+    return profiles
   elif len(full_attribute_name.split('.')) < 3:
     attribute_type = get_attribute_type(full_attribute_name)
   else:
@@ -278,12 +278,12 @@ def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
     if attribute_type == 'object':
       if attribute not in profiles[0].keys():
         add_object_attribute_to_profiles(prof_name+'.'+attribute,[],profiles)
-        return
+        return profiles
       else:
         attribute_type = get_attribute_type(full_attribute_name)
     elif attribute_type == 'array':
       add_array_attribute_to_profiles(prof_name+'.'+attribute,profiles)
-      return
+      return profiles
     
   if attribute_type == 'integer':
     add_integer_attribute_to_profiles(full_attribute_name,attributes,profiles)
@@ -293,6 +293,8 @@ def add_attributes_to_profiles(full_attribute_name,attributes,profiles):
     add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
   else:
     add_boolean_attribute_to_profiles(full_attribute_name,attributes,profiles)
+
+  return profiles
 
 def add_integer_attribute_to_profiles(full_attribute_name,attributes,profiles):
   """ Add the integer attribute to the provided profiles. """
@@ -354,7 +356,6 @@ def add_wide_5ghz_channels(profiles):
   width_dict = {'40mhz':False,'80mhz':False,'160mhz':False}
   widths_column = TABLE_COLUMNS['reg_domain_prof.channel_width.width']
 
-  width_profiles = []
   for width in widths_column:
     if width in data_structures.BOOLEAN_DICT:
       width_value = data_structures.BOOLEAN_DICT[width]
@@ -369,34 +370,37 @@ def add_wide_5ghz_channels(profiles):
   
   if width_dict['40mhz']:
     wide_40 = build_xmhz_channel_width_profiles('40mhz',widths_column,wide_20)
-    width_profiles.append(wide_40)
+    for width_profile,profile in zip(wide_40,profiles):
+      profile['valid_11a_40mhz_chan_pair_nd'] = width_profile
 
   if width_dict['80mhz']:
     wide_80 = build_xmhz_channel_width_profiles('80mhz',widths_column,wide_20)
-    width_profiles.append(wide_80)
+    for width_profile,profile in zip(wide_80,profiles):
+      profile['valid_11a_80mhz_chan_group'] = width_profile
   
   if width_dict['160mhz']:
     wide_160 = build_xmhz_channel_width_profiles('160mhz',widths_column,wide_20)
-    width_profiles.append(wide_160)
+    for width_profile,profile in zip(wide_160,profiles):
+      profile['valid_11a_160mhz_chan_group'] = width_profile
 
-  return width_profiles
+  return profiles
 
 def build_xmhz_channel_width_profiles(channel_width,widths_column,wide_20):
   """ Returns a set of profiles given the channel_width and widths_column. channel_width is 40mhz, 80mhz or 160mhz. """
 
-  chan_width_names = {'40mhz':['reg_domain_prof.valid_11a_40mhz_chan_pair_nd.valid-11a-40mhz-channel-pair-nd',2],
-                      '80mhz':['reg_domain_prof.valid_11a_80mhz_chan_group.valid-11a-80mhz-channel-group',4],
-                      '160mhz':['reg_domain_prof.valid_11a_160mhz_chan_group.valid-11a-160mhz-channel-group',8]}
+  chan_width_names = {'40mhz':['valid-11a-40mhz-channel-pair-nd',2],
+                      '80mhz':['valid-11a-80mhz-channel-group',4],
+                      '160mhz':['valid-11a-160mhz-channel-group',8]}
   
-  chan_width_prof_name = chan_width_names[channel_width][0]
+  prop_name = chan_width_names[channel_width][0]
   step = chan_width_names[channel_width][1]
-  wide_xmhz = {chan_width_prof_name:[]}
+  wide_xmhz = []
   pairs = make_pairs(wide_20,step)
   for width,pair in zip(widths_column,pairs):
     if data_structures.BOOLEAN_DICT[width] == channel_width:
-      wide_xmhz[chan_width_prof_name].append(pair)
+      wide_xmhz.append({prop_name:pair})
     else:
-      wide_xmhz[chan_width_prof_name].append('')
+      wide_xmhz.append('')
   
   return wide_xmhz
 
@@ -412,7 +416,7 @@ def make_pairs(wide_20,step):
     current = 0
     next = step-1
     ties = []
-    while current < len(channels_20)-1:
+    while current < len(channels_20)-1 and next < len(channels_20):
       ties.append(f"{channels_20[current]}-{channels_20[next]}")
       current += step
       next += step
@@ -440,21 +444,24 @@ def add_addresses_to_dhcp_pool(profiles):
       address:DNS1, address2:DNS2, etc. Up to 6 addresses can be added to the arrays. The attributes
       list contains the name of the addresses to configure: dns, dft_rtr, etc. """
   
-  attributes = ['dns','dft_rtr']
+  attributes = ['dns','def_rtr']
 
   for attribute in attributes:
     attr_name = f'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__{attribute}.address'
-    if attr_name in TABLE_COLUMNS[attr_name]:
+    if attribute == 'dns':
+      attr_name += '1'
+    if attr_name in TABLE_COLUMNS:
       addresses = TABLE_COLUMNS[attr_name]
   
       for profile,address in zip(profiles,addresses):
         address_list = address.replace(', ',',').split(',')
+        profile[attr_name.split('.')[1]] = {}
         for number,address in enumerate(address_list,start=1):
-          if number != 1:
-            address_name = f'address{number}'
-          else:
+          if number == 1 and attribute == 'def_rtr':
             address_name = 'address'
-          profile[f'ip_dhcp_pool_cfg__{attribute}'].append({address_name:address})
+          else:
+            address_name = f'address{number}'
+          profile[f'ip_dhcp_pool_cfg__{attribute}'][address_name] = address
   
   return profiles
 
@@ -882,7 +889,7 @@ def add_array_attribute_to_profiles(full_attribute_name,profiles):
             possible_attribute_numbers = extract_numbers_from_attribute(attribute)
             if len(possible_attribute_numbers) != 0:
               for number in possible_attribute_numbers:
-                if is_valid_string_or_number_in_array(required_property_path,int(number),type=property_type):
+                if is_valid_string_or_number(required_property_path,int(number),type=property_type):
                   attribute_value = int(number)
                   profile[attribute_name].append({required_property:attribute_value})
                 else:
@@ -897,7 +904,7 @@ def add_array_attribute_to_profiles(full_attribute_name,profiles):
               attribute_list = attribute.replace(' ','').split(',')
               if len(attribute_list) > 1:
                 for attribute_item in attribute_list:
-                  if is_valid_string_or_number_in_array(required_property_path,attribute_item):
+                  if is_valid_string_or_number(required_property_path,attribute_item):
                     profile[attribute_name].append({required_property:attribute_item})
                   else:
                     raise ValueError(f'Invalid value. {required_property} is incorrectly configured.')
@@ -1146,17 +1153,21 @@ def get_attribute_min_len(full_attribute_name):
   else:
     profile_name,attribute_name = names
 
-  if property_name != "":
-    for ref in API_REF:
-      if profile_name in ref["definitions"]:
-        if get_attribute_type(profile_name+'.'+attribute_name) == 'array':
-          min_len = ref["definitions"][profile_name]["properties"][attribute_name]["items"]["properties"][property_name]["minimum"]
-        min_len = ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["minimum"]
-  else:
-    for ref in API_REF:
-      if profile_name in ref["definitions"]:
-        min_len = ref["definitions"][profile_name]["properties"][attribute_name]["minimum"]
-  
+  try:
+    if property_name != "":
+      for ref in API_REF:
+        if profile_name in ref["definitions"]:
+          if get_attribute_type(profile_name+'.'+attribute_name) == 'array':
+            min_len = ref["definitions"][profile_name]["properties"][attribute_name]["items"]["properties"][property_name]["minimum"]
+          else:
+            min_len = ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["minimum"]
+    else:
+      for ref in API_REF:
+        if profile_name in ref["definitions"]:
+          min_len = ref["definitions"][profile_name]["properties"][attribute_name]["minimum"]
+  except KeyError:
+    min_len = 1 if get_attribute_type(full_attribute_name) == 'string' else 0
+
   return min_len
 
 def get_attribute_max_len(full_attribute_name):
@@ -1169,17 +1180,21 @@ def get_attribute_max_len(full_attribute_name):
   else:
     profile_name,attribute_name = names
 
-  if property_name != "":
-    for ref in API_REF:
-      if profile_name in ref["definitions"]:
-        if get_attribute_type(profile_name+'.'+attribute_name) == 'array':
-          max_len = ref["definitions"][profile_name]["properties"][attribute_name]["items"]["properties"][property_name]["maximum"]
-        max_len = ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["maximum"]
-  else:
-    for ref in API_REF:
-      if profile_name in ref["definitions"]:
-        max_len = ref["definitions"][profile_name]["properties"][attribute_name]["maximum"]
-  
+  try:
+    if property_name != "":
+      for ref in API_REF:
+        if profile_name in ref["definitions"]:
+          if get_attribute_type(profile_name+'.'+attribute_name) == 'array':
+            max_len = ref["definitions"][profile_name]["properties"][attribute_name]["items"]["properties"][property_name]["maximum"]
+          else:
+            max_len = ref["definitions"][profile_name]["properties"][attribute_name]["properties"][property_name]["maximum"]
+    else:
+      for ref in API_REF:
+        if profile_name in ref["definitions"]:
+          max_len = ref["definitions"][profile_name]["properties"][attribute_name]["maximum"]
+  except KeyError:
+    max_len = 256 if get_attribute_type(full_attribute_name) == 'string' else 10000 
+
   return max_len
 
 def attribute_has_properties(full_attribute_name):
@@ -1320,7 +1335,7 @@ def get_column_errors():
         
         if get_attribute_type(table_column) == 'object':
           for col,datum in enumerate(data):
-            if not is_valid_object(table_column,datum):
+            if not is_valid_object(datum, table_column):
               current_column[column_title].append([row,col,datum])
         
         else:
@@ -1348,7 +1363,8 @@ def validate_COL_TO_ATTR_dict():
       try:
         get_attribute_type(assoc)
       except KeyError:
-        incorrect_api_path[column_title] = data_structures.COL_TO_ATTR[column_title]
+        if column_title not in SPECIAL_COLUMNS:
+          incorrect_api_path[column_title] = data_structures.COL_TO_ATTR[column_title]
 
   return incorrect_api_path
 
@@ -1820,8 +1836,8 @@ def sanitize_white_spaces(text):
   return text
 
 SPECIAL_COLUMNS = {'vlan_name_id.name':add_vlan_name_association,
-                   'ap_a_radio_prof.channel_width':add_wide_5ghz_channels,
+                   'reg_domain_prof.channel_width.width':add_wide_5ghz_channels,
                    'role.role__acl.pname':add_acls_to_role_profiles,
                    'acl_sess.acl_sess__v4policy.ace':build_session_acl_objects,
-                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dns.address': add_addresses_to_dhcp_pool,
-                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dft_rtr.address': add_addresses_to_dhcp_pool}
+                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dns.address1': add_addresses_to_dhcp_pool,
+                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__def_rtr.address': add_addresses_to_dhcp_pool}

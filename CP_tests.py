@@ -1161,3 +1161,115 @@ def test_is_valid_object_returns_true_for_empty_objects():
     Result = CA.is_valid_object(attribute,full_attribute_name)
 
     assert Result == True
+
+def test_add_5ghz_width_adds_40mhz_channels_correctly():
+
+    doc = Document()
+    table = doc.add_table(cols=3,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'Node'
+    cells[1].text = '/md/America/East'
+    cells = table.columns[1].cells
+    cells[0].text = '5 GHz Channels'
+    cells[1].text = '36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161, 165'
+    cells = table.columns[2].cells
+    cells[0].text = '5 GHz Channel Width'
+    cells[1].text = '40 MHz'
+
+    expected = {
+                'profile-name':'some-name',
+                'valid_11a_40mhz_chan_pair_nd': {'valid-11a-40mhz-channel-pair-nd':['36-40','44-48','52-56','60-64','149-153','157-161']}
+    }
+
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(doc.tables)
+    CA.remove_column_headers_from_columns_table()
+    generated = CA.add_attributes_to_profiles('reg_domain_prof.channel_width.width',[],[{'profile-name':'some-name'}])
+
+    assert expected == generated[0]
+
+def test_add_5ghz_width_adds_80mhz_channels_correctly():
+
+    doc = Document()
+    table = doc.add_table(cols=3,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'Node'
+    cells[1].text = '/md/America/East'
+    cells = table.columns[1].cells
+    cells[0].text = '5 GHz Channels'
+    cells[1].text = '36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161, 165'
+    cells = table.columns[2].cells
+    cells[0].text = '5 GHz Channel Width'
+    cells[1].text = '80 MHz'
+
+    expected = {
+                'profile-name':'some-name',
+                'valid_11a_80mhz_chan_group': {'valid-11a-80mhz-channel-group':['36-48','52-64','149-161']}
+    }
+
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(doc.tables)
+    CA.remove_column_headers_from_columns_table()
+    generated = CA.add_attributes_to_profiles('reg_domain_prof.channel_width.width',[],[{'profile-name':'some-name'}])
+
+    assert expected == generated[0]
+
+def test_add_5ghz_width_adds_160mhz_channels_correctly():
+
+    doc = Document()
+    table = doc.add_table(cols=3,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'Node'
+    cells[1].text = '/md/America/East'
+    cells = table.columns[1].cells
+    cells[0].text = '5 GHz Channels'
+    cells[1].text = '36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 149, 153, 157, 161, 165'
+    cells = table.columns[2].cells
+    cells[0].text = '5 GHz Channel Width'
+    cells[1].text = '160 MHz'
+
+    expected = {
+                'profile-name':'some-name',
+                'valid_11a_160mhz_chan_group': {'valid-11a-160mhz-channel-group':['36-64','100-128','132-161']}
+    }
+
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(doc.tables)
+    CA.remove_column_headers_from_columns_table()
+    generated = CA.add_attributes_to_profiles('reg_domain_prof.channel_width.width',[],[{'profile-name':'some-name'}])
+
+    assert expected == generated[0]
+
+def test_add_addresses_to_dhcp_pool_adds_dns_addresses_correctly():
+
+    doc = Document()
+    table = doc.add_table(cols=1,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'DHCP Pool DNS IP'
+    cells[1].text = '192.168.1.21, 192.168.2.22, 192.168.3.33'
+
+    expected = {'pool-name':'some-name','ip_dhcp_pool_cfg__dns':{'address1':'192.168.1.21','address2':'192.168.2.22','address3':'192.168.3.33'}}
+    
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(doc.tables)
+    CA.remove_column_headers_from_columns_table()
+    generated = CA.add_attributes_to_profiles('ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dns.address1',[],[{'pool-name':'some-name'}])
+
+    assert expected == generated[0]
+
+def test_add_addresses_to_dhcp_pool_adds_dft_rtr_addresses_correctly():
+
+    doc = Document()
+    table = doc.add_table(cols=1,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'DHCP Pool Default Router'
+    cells[1].text = '192.168.1.21, 192.168.2.22, 192.168.3.33'
+
+    expected = {'pool-name':'some-name','ip_dhcp_pool_cfg__def_rtr':{'address':'192.168.1.21','address2':'192.168.2.22','address3':'192.168.3.33'}}
+    
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(doc.tables)
+    CA.remove_column_headers_from_columns_table()
+    generated = CA.add_attributes_to_profiles('ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__def_rtr.address',[],[{'pool-name':'some-name'}])
+
+    assert expected == generated[0]
