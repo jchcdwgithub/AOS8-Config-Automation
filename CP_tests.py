@@ -1273,3 +1273,51 @@ def test_add_addresses_to_dhcp_pool_adds_dft_rtr_addresses_correctly():
     generated = CA.add_attributes_to_profiles('ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__def_rtr.address',[],[{'pool-name':'some-name'}])
 
     assert expected == generated[0]
+
+def test_add_node_info_to_object_identifier_uses_empty_node_names_correctly():
+
+    doc = Document()
+    table = doc.add_table(cols=2,rows=5)
+    cells = table.columns[0].cells
+    cells[0].text = 'Node'
+    cells[1].text = '/md/America/West'
+    cells[2].text = ''
+    cells[3].text = ''
+    cells[4].text = '/md/America/East'
+    cells = table.columns[1].cells
+    cells[0].text = 'ESSID'
+    cells[1].text = 'WIRELESS'
+    cells[2].text = 'EK-CORP'
+    cells[3].text = 'EK-BYOD'
+    cells[4].text = 'Guest'
+
+    expected = {'ssid_prof.profile-name':['ESSID','WIRELESS,/md/America/West','EK-CORP,/md/America/West','EK-BYOD,/md/America/West','Guest,/md/America/East'],
+                'ssid_prof.essid.essid':['ESSID','WIRELESS,/md/America/West','EK-CORP,/md/America/West','EK-BYOD,/md/America/West','Guest,/md/America/East']}
+
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(doc.tables)
+    
+    assert CA.TABLE_COLUMNS == expected
+
+def test_add_vlan_name_id_association_adds_name_association_correctly():
+
+    doc = Document()
+    table = doc.add_table(cols=3,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'Node'
+    cells[1].text = '/md/America/West'
+    cells = table.columns[1].cells
+    cells[0].text = 'VLAN Name'
+    cells[1].text = 'BYOD'
+    cells = table.columns[2].cells
+    cells[0].text = 'VLAN ID'
+    cells[1].text = '20'
+
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(doc.tables)
+    CA.remove_column_headers_from_columns_table()
+    generated = CA.add_attributes_to_profiles('vlan_name.name',[],[{}])
+
+    expected = [{'name':'BYOD,/md/America/West'},{'name':'BYOD,/md/America/West', 'vlan-ids':'20'}]
+
+    assert expected == generated 

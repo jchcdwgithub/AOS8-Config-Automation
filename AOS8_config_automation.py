@@ -207,12 +207,12 @@ def build_profiles_from_ordered_list(ordered_profiles):
     suffixed_names = []
 
     for profile_name in profile_names:
-      if len(profile_name.split(',')) < 2:
+      if len(profile_name.split('%')) < 2:
         node = DEFAULT_PATH
         if '_prof' in profile_type or '_group' in profile_type:
           profile_name += f'_{profile_type}'
       else:
-        name,node = profile_name.split(',')
+        name,node = profile_name.split('%')
         if '_prof' in profile_type or '_group' in profile_type:
           profile_name = f'{name}_{profile_type}'
         else:
@@ -226,6 +226,8 @@ def build_profiles_from_ordered_list(ordered_profiles):
       remove_empty_objects_that_are_not_booleans(profile_attribute,TABLE_COLUMNS[profile_attribute],current_profiles)
 
     profiles.append(current_profiles)
+  
+  add_vlan_name_association(profiles,ordered_profiles)
 
   return profiles
     
@@ -233,13 +235,19 @@ def build_ordered_configuration_list(profiles_to_configure):
   """ Returns an ordered list of profiles to configure. """
 
   ordered_configuration_list = []
+  added_objects = set()
 
   for profile in profiles_to_configure:
     for attribute in profiles_to_configure[profile]:
-      if is_nested_profile(attribute):
-        add_profile_to_ordered_configuration_list(attribute,profiles_to_configure,ordered_configuration_list)
-        remove_nested_profile_from_profiles_to_configure(attribute,profiles_to_configure)
-    add_profile_to_ordered_configuration_list(profile,profiles_to_configure,ordered_configuration_list)
+      if is_nested_attribute(attribute):
+        if attribute not in profiles_to_configure:
+          attribute = get_dependency_object_name(attribute)
+        if attribute not in added_objects:
+          add_profile_to_ordered_configuration_list(attribute,profiles_to_configure,ordered_configuration_list)
+          added_objects.add(attribute)
+    if profile not in added_objects:
+      add_profile_to_ordered_configuration_list(profile,profiles_to_configure,ordered_configuration_list)
+      added_objects.add(profile)
   
   return ordered_configuration_list
 
@@ -252,10 +260,26 @@ def add_profile_to_ordered_configuration_list(profile,profiles_to_configure,orde
   
   ordered_configuration_list.append(grouped_attributes)
   
-def remove_nested_profile_from_profiles_to_configure(profile,profiles_to_configure):
-  """ Removes the nested profile from the profiles to configure list. """
+def is_nested_attribute(attribute):
+  """ Returns True if the attribute is a proper object in the API. """
+  
+  for object_name in data_structures.DEPENDENCY_DICT:
+    if data_structures.DEPENDENCY_DICT[object_name] == attribute:
+      return True
+  
+  if is_nested_profile(attribute):
+    return True
+  
+  return False
 
-  profiles_to_configure.pop(profile,None)
+def get_dependency_object_name(attribute):
+  """ Given an attribute of an object, return the object name of the attribute if it exists. """
+  
+  for object_name in data_structures.DEPENDENCY_DICT:
+    if data_structures.DEPENDENCY_DICT[object_name] == attribute:
+      return object_name
+  
+  return ''
 
 def get_object_name(object):
   """ Given an API object, return the ID for the object. """
@@ -849,20 +873,41 @@ def add_acls_to_role(full_attribute_name,profiles):
       acl_type,pname = acl.split(' ')
       profile['role__acl'].append({'pname':pname,'acl_type':acl_type}) 
 
-def add_vlan_name_association(profiles):
+def add_vlan_name_association(profiles,ordered_list):
   """ Make the VLAN name to ID associations if the IDs exist and have the same node information. """
-
-  if 'vlan_id.id' in TABLE_COLUMNS:
-    vlan_ids = TABLE_COLUMNS['vlan_id.id']
-    vlan_names = TABLE_COLUMNS['vlan_name.name']
-    for vlan_id,vlan_name,profile in zip(vlan_ids,vlan_names,profiles):
-      vid,id_node = vlan_id.split(',')
-      vname,name_node = vlan_name.split('.')
-      if id_node == name_node:
-        profile['name'] = vname
-        profile['vlan-ids'] = vid
   
+  if 'vlan_name.name' in TABLE_COLUMNS and 'vlan_id.id' in TABLE_COLUMNS:
+    vlan_name_profile_index,vlan_id_profile_index = 0,0
+    vlan_name_profile_index = get_profile_name_index(ordered_list,'vlan_name.name')
+    vlan_id_profile_index = get_profile_name_index(ordered_list,'vlan_id.id')
+    vlan_name_profiles = profiles[vlan_name_profile_index]
+    vlan_id_profiles = profiles[vlan_id_profile_index]
+    vlan_name_id_profiles = [{} for _ in vlan_name_profiles]
+    for vlan_name_profile,vlan_id_profile,vlan_name_id_profile in zip(vlan_name_profiles,vlan_id_profiles,vlan_name_id_profiles):
+      if vlan_name_profile['node'] == vlan_id_profile['node']:
+        vlan_name_id_profile['node'] = vlan_name_profile['node']
+        vlan_name_id_profile['name'] = vlan_name_profile['name']
+        vlan_name_id_profile['vlan-ids'] = str(vlan_id_profile['id'])
+    if vlan_name_profile_index < vlan_id_profile_index:
+      insert_index = vlan_id_profile_index + 1
+    else:
+      insert_index = vlan_name_profile_index + 1
+    ordered_list.insert(insert_index,['vlan_name_id.name'])
+    profiles.insert(insert_index,vlan_name_id_profiles)
+
   return profiles
+
+def get_profile_name_index(ordered_list,profile_name):
+  """ Returns the index for the vlan_name profiles. """
+  
+  index = 0
+  for list in ordered_list:
+    if profile_name in list:
+      return index
+    else:
+      index += 1
+  
+  return -1
 
 def add_array_attribute_to_profiles(full_attribute_name,profiles):
   """ Adds an array attribute to the profile. """
@@ -879,7 +924,7 @@ def add_array_attribute_to_profiles(full_attribute_name,profiles):
   
     for required_property in required_properties:
       required_property_path = prof_name + '.' + attribute_name + '.' + required_property
-      property_type = get_array_property_type(full_attribute_name,required_property)
+      property_type = get_attribute_type(required_property_path)
       if required_property_path in TABLE_COLUMNS:
         attributes = TABLE_COLUMNS[required_property_path]
 
@@ -894,7 +939,7 @@ def add_array_attribute_to_profiles(full_attribute_name,profiles):
                   profile[attribute_name].append({required_property:attribute_value})
                 else:
                   raise ValueError(f'Invalid value. {required_property} is incorrectly configured.')
-            elif property_type == 'string' and is_enumerated_array_property(required_property_path):
+            elif property_type == 'string' and is_enumerated_property(required_property_path):
               try:
                attribute_value = data_structures.BOOLEAN_DICT[attribute]
               except KeyError:
@@ -904,7 +949,10 @@ def add_array_attribute_to_profiles(full_attribute_name,profiles):
               attribute_list = attribute.replace(' ','').split(',')
               if len(attribute_list) > 1:
                 for attribute_item in attribute_list:
-                  if is_valid_string_or_number(required_property_path,attribute_item):
+                  attribute_type = get_attribute_type(required_property_path)
+                  if is_valid_string_or_number(required_property_path,attribute_item,attribute_type):
+                    if attribute_type == 'integer':
+                      attribute_item = int(attribute_item)
                     profile[attribute_name].append({required_property:attribute_item})
                   else:
                     raise ValueError(f'Invalid value. {required_property} is incorrectly configured.')
@@ -922,7 +970,7 @@ def remove_empty_objects_that_are_not_booleans(full_attribute_name,attributes,pr
   
   if len(names) == 3 and get_attribute_type(f'{prof_name}.{attribute_name}') == 'array':
     property_name = names[2]
-    attribute_type = get_array_property_type(f'{prof_name}.{attribute_name}',property_name)
+    attribute_type = get_attribute_type(full_attribute_name)
   else:    
     attribute_type = get_attribute_type(f'{prof_name}.{attribute_name}')
   
@@ -931,60 +979,6 @@ def remove_empty_objects_that_are_not_booleans(full_attribute_name,attributes,pr
       if attribute == '' and len(profile[attribute_name].keys()) == 0:
         profile.pop(attribute_name)
   
-
-def is_enumerated_array_property(full_attribute_name):
-  """ Returns True if the array property is an enumeration. """
-
-  prof_name,attribute_name,property_name = full_attribute_name.split('.')
-
-  for ref in API_REF:
-    if prof_name in ref['definitions'].keys():
-      return "enum" in ref['definitions'][prof_name]['properties'][attribute_name]['items']['properties'][property_name].keys()
-        
-    
-def is_valid_string_or_number_in_array(full_attribute_name,attribute,type='string'):
-  """ Returns True if the value is valid in the array. """
-
-  min_len = get_array_attribute_min_length(full_attribute_name)
-  max_len = get_array_attribute_max_length(full_attribute_name)
-  attribute_len = 0
-
-  if type == 'string':
-    if is_enumerated_property(full_attribute_name):
-      return string_is_in_enumerated_property_list(full_attribute_name,attribute)
-    else:
-      attribute_len = len(attribute)
-  else:
-    attribute_len = int(attribute)
-
-  return attribute_len <= max_len and attribute_len >= min_len    
-
-def get_array_attribute_min_length(full_attribute_name):
-  """ Returns the minimum length of the array attribute. """
-  
-  prof_name,attribute_name,property_name = full_attribute_name.split('.')
-
-  for ref in API_REF:
-    if prof_name in ref['definitions'].keys():
-      return ref['definitions'][prof_name]['properties'][attribute_name]['items']['properties'][property_name]['minimum']
-
-def get_array_attribute_max_length(full_attribute_name):
-  """ Returns the maximum length of the array attribute. """
-  
-  prof_name,attribute_name,property_name = full_attribute_name.split('.')
-
-  for ref in API_REF:
-    if prof_name in ref['definitions'].keys():
-      return ref['definitions'][prof_name]['properties'][attribute_name]['items']['properties'][property_name]['maximum']
-
-def get_array_property_type(full_attribute_name,property):
-  """ Returns the type of the property inside the array. """
-
-  prof_name,attribute_name = full_attribute_name.split('.')
-
-  for ref in API_REF:
-    if prof_name in ref['definitions']:
-      return ref['definitions'][prof_name]['properties'][attribute_name]['items']['properties'][property]['type']
 
 def add_object_attribute_to_profiles(full_attribute_name,attributes,profiles):
   """ Adds the object attributes to the profiles. """
@@ -1281,10 +1275,17 @@ def extract_numbers_from_attribute(attribute):
   
   has_letters = re.compile(r'[^\d]+')
   numbers = re.compile(r'\d+')
+  has_units = re.compile(r'\d+ [a-zA-Z]+')
   extracted_numbers = numbers.findall(attribute)
-  
-  if len(has_letters.findall(attribute)) != 0 or len(extracted_numbers) == 0:
-    return []
+
+  if len(extracted_numbers) != 0:
+    if len(has_letters.findall(attribute)) != 0:
+      if len(has_units.findall(attribute)) != 0:
+        return extracted_numbers
+      else:
+        return []
+    else:
+      return extracted_numbers
   else:
     return extracted_numbers
 
@@ -1322,7 +1323,9 @@ def get_column_errors():
 
   errors = []
   for table_column in TABLE_COLUMNS:
-    if get_attribute_type(table_column) != 'boolean': 
+    if table_column in SPECIAL_COLUMNS:
+      continue
+    elif get_attribute_type(table_column) != 'boolean': 
       column_title = TABLE_COLUMNS[table_column][0]
       current_column = {column_title:[]}
       names = table_column.split('.')
@@ -1671,12 +1674,17 @@ def add_node_info_to_profile_name(node_column, table_columns):
       for attribute in data_structures.COL_TO_ATTR[column.cells[0].text]:
         attribute_name = attribute.split('.')[0]
         if attribute == OBJECT_IDENTIFIERS[attribute_name] and not node_info_added:
+          current_node = node_column[0]
           for profile,node in zip(column.cells[1:],node_column):
+            if node.text == '':
+              node.text = current_node
+            else:
+              current_node = node.text
             if node.text in DEVICE_DICTIONARY:
               node_name = DEVICE_DICTIONARY[node.text]
             else:
               node_name = node.text
-            profile.text += ',' + node_name
+            profile.text += '%' + node_name
           node_info_added = True
     except KeyError:
       print(f"Your column {column.cells[0].text} is mistyped or the attribute is not currently supported. Delete the column or add the necessary information to the COL_TO_ATTR data structure in the data_structures.py file.")
@@ -1703,16 +1711,18 @@ def add_dependency_to_profiles_to_be_configured(current_profile,other_profile,pr
   other_profile_identifier = OBJECT_IDENTIFIERS[other_profile].split('.')[1]
 
   if other_profile in data_structures.DEPENDENCY_DICT.keys():
-    profile_name = f'{data_structures.DEPENDENCY_DICT[other_profile]}.'
+    profile_name = f'{data_structures.DEPENDENCY_DICT[other_profile]}'
   else:
-    profile_name = f'{other_profile}.'
+    profile_name = f'{other_profile}'
   
   if other_profile_identifier in data_structures.DEPENDENCY_DICT.keys():
     profile_name += data_structures.DEPENDENCY_DICT[other_profile_identifier]
   else:
-    profile_name += other_profile_identifier
+    if get_attribute_type(f'{current_profile}.{profile_name}') == 'object':
+      profile_name += '.' + other_profile_identifier
 
-  profiles_to_be_configured[current_profile].append(profile_name)  
+  if profile_name not in profiles_to_be_configured[current_profile]:
+    profiles_to_be_configured[current_profile].append(profile_name)  
 
 
 def profile_is_an_attribute_of_current_profile(current_profile,other_profile):
@@ -1737,7 +1747,7 @@ def add_dependency_to_table_columns_dict(current_profile,other_profile):
 
     for profile_name in current_profile_names:
       if profile_name in other_profile_names:
-        name_without_node_info = profile_name.split(',')[0]
+        name_without_node_info = profile_name.split('%')[0]
         if other_profile in data_structures.DEPENDENCY_DICT.keys():
           _,identifier = other_profile_identifier.split('.')
           dynamic_profile_name = f'{current_profile}.{data_structures.DEPENDENCY_DICT[other_profile]}.{identifier}'
@@ -1835,9 +1845,10 @@ def sanitize_white_spaces(text):
 
   return text
 
-SPECIAL_COLUMNS = {'vlan_name_id.name':add_vlan_name_association,
+SPECIAL_COLUMNS = {
                    'reg_domain_prof.channel_width.width':add_wide_5ghz_channels,
                    'role.role__acl.pname':add_acls_to_role_profiles,
                    'acl_sess.acl_sess__v4policy.ace':build_session_acl_objects,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dns.address1': add_addresses_to_dhcp_pool,
-                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__def_rtr.address': add_addresses_to_dhcp_pool}
+                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__def_rtr.address': add_addresses_to_dhcp_pool
+                   }

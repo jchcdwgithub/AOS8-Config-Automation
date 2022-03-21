@@ -159,4 +159,5 @@ DEPENDENCY_DICT = {'ap_g_radio_prof':'dot11g_prof',
                    'acl_ext': 'role__acl',
                    'ap_group':'loc',
                    'accname':'pname',
-                   'aaa_prof':'wired_aaa_prof'}
+                   'aaa_prof':'wired_aaa_prof',
+                   'vlan_id':'id'}
