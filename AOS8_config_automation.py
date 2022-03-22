@@ -1,6 +1,7 @@
 from fnmatch import translate
 from msilib.schema import Error
 from optparse import Values
+from pickle import OBJ
 import profile
 import string
 from tkinter import W
@@ -203,34 +204,49 @@ def build_profiles_from_ordered_list(ordered_profiles):
     current_profiles = []
     profile_type = profile[0].split('.')[0]
 
-    profile_names = TABLE_COLUMNS[profile[0]]
-    suffixed_names = []
+    for prof_attribute in profile:
+      if prof_attribute == OBJECT_IDENTIFIERS[profile_type]:
+        profile_names = TABLE_COLUMNS[prof_attribute]
+        suffixed_names = []
 
-    for profile_name in profile_names:
-      if len(profile_name.split('%')) < 2:
-        node = DEFAULT_PATH
-        if '_prof' in profile_type or '_group' in profile_type:
-          profile_name += f'_{profile_type}'
-      else:
-        name,node = profile_name.split('%')
-        if '_prof' in profile_type or '_group' in profile_type:
-          profile_name = f'{name}_{profile_type}'
-        else:
-          profile_name = name
-      suffixed_names.append(profile_name)
-      current_profiles.append({'node':node})
+        for profile_name in profile_names:
+          if len(profile_name.split('%')) < 2:
+            node = DEFAULT_PATH
+            if profile_name != '':
+              if '_prof' in profile_type or '_group' in profile_type:
+                profile_name += f'_{profile_type}'
+          else:
+            name,node = profile_name.split('%')
+            if name != '':
+              if '_prof' in profile_type or '_group' in profile_type:
+                profile_name = f'{name}_{profile_type}'
+              else:
+                profile_name = name
+          suffixed_names.append(profile_name)
+          current_profiles.append({'node':node})
 
-    TABLE_COLUMNS[profile[0]] = suffixed_names
+        TABLE_COLUMNS[prof_attribute] = suffixed_names
     for profile_attribute in profile:
       add_attributes_to_profiles(profile_attribute,TABLE_COLUMNS[profile_attribute],current_profiles)
-      remove_empty_objects_that_are_not_booleans(profile_attribute,TABLE_COLUMNS[profile_attribute],current_profiles)
+      if profile_attribute not in SPECIAL_COLUMNS:
+        remove_empty_objects_that_are_not_booleans(profile_attribute,TABLE_COLUMNS[profile_attribute],current_profiles)
 
     profiles.append(current_profiles)
   
   add_vlan_name_association(profiles,ordered_profiles)
 
   return profiles
-    
+
+def remove_node_only_profiles(profiles):
+  """ Removes profiles that only have a node attribute after having added attributes to the profile. """
+
+  non_empty_profiles = []
+  for profile in profiles:
+    if len(profile.keys()) != 1:
+      non_empty_profiles.append(profile)
+  
+  return non_empty_profiles
+          
 def build_ordered_configuration_list(profiles_to_configure):
   """ Returns an ordered list of profiles to configure. """
 
@@ -239,12 +255,13 @@ def build_ordered_configuration_list(profiles_to_configure):
 
   for profile in profiles_to_configure:
     for attribute in profiles_to_configure[profile]:
-      if is_nested_attribute(attribute):
-        if attribute not in profiles_to_configure:
-          attribute = get_dependency_object_name(attribute)
-        if attribute not in added_objects:
-          add_profile_to_ordered_configuration_list(attribute,profiles_to_configure,ordered_configuration_list)
-          added_objects.add(attribute)
+      attr_name = attribute.split('.')[0]
+      if is_nested_attribute(attr_name):
+        if attr_name not in profiles_to_configure:
+          attr_name = get_dependency_object_name(attr_name)
+        if attr_name not in added_objects:
+          add_profile_to_ordered_configuration_list(attr_name,profiles_to_configure,ordered_configuration_list)
+          added_objects.add(attr_name)
     if profile not in added_objects:
       add_profile_to_ordered_configuration_list(profile,profiles_to_configure,ordered_configuration_list)
       added_objects.add(profile)
@@ -255,10 +272,13 @@ def add_profile_to_ordered_configuration_list(profile,profiles_to_configure,orde
   """ Adds the profile and all its attributes to be configured to the ordered list. """
 
   grouped_attributes = []
-  for attribute in profiles_to_configure[profile]:
-    grouped_attributes.append(f'{profile}.{attribute}')
+  try:
+    for attribute in profiles_to_configure[profile]:
+      grouped_attributes.append(f'{profile}.{attribute}')
   
-  ordered_configuration_list.append(grouped_attributes)
+    ordered_configuration_list.append(grouped_attributes)
+  except KeyError:
+    print(f"{profile} is a nested attribute but there isn't any configuration data for it in the tables. If you are using a system defined/existing object then ignore this message. Otherwise, add the configuration data to your document and try again.")
   
 def is_nested_attribute(attribute):
   """ Returns True if the attribute is a proper object in the API. """
@@ -395,17 +415,20 @@ def add_wide_5ghz_channels(profiles):
   if width_dict['40mhz']:
     wide_40 = build_xmhz_channel_width_profiles('40mhz',widths_column,wide_20)
     for width_profile,profile in zip(wide_40,profiles):
-      profile['valid_11a_40mhz_chan_pair_nd'] = width_profile
+      if width_profile != '':
+        profile['valid_11a_40mhz_chan_pair_nd'] = width_profile
 
   if width_dict['80mhz']:
     wide_80 = build_xmhz_channel_width_profiles('80mhz',widths_column,wide_20)
     for width_profile,profile in zip(wide_80,profiles):
-      profile['valid_11a_80mhz_chan_group'] = width_profile
+      if width_profile != '':
+        profile['valid_11a_80mhz_chan_group'] = width_profile
   
   if width_dict['160mhz']:
     wide_160 = build_xmhz_channel_width_profiles('160mhz',widths_column,wide_20)
     for width_profile,profile in zip(wide_160,profiles):
-      profile['valid_11a_160mhz_chan_group'] = width_profile
+      if width_profile != '':
+        profile['valid_11a_160mhz_chan_group'] = width_profile
 
   return profiles
 
@@ -968,8 +991,9 @@ def remove_empty_objects_that_are_not_booleans(full_attribute_name,attributes,pr
   prof_name = names[0]
   attribute_name = names[1]
   
-  if len(names) == 3 and get_attribute_type(f'{prof_name}.{attribute_name}') == 'array':
-    property_name = names[2]
+  if full_attribute_name in SPECIAL_COLUMNS:
+    attribute_type = 'object'
+  elif len(names) == 3 and get_attribute_type(f'{prof_name}.{attribute_name}') == 'array':
     attribute_type = get_attribute_type(full_attribute_name)
   else:    
     attribute_type = get_attribute_type(f'{prof_name}.{attribute_name}')
@@ -1393,13 +1417,14 @@ def is_valid_object(attribute,full_attribute_name):
 def is_nested_profile(profile_attribute):
   """ If an attribute points to another profile then it is a nested profile. Returns True or False. """
 
-  nested_ending = re.compile(r'.+_prof$')
+  nested_ending_abbr = re.compile(r'.+_prof$')
+  nested_ending_full = re.compile(r'.+_profile$')
 
-  if nested_ending.match(profile_attribute) is None:
-    return False
+  if nested_ending_abbr.match(profile_attribute) is not None or nested_ending_full.match(profile_attribute) is not None:
+    return True 
 
   else:
-    return True  
+    return False 
 
 
 def get_profile_names(profile_name_col, suffix=""):
@@ -1437,6 +1462,22 @@ def configure_profiles(api_endpoint,profiles,path=DEFAULT_PATH):
   print("Successfully committed configuration.")
 
   return response_history
+
+def create_table(columns):
+    """ Returns a table created from the columns passed to it. """
+
+    rows,cols = 0,0
+    for _ in columns:
+        cols += 1
+    rows = len(columns[0])
+
+    doc = Document()
+    table = doc.add_table(cols=cols,rows=rows)
+    for col,table_col in zip(columns,table.columns):
+        for value,cell in zip(col,table_col.cells):
+            cell.text = value
+    
+    return doc.tables
 
 # filter processing
 def sanitize_filter(filter):
@@ -1716,9 +1757,10 @@ def add_dependency_to_profiles_to_be_configured(current_profile,other_profile,pr
     profile_name = f'{other_profile}'
   
   if other_profile_identifier in data_structures.DEPENDENCY_DICT.keys():
-    profile_name += data_structures.DEPENDENCY_DICT[other_profile_identifier]
+    profile_name += '.' + data_structures.DEPENDENCY_DICT[other_profile_identifier]
   else:
-    if get_attribute_type(f'{current_profile}.{profile_name}') == 'object':
+    other_profile_type = get_attribute_type(f'{current_profile}.{profile_name}')
+    if other_profile_type == 'object' or other_profile_type == 'array':
       profile_name += '.' + other_profile_identifier
 
   if profile_name not in profiles_to_be_configured[current_profile]:
@@ -1744,19 +1786,24 @@ def add_dependency_to_table_columns_dict(current_profile,other_profile):
     current_profile_names = TABLE_COLUMNS[current_profile_identifier]
     other_profile_names = TABLE_COLUMNS[other_profile_identifier]
     dynamic_profile_name = ''
+    if other_profile in data_structures.DEPENDENCY_DICT.keys():
+      _,identifier = other_profile_identifier.split('.')
+      dynamic_profile_name = f'{current_profile}.{data_structures.DEPENDENCY_DICT[other_profile]}.{identifier}'
+    else:
+      dynamic_profile_name = f"{current_profile}.{other_profile_identifier}"
 
     for profile_name in current_profile_names:
       if profile_name in other_profile_names:
         name_without_node_info = profile_name.split('%')[0]
-        if other_profile in data_structures.DEPENDENCY_DICT.keys():
-          _,identifier = other_profile_identifier.split('.')
-          dynamic_profile_name = f'{current_profile}.{data_structures.DEPENDENCY_DICT[other_profile]}.{identifier}'
-        else:
-          dynamic_profile_name = f'{current_profile}.{other_profile_identifier}'      
         if dynamic_profile_name in TABLE_COLUMNS.keys():
           TABLE_COLUMNS[dynamic_profile_name].append(f'{name_without_node_info}_{other_profile}')
         else:
           TABLE_COLUMNS[dynamic_profile_name] = [f'{name_without_node_info}_{other_profile}'] 
+      else:
+        if dynamic_profile_name in TABLE_COLUMNS.keys():
+          TABLE_COLUMNS[dynamic_profile_name].append('')
+        else:
+          TABLE_COLUMNS[dynamic_profile_name] = ['']
 
 def get_profile_properties(profile):
   """ Returns properties of the profile from the API_REF dictionary. """
@@ -1845,9 +1892,38 @@ def sanitize_white_spaces(text):
 
   return text
 
+def add_mac_auth_info_to_tables_columns():
+  """ MAC Auth is set to either True or False in the columns. Use the ESSID information to make default
+      MAC authentication profile names and AAA MAC auth profile parameters."""
+
+  profile_names = []
+  mac_auth_profile_names = []
+  mac_auth_column = TABLE_COLUMNS['mac_auth_profile.profile-name']
+  if 'aaa_prof.profile-name' in TABLE_COLUMNS:
+    profile_names = TABLE_COLUMNS['aaa_prof.profile-name']
+    if len(profile_names[0].split('%')) != 1:
+      profile_names = [profile_name.split('%')[0] for profile_name in profile_names]
+  elif 'ssid_prof.profile-name' in TABLE_COLUMNS:
+    profile_names = TABLE_COLUMNS['ssid_prof.profile-name']
+    if len(profile_names[0].split('%')) != 1:
+      profile_names = [profile_name.split('%')[0] for profile_name in profile_names]
+    aaa_profile_names = [f"{profile_name}_aaa_prof" for profile_name in profile_names]
+    TABLE_COLUMNS['aaa_prof.profile-name'] = aaa_profile_names
+  else:
+    print('Either SSID profile and/or AAA profiles must be present for MAC Auth to be configured.')
+    exit()
+  for truth_value,profile_name in zip(mac_auth_column,profile_names):
+    if truth_value == 'True':
+      mac_auth_profile_names.append(f"{profile_name}_mac_auth_profile")
+    else:
+      mac_auth_profile_names.append('')
+  TABLE_COLUMNS['mac_auth_profile.profile-name'] = mac_auth_profile_names
+  TABLE_COLUMNS['aaa_prof.mac_auth_profile.profile-name'] = mac_auth_profile_names
+
 SPECIAL_COLUMNS = {
                    'reg_domain_prof.channel_width.width':add_wide_5ghz_channels,
                    'role.role__acl.pname':add_acls_to_role_profiles,
+                   'mac_auth_profile.profile-name':add_mac_auth_info_to_tables_columns,
                    'acl_sess.acl_sess__v4policy.ace':build_session_acl_objects,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dns.address1': add_addresses_to_dhcp_pool,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__def_rtr.address': add_addresses_to_dhcp_pool

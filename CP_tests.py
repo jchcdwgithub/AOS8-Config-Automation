@@ -1,3 +1,4 @@
+from inspect import GEN_CREATED
 from re import I, fullmatch
 import AOS8_config_automation as CA
 import setup
@@ -1316,8 +1317,47 @@ def test_add_vlan_name_id_association_adds_name_association_correctly():
     CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(doc.tables)
     CA.remove_column_headers_from_columns_table()
-    generated = CA.add_attributes_to_profiles('vlan_name.name',[],[{}])
+    profiles = CA.get_profiles_to_be_configured()
+    CA.build_profiles_dependencies(profiles)
+    ordered_list = CA.build_ordered_configuration_list(profiles)
+    generated = CA.build_profiles_from_ordered_list(ordered_list)
 
-    expected = [{'name':'BYOD,/md/America/West'},{'name':'BYOD,/md/America/West', 'vlan-ids':'20'}]
+    expected = [[{'name':'BYOD','node':'/md/America/West'}],[{'id':20,'node':'/md/America/West'}],[{'name':'BYOD','node':'/md/America/West', 'vlan-ids':'20'}]]
 
     assert expected == generated 
+
+def test_create_table():
+
+    columns = [["Node","/md/America/West"],["VLAN Name","BYOD"],["VLAN ID","20"]]
+    generated = CA.create_table(columns)
+    doc = Document()
+    table = doc.add_table(cols=3,rows=2)
+    cells = table.columns[0].cells
+    cells[0].text = 'Node'
+    cells[1].text = '/md/America/West'
+    cells = table.columns[1].cells
+    cells[0].text = 'VLAN Name'
+    cells[1].text = 'BYOD'
+    cells = table.columns[2].cells
+    cells[0].text = 'VLAN ID'
+    cells[1].text = '20'
+    expected = doc.tables
+    generated_columns = generated[0].columns
+    expected_columns = expected[0].columns
+
+    for column1,column2 in zip(generated_columns,expected_columns):
+        for cell1,cell2 in zip(column1.cells,column2.cells):
+            assert cell1.text == cell2.text
+
+def test_mac_auth_creates_mac_auth_profs_and_aaa_mac_auth_profs_correctly():
+
+    columns = [['Node','/md/America/West'],['WLAN ESSID','Test'],['MAC Auth', 'True']]
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(CA.create_table(columns))
+    CA.add_mac_auth_info_to_tables_columns()
+
+    aaa_column = {'aaa_prof.profile-name':['Test_aaa_prof']}
+    mac_auth_column = {'mac_auth_profile.profile-name':['Test_mac_auth_profile']}
+    aaa_mac_column = {'aaa_prof.mac_auth_profile.profile-name':['Test_mac_auth_profile']}
+
+    assert aaa_column in CA.TABLE_COLUMNS and mac_auth_column in CA.TABLE_COLUMNS and aaa_mac_column in CA.TABLE_COLUMNS
