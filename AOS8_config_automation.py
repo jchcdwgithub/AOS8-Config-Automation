@@ -230,6 +230,7 @@ def build_profiles_from_ordered_list(ordered_profiles):
       add_attributes_to_profiles(profile_attribute,TABLE_COLUMNS[profile_attribute],current_profiles)
       if profile_attribute not in SPECIAL_COLUMNS:
         remove_empty_objects_that_are_not_booleans(profile_attribute,TABLE_COLUMNS[profile_attribute],current_profiles)
+      current_profiles = remove_node_only_profiles(current_profiles)
 
     profiles.append(current_profiles)
   
@@ -1355,10 +1356,9 @@ def get_column_errors():
       names = table_column.split('.')
       prof_name = names[0]
       for row,possible_list in enumerate(TABLE_COLUMNS[table_column][1:]):
+        data = possible_list.replace(' ','').split(',')
         if table_column == OBJECT_IDENTIFIERS[prof_name]:
-          data = possible_list.replace(' ','').split(',')[:-1]
-        else:
-          data = possible_list.replace(' ','').split(',')
+          data = [datum.split('%')[0] for datum in data]
         
         if get_attribute_type(table_column) == 'object':
           for col,datum in enumerate(data):
@@ -1373,7 +1373,9 @@ def get_column_errors():
               type = 'string'
               if datum in data_structures.BOOLEAN_DICT:
                 datum = data_structures.BOOLEAN_DICT[datum]
-            if not is_valid_string_or_number(table_column,datum,type=type):
+            if datum == '':
+              continue
+            elif not is_valid_string_or_number(table_column,datum,type=type):
               current_column[column_title].append([row,col,datum])
         if len(current_column[column_title]) != 0:
           errors.append(current_column)
@@ -1411,6 +1413,8 @@ def is_valid_object(attribute,full_attribute_name):
       if not 'properties' in ref['definitions'][prof_name]['properties'][attribute_name]:
         result = True
       else:
+        if attribute in data_structures.BOOLEAN_DICT:
+          attribute = data_structures.BOOLEAN_DICT[attribute]
         result = attribute in ref['definitions'][prof_name]['properties'][attribute_name]['properties']
       return result
 
@@ -1748,23 +1752,22 @@ def build_profiles_dependencies(profiles_to_be_configured):
 def add_dependency_to_profiles_to_be_configured(current_profile,other_profile,profiles_to_be_configured):
   """ Adds the dynamic profiles to profiles to be configured. """
 
-  profile_name = ''
-  other_profile_identifier = OBJECT_IDENTIFIERS[other_profile].split('.')[1]
-
-  if other_profile in data_structures.DEPENDENCY_DICT.keys():
-    profile_name = f'{data_structures.DEPENDENCY_DICT[other_profile]}'
+  other_prof_name = ''
+  if other_profile in data_structures.DEPENDENCY_DICT:
+    other_prof_name = data_structures.DEPENDENCY_DICT[other_profile]
   else:
-    profile_name = f'{other_profile}'
-  
+    other_prof_name = other_profile
+  other_profile_identifier = get_nested_object_identifier(f"{current_profile}.{other_prof_name}")
+
   if other_profile_identifier in data_structures.DEPENDENCY_DICT.keys():
-    profile_name += '.' + data_structures.DEPENDENCY_DICT[other_profile_identifier]
+    other_prof_name += '.' + data_structures.DEPENDENCY_DICT[other_profile_identifier]
   else:
-    other_profile_type = get_attribute_type(f'{current_profile}.{profile_name}')
+    other_profile_type = get_attribute_type(f'{current_profile}.{other_prof_name}')
     if other_profile_type == 'object' or other_profile_type == 'array':
-      profile_name += '.' + other_profile_identifier
+      other_prof_name += '.' + other_profile_identifier
 
-  if profile_name not in profiles_to_be_configured[current_profile]:
-    profiles_to_be_configured[current_profile].append(profile_name)  
+  if other_prof_name not in profiles_to_be_configured[current_profile]:
+    profiles_to_be_configured[current_profile].append(other_prof_name)  
 
 
 def profile_is_an_attribute_of_current_profile(current_profile,other_profile):
@@ -1787,23 +1790,44 @@ def add_dependency_to_table_columns_dict(current_profile,other_profile):
     other_profile_names = TABLE_COLUMNS[other_profile_identifier]
     dynamic_profile_name = ''
     if other_profile in data_structures.DEPENDENCY_DICT.keys():
-      _,identifier = other_profile_identifier.split('.')
+      identifier = get_nested_object_identifier(f"{current_profile}.{data_structures.DEPENDENCY_DICT[other_profile]}") 
       dynamic_profile_name = f'{current_profile}.{data_structures.DEPENDENCY_DICT[other_profile]}.{identifier}'
     else:
       dynamic_profile_name = f"{current_profile}.{other_profile_identifier}"
+    if dynamic_profile_name not in TABLE_COLUMNS:
+      for profile_name in current_profile_names:
+        if profile_name in other_profile_names:
+          name_without_node_info = profile_name.split('%')[0]
+          if dynamic_profile_name in TABLE_COLUMNS.keys():
+            TABLE_COLUMNS[dynamic_profile_name].append(f'{name_without_node_info}_{other_profile}')
+          else:
+            TABLE_COLUMNS[dynamic_profile_name] = [f'{name_without_node_info}_{other_profile}'] 
+        else:
+          if dynamic_profile_name in TABLE_COLUMNS.keys():
+            TABLE_COLUMNS[dynamic_profile_name].append('')
+          else:
+            TABLE_COLUMNS[dynamic_profile_name] = ['']
 
-    for profile_name in current_profile_names:
-      if profile_name in other_profile_names:
-        name_without_node_info = profile_name.split('%')[0]
-        if dynamic_profile_name in TABLE_COLUMNS.keys():
-          TABLE_COLUMNS[dynamic_profile_name].append(f'{name_without_node_info}_{other_profile}')
-        else:
-          TABLE_COLUMNS[dynamic_profile_name] = [f'{name_without_node_info}_{other_profile}'] 
+def get_nested_object_identifier(full_attribute_name):
+  """ The identifier for the API object is not necessarily the same identifier for the API object nested inside another object. """
+
+  prof_name,attribute_name = full_attribute_name.split('.')
+
+  for ref in API_REF:
+    if prof_name in ref['definitions']:
+      if get_attribute_type(full_attribute_name) == 'array':
+        inner_id = ref['definitions'][prof_name]['properties'][attribute_name]['items']['required']
+      elif get_attribute_type(full_attribute_name) == 'object':
+        inner_id = ref['definitions'][prof_name]['properties'][attribute_name]['required']
       else:
-        if dynamic_profile_name in TABLE_COLUMNS.keys():
-          TABLE_COLUMNS[dynamic_profile_name].append('')
-        else:
-          TABLE_COLUMNS[dynamic_profile_name] = ['']
+        inner_id = attribute_name
+  
+  if len(inner_id) > 1:
+    has_name = re.compile(r'.*name$')
+    for id in inner_id:
+      if has_name.match(id) is not None:
+        return id
+  return inner_id[0]
 
 def get_profile_properties(profile):
   """ Returns properties of the profile from the API_REF dictionary. """
@@ -1898,32 +1922,98 @@ def add_mac_auth_info_to_tables_columns():
 
   profile_names = []
   mac_auth_profile_names = []
-  mac_auth_column = TABLE_COLUMNS['mac_auth_profile.profile-name']
+  mac_auth_column = TABLE_COLUMNS.pop('mac_auth_profile.profile-name')
   if 'aaa_prof.profile-name' in TABLE_COLUMNS:
     profile_names = TABLE_COLUMNS['aaa_prof.profile-name']
-    if len(profile_names[0].split('%')) != 1:
-      profile_names = [profile_name.split('%')[0] for profile_name in profile_names]
   elif 'ssid_prof.profile-name' in TABLE_COLUMNS:
     profile_names = TABLE_COLUMNS['ssid_prof.profile-name']
-    if len(profile_names[0].split('%')) != 1:
-      profile_names = [profile_name.split('%')[0] for profile_name in profile_names]
-    aaa_profile_names = [f"{profile_name}_aaa_prof" for profile_name in profile_names]
-    TABLE_COLUMNS['aaa_prof.profile-name'] = aaa_profile_names
+    TABLE_COLUMNS['aaa_prof.profile-name'] = profile_names.copy()
   else:
     print('Either SSID profile and/or AAA profiles must be present for MAC Auth to be configured.')
     exit()
   for truth_value,profile_name in zip(mac_auth_column,profile_names):
-    if truth_value == 'True':
-      mac_auth_profile_names.append(f"{profile_name}_mac_auth_profile")
+    truthy = truth_value.split('%')[0]
+    if truthy == 'True':
+      mac_auth_profile_names.append(profile_name)
     else:
       mac_auth_profile_names.append('')
   TABLE_COLUMNS['mac_auth_profile.profile-name'] = mac_auth_profile_names
-  TABLE_COLUMNS['aaa_prof.mac_auth_profile.profile-name'] = mac_auth_profile_names
+  TABLE_COLUMNS['aaa_prof.mac_auth_profile.profile-name'] = [name.split('%')[0] for name in mac_auth_profile_names] 
+
+def is_object_in_api(attribute):
+  """ Returns true for attributes that are objects in the API i.e. is a key in the 'definitions' object. """
+
+  attribute_object_name = attribute.split('.')[0]
+
+  for ref in API_REF:
+    if attribute_object_name in ref['definitions']:
+      return True
+  
+  return False
+
+def is_a_nested_object(attribute,outer_object):
+  """ Returns True if the attribute is an object in the API and is a property of the outer_object. """
+
+  properties = get_object_properties(outer_object.split('.')[0])
+
+  inner_name = ''
+
+  if attribute in data_structures.BOOLEAN_DICT:
+    inner_name = data_structures.BOOLEAN_DICT[attribute]
+  else:
+    inner_name = attribute.split('.')[0]
+  
+  if inner_name in properties and is_object_in_api(attribute):
+    return True
+  else:
+    return False
+
+def attribute_is_api_object(attribute):
+  """ Returns True if the attribute found inside the object is itself an object in the API. """
+
+  is_api_object = False
+
+  if attribute in data_structures.NESTED_DICT:
+    is_api_object = True
+  else:
+    is_api_object = is_object_in_api(attribute)
+
+  return is_api_object  
+
+def get_object_properties(object):
+  """" Returns all the properties of an API object. """
+
+  for ref in API_REF:
+    if object in ref['definitions']:
+      return ref['definitions'][object]['properties']
+  
+  return []
+
+def updated_build_ordered_configuration_list(profiles_to_configure):
+  """ Find objects that are dependent on each other in the TABLE_COLUMNS dictionary and add object attributes to be configured. """
+
+  ordered_configuration_list = []
+  added_objects = set()
+
+  for profile in profiles_to_configure:
+    for attribute in profiles_to_configure[profile]:
+      attr_name = attribute.split('.')[0]
+      if attribute_is_api_object(attr_name):
+        if attr_name not in profiles_to_configure:
+          attr_name = get_dependency_object_name(attr_name)
+        if attr_name not in added_objects:
+          add_profile_to_ordered_configuration_list(attr_name,profiles_to_configure,ordered_configuration_list)
+          added_objects.add(attr_name)
+    if profile not in added_objects:
+      add_profile_to_ordered_configuration_list(profile,profiles_to_configure,ordered_configuration_list)
+      added_objects.add(profile)
+  
+  return ordered_configuration_list
+  
 
 SPECIAL_COLUMNS = {
                    'reg_domain_prof.channel_width.width':add_wide_5ghz_channels,
                    'role.role__acl.pname':add_acls_to_role_profiles,
-                   'mac_auth_profile.profile-name':add_mac_auth_info_to_tables_columns,
                    'acl_sess.acl_sess__v4policy.ace':build_session_acl_objects,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dns.address1': add_addresses_to_dhcp_pool,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__def_rtr.address': add_addresses_to_dhcp_pool

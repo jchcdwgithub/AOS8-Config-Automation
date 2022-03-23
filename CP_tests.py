@@ -15,69 +15,6 @@ def test_build_hierarchy_builds_all_paths():
 
     assert expected == generated
 
-def test_get_columns_from_tables_returns_all_columns():
-    """ All the columns in the provided tables should be present in the returned columns dictionary. """
-
-    tables = Document('../Radio Testing Tables.docx').tables
-
-    expected = {"ap_g_radio_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
-                "ap_a_radio_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
-                "reg_domain_prof.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
-                "ap_group.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
-                "ap_g_radio_prof.eirp_min.eirp-min":["3 dBm", "3 dBm", "3 dBm", "3 dBm", "3 dBm", "3 dBm"],
-                "ap_g_radio_prof.eirp_max.eirp-max":["7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm"],
-                "ap_a_radio_prof.eirp_min.eirp-min":["6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm"],
-                "ap_a_radio_prof.eirp_max.eirp-max":["10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm"],
-                "reg_domain_prof.valid_11b_channel.valid-11g-channel":["1, 6, 11", "1,6,11", "1, 6, 11", "1, 6, 11", "1, 6, 11", "1, 6, 11"],
-                "reg_domain_prof.valid_11a_channel.valid-11a-channel":["36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 149, 153, 157, 161,165" ],
-                "ssid_prof.profile-name":["ChoiceAccess", "CorpAccess", "CorpTest", "GuestAccess", "MobiAccess"],
-                "ssid_prof.essid.essid":["ChoiceAccess", "CorpAccess", "CorpTest", "GuestAccess", "MobiAccess"],
-                "ssid_prof.g_basic_rates":["12", "12", "12", "12", "12"],
-                "ssid_prof.g_tx_rates":["12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54"],
-                "ssid_prof.a_basic_rates":["12", "12", "12, 24", "12", "12"],
-                "ssid_prof.a_tx_rates":["12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54"]}
-    
-    CA.build_tables_columns_dict(tables)    
-    CA.remove_column_headers_from_columns_table()
-
-    assert expected == CA.TABLE_COLUMNS
-
-def test_build_tables_columns_dict_builds_comma_separated_name_node_pairs():
-
-    tables = Document('../Node Testing Tables.docx').tables
-
-    expected = {"ap_g_radio_prof.profile-name":["Global,/md/HQ","HQ,/md/HQ","WAREHOUSE,/md/Branch1","FACTORY,/md/Branch2"],
-                "ap_a_radio_prof.profile-name":["Global,/md/HQ","HQ,/md/HQ","WAREHOUSE,/md/Branch1","FACTORY,/md/Branch2"],
-                "reg_domain_prof.profile-name":["Global,/md/HQ","HQ,/md/HQ","WAREHOUSE,/md/Branch1","FACTORY,/md/Branch2"],
-                "ap_g_radio_prof.eirp_min.eirp-min":["8 dBm", "5 dBm", "11 dBm", "8 dBm"],
-                "ap_g_radio_prof.eirp_max.eirp-max":["14 dBm", "11 dBm", "14 dBm", "14 dBm"],
-                "ap_a_radio_prof.eirp_min.eirp-min":["11 dBm", "8 dBm", "11 dBm", "11 dBm"],
-                "ap_a_radio_prof.eirp_max.eirp-max":["17 dBm", "14 dBm", "16 dBm", "14 dBm"]}
-    
-    CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict(tables)
-    CA.remove_column_headers_from_columns_table()
-
-    assert expected == CA.TABLE_COLUMNS
-
-def test_get_profiles_to_be_configured_returns_correct_dictionary():
-    """ Given the above test tables, get the names and attributes of profiles to be configured. """
-
-    tables = Document('../Radio Testing Tables.docx').tables
-    CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict(tables)
-    CA.add_entries_to_object_identifiers()
-
-    expected = {"ap_g_radio_prof":["profile-name","eirp_min.eirp-min","eirp_max.eirp-max"],
-                "ap_a_radio_prof":["profile-name","eirp_min.eirp-min","eirp_max.eirp-max"],
-                "ap_group":["profile-name"],
-                "reg_domain_prof":["profile-name","valid_11b_channel.valid-11g-channel","valid_11a_channel.valid-11a-channel"],
-                "ssid_prof":["profile-name","essid.essid","g_basic_rates","g_tx_rates","a_basic_rates","a_tx_rates"]}
-    
-    generated = CA.get_profiles_to_be_configured()
-
-    assert expected == generated
-    
 def test_check_for_required_attributes_returns_true_when_all_attributes_are_configured():
 
     profile_name = "configuration_device_filename"
@@ -426,8 +363,18 @@ def test_add_object_attribute_to_profiles_correctly_adds_an_enumerated_string_co
     profiles = [{}]
     attributes = ['Voice']
 
+    columns = [
+        ['WLAN ESSID', 'ChoiceAccess','CorpAccess','CorpTest','GuestAccess','MobiAccess'],
+        ['WMM EAP AC', 'Best Effort', 'Voice', 'Background', 'Background', 'Voice'],
+        ['AP Group', 'HQ', 'Seattle', 'New York'],
+        ['AP Group 5 GHz Profile', 'HQ', 'Seattle','New York'],
+        ['Group VAPs', 'ChoiceAccess, CorpAccess, GuestAccess, MobiAccess'],
+        ['QoS Profile', 'HQ', 'Seattle', 'New York'],
+        ['QoS BW Allocation VAP', 'ChoiceAccess', 'CorpAccess', 'GuestAccess'],
+        ['QoS BW Allocation Share', '20', '30', '15']
+        ]
     CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict(Document('../Extension Testing Tables.docx').tables)
+    CA.build_tables_columns_dict(CA.create_table(columns))
     CA.remove_column_headers_from_columns_table()
     CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
@@ -440,8 +387,18 @@ def test_add_object_attribute_to_profiles_adds_string_to_object_attribute():
     profiles = [{}]
     attributes = ['https://www.google.com']
 
+    columns = [
+        ['WLAN ESSID', 'ChoiceAccess','CorpAccess','CorpTest','GuestAccess','MobiAccess'],
+        ['WMM EAP AC', 'Best Effort', 'Voice', 'Background', 'Background', 'Voice'],
+        ['AP Group', 'HQ', 'Seattle', 'New York'],
+        ['AP Group 5 GHz Profile', 'HQ', 'Seattle','New York'],
+        ['Group VAPs', 'ChoiceAccess, CorpAccess, GuestAccess, MobiAccess'],
+        ['QoS Profile', 'HQ', 'Seattle', 'New York'],
+        ['QoS BW Allocation VAP', 'ChoiceAccess', 'CorpAccess', 'GuestAccess'],
+        ['QoS BW Allocation Share', '20', '30', '15']
+        ]
     CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict(Document('../Extension Testing Tables.docx').tables)
+    CA.build_tables_columns_dict(CA.create_table(columns))
     CA.remove_column_headers_from_columns_table()
     CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
@@ -496,58 +453,6 @@ def test_add_object_attributes_to_profiles_raises_value_error_when_boolean_not_d
     with pytest.raises(ValueError):
         CA.add_object_attribute_to_profiles(full_attribute_name,attributes,profiles)
 
-def test_get_array_property_type_returns_correct_type():
-
-    full_attribute_name = 'ap_group.virtual_ap'
-    property = 'profile-name'
-
-    type = CA.get_array_property_type(full_attribute_name,property)
-
-    assert 'string' == type
-
-def test_get_array_property_minimum_length_returns_correct_minimum():
-
-    full_attribute_name = 'ap_group.virtual_ap.profile-name'
-
-    min = CA.get_array_attribute_min_length(full_attribute_name)
-
-    assert min == 1
-    
-
-def test_get_array_property_maximum_length_returns_correct_minimum():
-
-    full_attribute_name = 'ap_group.virtual_ap.profile-name'
-
-    max = CA.get_array_attribute_max_length(full_attribute_name)
-
-    assert max == 256
-
-def test_is_enumerated_array_property_returns_true_for_enumerated_property():
-
-    full_attribute_name = 'usb_acl_prof.usb_access_rule.usb_vendor_list'
-    
-    assert True == CA.is_enumerated_array_property(full_attribute_name)
-
-def test_is_enumerated_array_property_returns_false_for_non_enumerated_property():
-
-    full_attribute_name = 'ids_rap_wml_server_prof.wml_table.profile-name'
-    
-    assert False == CA.is_enumerated_array_property(full_attribute_name)
-
-def test_add_array_attribute_correctly_adds_attributes():
-
-    full_attribute_name = "wlan_qos_prof.bw_alloc"
-
-    CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict(Document('../Extension Testing Tables.docx').tables)
-    CA.remove_column_headers_from_columns_table()
-
-    profiles = [{}]
-
-    CA.add_array_attribute_to_profiles(full_attribute_name,profiles)
-
-    assert [{'virtual-ap':'ChoiceAccess'},{'share':20}] == profiles[0]['bw_alloc']
-
 def test_profile_is_an_attribute_of_current_profile_returns_true_for_properties():
 
     current_profile = 'ap_group'
@@ -568,8 +473,24 @@ def test_profile_is_an_attribute_of_current_profile_returns_false_for_nonpropert
 
 def test_add_dependencies_to_table_columns_dict_adds_dependent_profiles():
 
+    columns = [
+        ['RF Profile','CGR','DEP','KFD','PWK','SIG','Test'],
+        ['2.4 GHz Minimum', '3 dBm','3 dBm','3 dBm','3 dBm','3 dBm','3 dBm'],
+        ['5 GHz Minimum', '6 dBm','6 dBm','6 dBm','6 dBm','6 dBm','6 dBm'],
+        ['2.4 GHz Maximum', '7 dBm','7 dBm','7 dBm','7 dBm','7 dBm','7 dBm'],
+        ['5 GHz Maximum', '10 dBm','10 dBm','10 dBm','10 dBm','10 dBm','10 dBm'],
+        ['RF Profile','CGR','DEP','KFD','PWK','SIG','Test'],
+        ['2.4 GHz Channels', '1,6,11','1,6,11','1,6,11','1,6,11','1,6,11','1,6,11'],
+        ['5 GHz Channels', '36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,149,153,157,161,165'],
+        ['AP Group','CGR','DEP','KFD','PWK','SIG','Test'],
+        ['WLAN ESSID', 'ChoiceAccess', 'CorpAccess', 'CorpTest', "FitnessTest",'GuestAccess', 'MobiAccess'],
+        ['G Rates Required', '12','12','12','12','12','12'],
+        ['G Rates Allowed', '12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54'],
+        ['A Rates Required', '12','12','12,24','12','12','12'],
+        ['A Rates Allowed', '12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54']
+    ]
     CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict(Document('../Radio Testing Tables.docx').tables)
+    CA.build_tables_columns_dict(CA.create_table(columns))
     CA.remove_column_headers_from_columns_table()
     profiles = CA.get_profiles_to_be_configured()
     CA.build_profiles_dependencies(profiles)
@@ -581,25 +502,44 @@ def test_add_dependencies_to_table_columns_dict_adds_dependent_profiles():
                 "ap_g_radio_prof.eirp_max.eirp-max":["7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm", "7 dBm"],
                 "ap_a_radio_prof.eirp_min.eirp-min":["6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm", "6 dBm"],
                 "ap_a_radio_prof.eirp_max.eirp-max":["10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm", "10 dBm"],
-                "reg_domain_prof.valid_11b_channel.valid-11g-channel":["1, 6, 11", "1,6,11", "1, 6, 11", "1, 6, 11", "1, 6, 11", "1, 6, 11"],
-                "reg_domain_prof.valid_11a_channel.valid-11a-channel":["36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161,165", "36, 40, 44, 48, 149, 153, 157, 161,165" ],
-                "ssid_prof.profile-name":["ChoiceAccess", "CorpAccess", "CorpTest", "GuestAccess", "MobiAccess"],
-                "ssid_prof.essid.essid":["ChoiceAccess", "CorpAccess", "CorpTest", "GuestAccess", "MobiAccess"],
-                "ssid_prof.g_basic_rates":["12", "12", "12", "12", "12"],
-                "ssid_prof.g_tx_rates":["12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54"],
-                "ssid_prof.a_basic_rates":["12", "12", "12, 24", "12", "12"],
-                "ssid_prof.a_tx_rates":["12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54", "12, 18, 24, 36, 48, 54"],
+                "reg_domain_prof.valid_11b_channel.valid-11g-channel":["1,6,11", "1,6,11", "1,6,11", "1,6,11", "1,6,11", "1,6,11"],
+                "reg_domain_prof.valid_11a_channel.valid-11a-channel":[ '36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,149,153,157,161,165'],
+                "ssid_prof.profile-name":["ChoiceAccess", "CorpAccess", "CorpTest", "FitnessTest","GuestAccess", "MobiAccess"],
+                "ssid_prof.essid.essid":["ChoiceAccess", "CorpAccess", "CorpTest", "FitnessTest", "GuestAccess", "MobiAccess"],
+                "virtual_ap.profile-name":["ChoiceAccess", "CorpAccess", "CorpTest", "FitnessTest", "GuestAccess", "MobiAccess"],
+                "virtual_ap.ssid_prof.profile-name":["ChoiceAccess_ssid_prof", "CorpAccess_ssid_prof", "CorpTest_ssid_prof", "FitnessTest_ssid_prof","GuestAccess_ssid_prof", "MobiAccess_ssid_prof"],
+                "ssid_prof.g_basic_rates":["12", "12", "12", "12", "12","12"],
+                "ssid_prof.g_tx_rates":[ '12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54'],
+                "ssid_prof.a_basic_rates":["12", "12", "12,24", "12", "12","12"],
+                "ssid_prof.a_tx_rates":[ '12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54'],
                 "ap_group.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
                 "ap_group.dot11g_prof.profile-name":["CGR_ap_g_radio_prof","DEP_ap_g_radio_prof","KFD_ap_g_radio_prof","PWK_ap_g_radio_prof","SIG_ap_g_radio_prof","Test_ap_g_radio_prof"],
                 "ap_group.dot11a_prof.profile-name":["CGR_ap_a_radio_prof","DEP_ap_a_radio_prof","KFD_ap_a_radio_prof","PWK_ap_a_radio_prof","SIG_ap_a_radio_prof","Test_ap_a_radio_prof"],
+                "ap_group.virtual_ap.profile-name":['','','','','',''],
                 "ap_group.reg_domain_prof.profile-name":["CGR_reg_domain_prof","DEP_reg_domain_prof","KFD_reg_domain_prof","PWK_reg_domain_prof","SIG_reg_domain_prof","Test_reg_domain_prof"]}
 
     assert expected == CA.TABLE_COLUMNS
 
 def test_add_dependencies_to_table_columns_dict_adds_new_profiles_to_profiles_to_be_configured():
 
+    columns = [
+        ['RF Profile','CGR','DEP','KFD','PWK','SIG','Test'],
+        ['2.4 GHz Minimum', '3 dBm','3 dBm','3 dBm','3 dBm','3 dBm','3 dBm'],
+        ['5 GHz Minimum', '6 dBm','6 dBm','6 dBm','6 dBm','6 dBm','6 dBm'],
+        ['2.4 GHz Maximum', '7 dBm','7 dBm','7 dBm','7 dBm','7 dBm','7 dBm'],
+        ['5 GHz Maximum', '10 dBm','10 dBm','10 dBm','10 dBm','10 dBm','10 dBm'],
+        ['RF Profile','CGR','DEP','KFD','PWK','SIG','Test'],
+        ['2.4 GHz Channels', '1,6,11','1,6,11','1,6,11','1,6,11','1,6,11','1,6,11'],
+        ['5 GHz Channels', '36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,149,153,157,161,165'],
+        ['AP Group','CGR','DEP','KFD','PWK','SIG','Test'],
+        ['WLAN ESSID', 'ChoiceAccess', 'CorpAccess', 'CorpTest', "FitnessTest",'GuestAccess', 'MobiAccess'],
+        ['G Rates Required', '12','12','12','12','12','12'],
+        ['G Rates Allowed', '12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54'],
+        ['A Rates Required', '12','12','12,24','12','12','12'],
+        ['A Rates Allowed', '12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54']
+    ]
     CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict(Document('../Radio Testing Tables.docx').tables)
+    CA.build_tables_columns_dict(CA.create_table(columns))
     CA.remove_column_headers_from_columns_table()
     profiles = CA.get_profiles_to_be_configured()
     CA.build_profiles_dependencies(profiles)
@@ -608,8 +548,25 @@ def test_add_dependencies_to_table_columns_dict_adds_new_profiles_to_profiles_to
 
 def test_build_ordered_configuration_list_builds_list_correctly():
 
+    columns = [
+        ['RF Profile','CGR','DEP','KFD','PWK','SIG','Test'],
+        ['2.4 GHz Minimum', '3 dBm','3 dBm','3 dBm','3 dBm','3 dBm','3 dBm'],
+        ['5 GHz Minimum', '6 dBm','6 dBm','6 dBm','6 dBm','6 dBm','6 dBm'],
+        ['2.4 GHz Maximum', '7 dBm','7 dBm','7 dBm','7 dBm','7 dBm','7 dBm'],
+        ['5 GHz Maximum', '10 dBm','10 dBm','10 dBm','10 dBm','10 dBm','10 dBm'],
+        ['RF Profile','CGR','DEP','KFD','PWK','SIG','Test'],
+        ['2.4 GHz Channels', '1,6,11','1,6,11','1,6,11','1,6,11','1,6,11','1,6,11'],
+        ['5 GHz Channels', '36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,52,56,60,64,149,153,157,161,165','36,40,44,48,149,153,157,161,165'],
+        ['AP Group','CGR','DEP','KFD','PWK','SIG','Test'],
+        ['WLAN ESSID', 'ChoiceAccess', 'CorpAccess', 'CorpTest', 'GuestAccess', 'MobiAccess'],
+        ['G Rates Required', '12','12','12','12','12'],
+        ['G Rates Allowed', '12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54'],
+        ['A Rates Required', '12','12','12,24','12','12'],
+        ['A Rates Allowed', '12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54']
+    ]
+
     CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict(Document('../Radio Testing Tables.docx').tables)
+    CA.build_tables_columns_dict(CA.create_table(columns))
     CA.remove_column_headers_from_columns_table()
     profiles = CA.get_profiles_to_be_configured()
     CA.build_profiles_dependencies(profiles)
@@ -626,13 +583,17 @@ def test_build_ordered_configuration_list_builds_list_correctly():
                 ["ap_group.profile-name",
                 "ap_group.dot11g_prof.profile-name",
                 "ap_group.dot11a_prof.profile-name",
-                "ap_group.reg_domain_prof.profile-name"],
+                "ap_group.reg_domain_prof.profile-name",
+                "ap_group.virtual_ap.profile-name"],
                 ["ssid_prof.profile-name",
                  "ssid_prof.essid.essid",
                 "ssid_prof.g_basic_rates",
                 "ssid_prof.g_tx_rates",
                 "ssid_prof.a_basic_rates",
-                "ssid_prof.a_tx_rates"]]
+                "ssid_prof.a_tx_rates"],
+                ["virtual_ap.profile-name",
+                "virtual_ap.ssid_prof.profile-name"]
+                ]
 
     generated = CA.build_ordered_configuration_list(profiles)
 
@@ -997,103 +958,76 @@ def test_add_aces_to_acl_produces_acl_correctly_02():
 
 def test_get_column_errors_processes_single_integer_value_in_range_correctly():
 
-    doc = Document()
-    table = doc.add_table(cols=1,rows=2)
-    cells = table.columns[0].cells
-    cells[0].text = 'Int VLAN ID'
-    cells[1].text = '20'
+    columns = [['Int VLAN ID', '20']]
 
     CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict([table])
+    CA.build_tables_columns_dict(CA.create_table(columns))
     generated = CA.get_column_errors()
 
     assert [] == generated
 
 def test_get_column_errors_processes_single_integer_value_out_of_range_correctly():
 
-    doc = Document()
-    table = doc.add_table(cols=2,rows=2)
-    cells = table.columns[0].cells
-    cells[0].text = 'Node'
-    cells[1].text = '/md/America/East'
-    cells = table.columns[1].cells
-    cells[0].text = 'Int VLAN ID'
-    cells[1].text = '4098'
+    columns = [['Node','/md/America/East'],['Int VLAN ID','4098']]
 
     CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict([table])
+    CA.build_tables_columns_dict(CA.create_table(columns))
     generated = CA.get_column_errors()
 
     assert [{"Int VLAN ID":[[0, 0,'4098']]}] == generated
 
 def test_get_column_errors_processes_single_string_value_correctly():
 
-    doc = Document()
-    table = doc.add_table(cols=2,rows=2)
-    cells = table.columns[0].cells
-    cells[0].text = 'Node'
-    cells[1].text = '/md/America/East'
-    cells = table.columns[1].cells
-    cells[0].text = 'DHCP Pool Name'
-    cells[1].text = 'Some_Name'
+    columns = [['Node','/md/America/East'],['DHCP Pool Name','Some_Name']]
 
     CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict([table])
+    CA.build_tables_columns_dict(CA.create_table(columns))
     generated = CA.get_column_errors()
 
     assert [] == generated
 
 def test_get_column_errors_processes_multiple_string_values_correctly():
 
-    doc = Document()
-    table = doc.add_table(cols=2,rows=2)
-    cells = table.columns[0].cells
-    cells[0].text = 'Node'
-    cells[1].text = '/md/America/East'
-    cells = table.columns[1].cells
-    cells[0].text = 'SG Server Name'
-    cells[1].text = 'Server1, Server2, Server3'
+    columns = [['Node','/md/America/East'],['SG Server Name','Server1, Server2, Server3']]
 
     CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict([table])
+    CA.build_tables_columns_dict(CA.create_table(columns))
     generated = CA.get_column_errors()
 
     assert [] == generated
 
 def test_get_column_errors_catches_invalid_string_in_multiple_string_values_correctly():
 
-    doc = Document()
-    table = doc.add_table(cols=2,rows=2)
-    cells = table.columns[0].cells
-    cells[0].text = 'Node'
-    cells[1].text = '/md/America/East'
-    cells = table.columns[1].cells
-    cells[0].text = 'SG Server Name'
-    cells[1].text = 'Server1'*40 + ', Server2, Server3'
+    server_name = 'Server1'*40 + ', Server2, Server3'
+    columns = [['Node','/md/America/East'],['SG Server Name',server_name]]
 
     CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict([table])
+    CA.build_tables_columns_dict(CA.create_table(columns))
     generated = CA.get_column_errors()
 
     assert [{'SG Server Name':[[0, 0, 'Server1'*40]]}] == generated
 
 def test_get_column_errors_catches_invalid_strings_in_multiple_string_values_correctly():
 
-    doc = Document()
-    table = doc.add_table(cols=2,rows=2)
-    cells = table.columns[0].cells
-    cells[0].text = 'Node'
-    cells[1].text = '/md/America/East'
-    cells = table.columns[1].cells
-    cells[0].text = 'SG Server Name'
-    cells[1].text = 'Server1'*40 + ', Server2'
-    cells[1].text += ', '+'Server3'*40
+    server_name = 'Server1'*40 + ', Server2'
+    server_name += ', '  + 'Server3'*40
+    columns = [['Node','/md/America/East'],['SG Server Name',server_name]]
 
     CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict([table])
+    CA.build_tables_columns_dict(CA.create_table(columns))
     generated = CA.get_column_errors()
 
     assert [{'SG Server Name':[[0, 0, 'Server1'*40],[0, 2, 'Server3'*40]]}] == generated
+
+def test_get_column_errors_does_not_report_empty_cells_as_errors():
+
+    columns = [['Node','/md','','','/md/Europe'],['SG Server Name','Server1,Server2,Server3','','','Server4']]
+
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(CA.create_table(columns))
+    generated = CA.get_column_errors()
+
+    assert [] == generated
 
 def test_string_is_in_enumerated_list_checks_for_attributes_two_deep():
 
@@ -1113,34 +1047,20 @@ def test_string_is_in_enumerated_list_checks_for_attributes_three_deep():
 
 def test_get_column_skips_empty_object_attributes():
 
-    doc = Document()
-    table = doc.add_table(cols=2,rows=2)
-    cells = table.columns[0].cells
-    cells[0].text = 'Node'
-    cells[1].text = '/md/America/East'
-    cells = table.columns[1].cells
-    cells[0].text = 'MFP/PMF'
-    cells[1].text = 'True'
+    columns = [['Node','/md/America/East'],['MFP/PMF','True']]
 
     CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict([table])
+    CA.build_tables_columns_dict(CA.create_table(columns))
     generated = CA.get_column_errors()
 
     assert [] == generated
 
 def test_get_column_errors_skips_boolean_attributes():
 
-    doc = Document()
-    table = doc.add_table(cols=2,rows=2)
-    cells = table.columns[0].cells
-    cells[0].text = 'Node'
-    cells[1].text = '/md/America/East'
-    cells = table.columns[1].cells
-    cells[0].text = 'MFP/PMF'
-    cells[1].text = 'True'
+    columns = [['Node','/md/America/East'],['MFP/PMF','True']]
 
     CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict([table])
+    CA.build_tables_columns_dict(CA.create_table(columns))
     generated = CA.get_column_errors()
 
     assert [] == generated
@@ -1268,35 +1188,22 @@ def test_add_addresses_to_dhcp_pool_adds_dft_rtr_addresses_correctly():
 
     expected = {'pool-name':'some-name','ip_dhcp_pool_cfg__def_rtr':{'address':'192.168.1.21','address2':'192.168.2.22','address3':'192.168.3.33'}}
     
-    CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict(doc.tables)
-    CA.remove_column_headers_from_columns_table()
+
+
     generated = CA.add_attributes_to_profiles('ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__def_rtr.address',[],[{'pool-name':'some-name'}])
 
     assert expected == generated[0]
 
 def test_add_node_info_to_object_identifier_uses_empty_node_names_correctly():
 
-    doc = Document()
-    table = doc.add_table(cols=2,rows=5)
-    cells = table.columns[0].cells
-    cells[0].text = 'Node'
-    cells[1].text = '/md/America/West'
-    cells[2].text = ''
-    cells[3].text = ''
-    cells[4].text = '/md/America/East'
-    cells = table.columns[1].cells
-    cells[0].text = 'ESSID'
-    cells[1].text = 'WIRELESS'
-    cells[2].text = 'EK-CORP'
-    cells[3].text = 'EK-BYOD'
-    cells[4].text = 'Guest'
+    columns = [['Node','/md/America/West','','','/md/America/East'],['WLAN ESSID','WIRELESS','EK-CORP','EK-BYOD','Guest']]
 
-    expected = {'ssid_prof.profile-name':['ESSID','WIRELESS,/md/America/West','EK-CORP,/md/America/West','EK-BYOD,/md/America/West','Guest,/md/America/East'],
-                'ssid_prof.essid.essid':['ESSID','WIRELESS,/md/America/West','EK-CORP,/md/America/West','EK-BYOD,/md/America/West','Guest,/md/America/East']}
+    expected = {'ssid_prof.profile-name':['WLAN ESSID','WIRELESS%/md/America/West','EK-CORP%/md/America/West','EK-BYOD%/md/America/West','Guest%/md/America/East'], 
+                'ssid_prof.essid.essid':['WLAN ESSID','WIRELESS%/md/America/West','EK-CORP%/md/America/West','EK-BYOD%/md/America/West','Guest%/md/America/East'], 
+                'virtual_ap.profile-name':['WLAN ESSID','WIRELESS%/md/America/West','EK-CORP%/md/America/West','EK-BYOD%/md/America/West','Guest%/md/America/East']} 
 
     CA.add_entries_to_object_identifiers()
-    CA.build_tables_columns_dict(doc.tables)
+    CA.build_tables_columns_dict(CA.create_table(columns))
     
     assert CA.TABLE_COLUMNS == expected
 
@@ -1354,10 +1261,73 @@ def test_mac_auth_creates_mac_auth_profs_and_aaa_mac_auth_profs_correctly():
     columns = [['Node','/md/America/West'],['WLAN ESSID','Test'],['MAC Auth', 'True']]
     CA.add_entries_to_object_identifiers()
     CA.build_tables_columns_dict(CA.create_table(columns))
+    CA.remove_column_headers_from_columns_table()
     CA.add_mac_auth_info_to_tables_columns()
 
-    aaa_column = {'aaa_prof.profile-name':['Test_aaa_prof']}
-    mac_auth_column = {'mac_auth_profile.profile-name':['Test_mac_auth_profile']}
-    aaa_mac_column = {'aaa_prof.mac_auth_profile.profile-name':['Test_mac_auth_profile']}
+    table_column = {'aaa_prof.profile-name':['Test%/md/America/West'],
+                    'ssid_prof.profile-name':['Test%/md/America/West'],
+                    'ssid_prof.essid.essid':['Test%/md/America/West'],
+                    'mac_auth_profile.profile-name':['Test%/md/America/West'],
+                    'virtual_ap.profile-name':['Test%/md/America/West'],
+                    'aaa_prof.mac_auth_profile.profile-name':['Test']}
 
-    assert aaa_column in CA.TABLE_COLUMNS and mac_auth_column in CA.TABLE_COLUMNS and aaa_mac_column in CA.TABLE_COLUMNS
+    assert table_column == CA.TABLE_COLUMNS
+
+def test_mac_auth_creates_mac_auth_profs_and_aaa_mac_auth_profs_with_empty_values_correctly():
+
+    columns = [['Node','/md/America/West','','/md/America/East'],
+               ['WLAN ESSID','CorpAccess','CorpTest','FitnessTest'],
+               ['MAC Auth','True','False','True']]
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(CA.create_table(columns))
+    CA.remove_column_headers_from_columns_table()
+    CA.add_mac_auth_info_to_tables_columns()
+
+    table_columns = {'aaa_prof.profile-name':['CorpAccess%/md/America/West','CorpTest%/md/America/West','FitnessTest%/md/America/East'],
+                     'ssid_prof.profile-name':['CorpAccess%/md/America/West','CorpTest%/md/America/West','FitnessTest%/md/America/East'],
+                     'ssid_prof.essid.essid':['CorpAccess%/md/America/West','CorpTest%/md/America/West','FitnessTest%/md/America/East'],
+                     'mac_auth_profile.profile-name':['CorpAccess%/md/America/West','','FitnessTest%/md/America/East'],
+                     'virtual_ap.profile-name':['CorpAccess%/md/America/West','CorpTest%/md/America/West','FitnessTest%/md/America/East'],
+                     'aaa_prof.mac_auth_profile.profile-name':['CorpAccess','','FitnessTest']
+    }
+
+    assert table_columns == CA.TABLE_COLUMNS
+
+def test_is_object_in_api_returns_true_for_api_objects():
+
+    object = 'acl_sess'
+
+    Result = CA.is_object_in_api(object)
+
+    assert Result == True
+
+def test_is_object_in_api_returns_false_for_non_api_objects():
+
+    object = 'random_number'
+
+    Result = CA.is_object_in_api(object)
+
+    assert Result == False 
+
+def test_is_nested_object_returns_true_for_nested_objects():
+
+    attribute = 'ssid_prof'
+    outer_object = 'virtual_ap'
+
+    Result = CA.is_a_nested_object(attribute,outer_object)
+
+    assert Result == True
+
+def test_get_nested_identifier_returns_nested_id_correctly():
+
+    full_attribute_name = 'role.role__cp'
+    expected = 'cp_profile_name'
+    generated = CA.get_nested_object_identifier(full_attribute_name)
+    assert expected == generated
+
+def test_get_nested_identifier_returns_name_containing_id_when_multiple_required_properties_exist():
+
+    full_attribute_name = 'role.role__bwc_ex'
+    expected = 'appname'
+    generated = CA.get_nested_object_identifier(full_attribute_name)
+    assert expected == generated
