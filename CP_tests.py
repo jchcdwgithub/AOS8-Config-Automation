@@ -1331,3 +1331,207 @@ def test_get_nested_identifier_returns_name_containing_id_when_multiple_required
     expected = 'appname'
     generated = CA.get_nested_object_identifier(full_attribute_name)
     assert expected == generated
+
+def test_add_auth_server_to_server_group_adds_all_correctly():
+
+    cols = [
+        ['Node','/md/America/West'],
+        ['Server Group', 'All_SG'],
+        ['SG Server Name', 'All']
+        ]
+
+    profiles = [{'profile-name':'All_SG'}]
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(CA.create_table(cols))
+    CA.remove_column_headers_from_columns_table()
+    CA.add_attributes_to_profiles('server_group_prof.auth_server.name',[],profiles)
+
+    expected = {'profile-name':'All_SG','auth_server':[{'all':True}]}
+    assert expected == profiles[0]
+
+def test_add_auth_server_to_server_group_adds_list_of_servers_correctly():
+
+    cols = [
+        ['Node','/md/America/West'],
+        ['Server Group', 'All_SG'],
+        ['SG Server Name', 'Server1, Server2, Server3']
+        ]
+
+    profiles = [{'profile-name':'All_SG'}]
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(CA.create_table(cols))
+    CA.remove_column_headers_from_columns_table()
+    CA.add_attributes_to_profiles('server_group_prof.auth_server.name',[],profiles)
+
+    expected = {'profile-name':'All_SG','auth_server':[{'name':'Server1'},{'name':'Server2'},{'name':'Server3'}]}
+    assert expected == profiles[0]
+
+def test_add_lease_to_dhcp_pool_adds_lease_with_day_only_correctly():
+
+    cols = [
+        ['DHCP Pool Name', 'some_name'],
+        ['DHCP Pool Lease (days)','5']
+    ]
+
+    profiles = [{'pool_name':'some_name'}]
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(CA.create_table(cols))
+    CA.remove_column_headers_from_columns_table()
+    CA.add_attributes_to_profiles('ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__lease.var1',[],profiles)
+
+    expected = {'pool_name':'some_name', 'ip_dhcp_pool_cfg__lease':{'var1':5,'var2':0,'var3':0}}
+    assert expected == profiles[0]
+
+def test_add_lease_to_dhcp_pool_adds_lease_with_hour_only_correctly():
+
+    cols = [
+        ['DHCP Pool Name', 'some_name'],
+        ['DHCP Pool Lease (hours)','8']
+    ]
+
+    profiles = [{'pool_name':'some_name'}]
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(CA.create_table(cols))
+    CA.remove_column_headers_from_columns_table()
+    CA.add_attributes_to_profiles('ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__lease.var1',[],profiles)
+
+    expected = {'pool_name':'some_name', 'ip_dhcp_pool_cfg__lease':{'var1':0,'var2':8,'var3':0}}
+    assert expected == profiles[0]
+
+def test_add_lease_to_dhcp_pool_adds_lease_with_minute_only_correctly():
+
+    cols = [
+        ['DHCP Pool Name', 'some_name'],
+        ['DHCP Pool Lease (minutes)','38']
+    ]
+
+    profiles = [{'pool_name':'some_name'}]
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(CA.create_table(cols))
+    CA.remove_column_headers_from_columns_table()
+    CA.add_attributes_to_profiles('ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__lease.var1',[],profiles)
+
+    expected = {'pool_name':'some_name', 'ip_dhcp_pool_cfg__lease':{'var1':0,'var2':0,'var3':38}}
+    assert expected == profiles[0]
+
+def test_add_lease_to_dhcp_pool_adds_lease_with_mixed_units_correctly():
+
+    cols = [
+        ['DHCP Pool Name', 'some_name'],
+        ['DHCP Pool Lease (days)','5'],
+        ['DHCP Pool Lease (hours)','8'],
+        ['DHCP Pool Lease (minutes)','38']
+    ]
+
+    profiles = [{'pool_name':'some_name'}]
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(CA.create_table(cols))
+    CA.remove_column_headers_from_columns_table()
+    CA.add_attributes_to_profiles('ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__lease.var1',[],profiles)
+
+    expected = {'pool_name':'some_name', 'ip_dhcp_pool_cfg__lease':{'var1':5,'var2':8,'var3':38}}
+    assert expected == profiles[0]
+
+def test_add_lease_to_dhcp_pool_adds_lease_with_empty_values_correctly():
+
+    cols = [
+        ['DHCP Pool Name', 'some_name','some_other_name'],
+        ['DHCP Pool Lease (days)','5',''],
+        ['DHCP Pool Lease (hours)','8','9'],
+        ['DHCP Pool Lease (minutes)','38','']
+    ]
+
+    profiles = [{'pool_name':'some_name'},{'pool_name':'some_other_name'}]
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(CA.create_table(cols))
+    CA.remove_column_headers_from_columns_table()
+    CA.add_attributes_to_profiles('ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__lease.var1',[],profiles)
+
+    expected1 = {'pool_name':'some_name', 'ip_dhcp_pool_cfg__lease':{'var1':5,'var2':8,'var3':38}}
+    expected2 = {'pool_name':'some_other_name', 'ip_dhcp_pool_cfg__lease':{'var1':0,'var2':9,'var3':0}}
+    assert expected1 == profiles[0] and expected2 == profiles[1]
+
+def test_add_dns_server_addresses_adds_multiple_server_addresses_correctly():
+
+    cols = [
+        ['DNS Server IPs', '10.10.10.100, 10.10.10.101, 10.10.10.102']
+    ]
+
+    profiles = [{'node':'/md/America/West'}]
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(CA.create_table(cols))
+    CA.remove_column_headers_from_columns_table()
+    generated = CA.add_dns_server_addresses(profiles)
+
+    expected = [{'node':'/md/America/West', 'address':'10.10.10.100'},
+                {'node':'/md/America/West', 'address':'10.10.10.101'},
+                {'node':'/md/America/West', 'address':'10.10.10.102'},
+                ]
+    
+    assert expected == generated
+
+def test_add_dns_server_addresses_adds_one_server_address_correctly():
+
+    cols = [
+        ['DNS Server IPs', '10.10.10.100']
+    ]
+
+    profiles = [{'node':'/md/America/West'}]
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(CA.create_table(cols))
+    CA.remove_column_headers_from_columns_table()
+    generated = CA.add_dns_server_addresses(profiles)
+
+    expected = [{'node':'/md/America/West', 'address':'10.10.10.100'}]
+    
+    assert expected == generated
+
+def test_add_dns_server_addresses_adds_first_three_addresses_when_more_is_given():
+
+    cols = [
+        ['DNS Server IPs', '10.10.10.100, 10.10.10.101, 10.10.10.102, 10.10.10.103']
+    ]
+
+    profiles = [{'node':'/md/America/West'}]
+    CA.add_entries_to_object_identifiers()
+    CA.build_tables_columns_dict(CA.create_table(cols))
+    CA.remove_column_headers_from_columns_table()
+    generated = CA.add_dns_server_addresses(profiles)
+
+    expected = [{'node':'/md/America/West', 'address':'10.10.10.100'},
+                {'node':'/md/America/West', 'address':'10.10.10.101'},
+                {'node':'/md/America/West', 'address':'10.10.10.102'},
+                ]
+    
+    assert expected == generated
+
+def test_remove_empty_string_objects_removes_only_empty_string_objects():
+
+    profiles = [{'node':'node1', 'hostname':'host1','address':'address1'},
+                {'node':'node1', 'hostname':'','address':'address2'},
+                {'node':'node1', 'hostname':'host3','address':'address3'},
+    ]
+    expected = [{'node':'node1', 'hostname':'host1','address':'address1'},
+                {'node':'node1', 'address':'address2'},
+                {'node':'node1', 'hostname':'host3','address':'address3'},
+    ]
+    generated = CA.remove_empty_string_objects(profiles)
+
+    assert expected == generated
+
+def test_remove_empty_string_objects_removes_empty_objects_in_array():
+
+    profiles = [
+                {'dstname': 'guestaccess_cppm_prof',
+                 'netdst__host':[{'address':'10.24.0.12'}],
+                 'netdst__name':[{'host_name': ''}]
+                 }
+                 ]
+    expected = [ 
+        {'dstname': 'guestaccess_cppm_prof',
+         'netdst__host':[{'address':'10.24.0.12'}]
+         }
+    ]
+    generated = CA.remove_empty_string_objects(profiles)
+    
+    assert expected == generated

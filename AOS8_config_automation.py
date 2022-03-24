@@ -1,4 +1,6 @@
+from curses.ascii import TAB
 from fnmatch import translate
+from msilib import Table
 from msilib.schema import Error
 from optparse import Values
 from pickle import OBJ
@@ -22,7 +24,7 @@ from pprint import pprint
 
 CONTROLLER_IP = '192.168.1.241'
 BASE_URL = f"https://{CONTROLLER_IP}:4343/v1/"
-DEFAULT_PATH = '/mm/mynode'
+DEFAULT_PATH = '/md/ATC'
 API_ROOT = 'configuration/object/'
 
 API_REF = setup.get_API_JSON_files()
@@ -32,7 +34,7 @@ CONFIG_HISTORY = []
 TABLE_COLUMNS = {}
 OBJECT_IDENTIFIERS = {}
 
-DEVICE_DICTIONARY = {'pwkinf302p':'/md/ATC/peewaukee','MM-HQ-01':'/mm/mynode', 'WC-HQ-01':'/md/ATC/HQ', 'WC-HQ-02':'/md/ATC/HQ','MM-SMIT-01':'/md/ATC/SMIT'}
+DEVICE_DICTIONARY = {}
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -165,35 +167,53 @@ def get_list_of_api_endpoints(ordered_profiles):
   
   return api_endpoints
 
-def push_profiles_to_network(ordered_configuration_list, profiles):
+def push_profiles_to_network(api_endpoints, profiles):
   """ Given a list of profiles, push them to the network. """
 
-  for profile_api_endpoint,profile_list in zip(ordered_configuration_list,profiles):
+  for api_endpoint,profile_list in zip(api_endpoints,profiles):
+    current_node = ''
     for profile in profile_list:
       node = profile.pop('node')
-      profile_name = get_object_name(profile)
-      
-      print(f"Pushing configuration object {profile_api_endpoint} {profile_name} to {node}:")
+      if node != current_node:
+        if current_node == '':
+          current_node = node
+        else:
+          proceed = input('Must commit all chnages to current node to push configuration to other nodes. Commit changes to current node? (y/n)')
+          if proceed == 'y':
+            print(f"Saving configuration...")
+            response = write_mem(path=current_node)
+            if response.status_code != 200:
+              print(f"Encountered problem when trying to write memory: HTTP Status Code: {response.status_code}. Aborting...")
+              exit()
+            else:
+               current_node = node      
+          else:
+            print(f"Aborting...")
+            exit()
+      print(f"Pushing configuration object {api_endpoint} to {node}. Profile details:")
       pprint(profile)
       proceed = input("Proceed? (y/n)")
       if proceed == 'y':
-        response = call_api(profile_api_endpoint,config_path=node,data=profile,post=True)
-        if (response.status_code == 200 and response.json()['_global_result']['_status'] != 0) or response.status_code != 200:
+        response = call_api(api_endpoint,config_path=node,data=profile,post=True)
+        if (response.status_code == 200 and response.json()['_global_result']['status'] != 0) or response.status_code != 200:
           if response.status_code != 200:
             print(f"Something went wrong while trying to communicate with the MM. HTTP Status Code: {response.status_code}. Exiting...")
-            exit()
+            #exit()
           else:
-            print(f"One or more of the attributes in the configuration profile {profile_name} failed to push:")
+            print(f"One or more of the attributes in the configuration profile {profile} failed to push:")
             pprint(response.json())
         else:
-          print(f'Successfully configuration profile {profile_name} to {node}.')
+          print(f'Successfully pushed all configuration profiles of type {api_endpoint} to {node}.')
       else:
-        exit()
-    print(f"Saving configurations...")
+        print('Continuing in test environment...')
+        #exit()
+    print(f"Saving configurations before moving on to the next set of profiles...")
     response = write_mem(path=node)
-    if response != 200:
+    if response.status_code != 200:
       print(f"Encountered problem when trying to write memory. HTTP Status Code: {response.status_code}. Aborting...")
-      exit()
+      #exit()
+    else:
+      print("Saved configurations.")
   print(f'All configuration pushed to the network.')
 
 def build_profiles_from_ordered_list(ordered_profiles):
@@ -222,6 +242,8 @@ def build_profiles_from_ordered_list(ordered_profiles):
                 profile_name = f'{name}_{profile_type}'
               else:
                 profile_name = name
+            else:
+              profile_name = name
           suffixed_names.append(profile_name)
           current_profiles.append({'node':node})
 
@@ -230,6 +252,7 @@ def build_profiles_from_ordered_list(ordered_profiles):
       add_attributes_to_profiles(profile_attribute,TABLE_COLUMNS[profile_attribute],current_profiles)
       if profile_attribute not in SPECIAL_COLUMNS:
         remove_empty_objects_that_are_not_booleans(profile_attribute,TABLE_COLUMNS[profile_attribute],current_profiles)
+        current_profiles = remove_empty_string_objects(current_profiles)
       current_profiles = remove_node_only_profiles(current_profiles)
 
     profiles.append(current_profiles)
@@ -237,6 +260,30 @@ def build_profiles_from_ordered_list(ordered_profiles):
   add_vlan_name_association(profiles,ordered_profiles)
 
   return profiles
+
+def remove_empty_string_objects(current_profiles):
+  """ Removes any objects that might have empty strings. These will raise an incomplete configuration at runtime. """
+  
+  returned_profiles = []
+  for profile in current_profiles:
+    profile_copy = profile.copy()
+    for attribute in profile:
+      if isinstance(profile[attribute],list):
+        for object in profile[attribute]:
+          list_copy = []
+          for key in object:
+            if object[key] != '':
+              list_copy.append({key:object[key]})
+          if len(list_copy) != 0:
+            profile_copy[attribute] = list_copy
+          else:
+            profile_copy.pop(attribute)
+      else:
+       if profile[attribute] == '':
+         profile_copy.pop(attribute)
+    returned_profiles.append(profile_copy)
+  
+  return returned_profiles
 
 def remove_node_only_profiles(profiles):
   """ Removes profiles that only have a node attribute after having added attributes to the profile. """
@@ -247,9 +294,34 @@ def remove_node_only_profiles(profiles):
       non_empty_profiles.append(profile)
   
   return non_empty_profiles
+
+def make_ordered_config_list(all_profiles):
+
+  added_to_ordered_list = set()
+  ordered_config_list = []
+  for profile in all_profiles:
+    if profile not in added_to_ordered_list:
+      rec_build_ordered_config_list(profile, all_profiles, ordered_config_list,added_to_ordered_list)
+
+  return ordered_config_list
+
+def rec_build_ordered_config_list(current_profile, all_profiles, order_config_list, added):
+
+  if current_profile not in all_profiles:
+    print(f"{current_profile} is a nested object but does not have any corresponding configuration data. If it is a system defined/default object then ignore this message. Otherwise, add configuration for this object or the configuration will fail to push completely.")
+    return order_config_list
+  for attribute in all_profiles[current_profile]:
+    attr_name = attribute.split('.')[0]
+    if attribute_is_api_object(attr_name):
+      if attr_name in data_structures.NESTED_DICT and current_profile != 'vlan_id':
+        attr_name = data_structures.NESTED_DICT[attr_name][0]
+      rec_build_ordered_config_list(attr_name, all_profiles, order_config_list, added)
+    
+  added.add(current_profile)
+  return add_profile_to_ordered_configuration_list(current_profile, all_profiles, order_config_list)
           
 def build_ordered_configuration_list(profiles_to_configure):
-  """ Returns an ordered list of profiles to configure. """
+  """ Find objects that are dependent on each other in the TABLE_COLUMNS dictionary and add object attributes to be configured. """
 
   ordered_configuration_list = []
   added_objects = set()
@@ -257,11 +329,11 @@ def build_ordered_configuration_list(profiles_to_configure):
   for profile in profiles_to_configure:
     for attribute in profiles_to_configure[profile]:
       attr_name = attribute.split('.')[0]
-      if is_nested_attribute(attr_name):
+      if attribute_is_api_object(attr_name):
         if attr_name not in profiles_to_configure:
           attr_name = get_dependency_object_name(attr_name)
         if attr_name not in added_objects:
-          add_profile_to_ordered_configuration_list(attr_name,profiles_to_configure,ordered_configuration_list)
+          add_profile_to_ordered_configuration_list(profile,profiles_to_configure,ordered_configuration_list,inner_profile=attr_name,added=added_objects)
           added_objects.add(attr_name)
     if profile not in added_objects:
       add_profile_to_ordered_configuration_list(profile,profiles_to_configure,ordered_configuration_list)
@@ -273,13 +345,9 @@ def add_profile_to_ordered_configuration_list(profile,profiles_to_configure,orde
   """ Adds the profile and all its attributes to be configured to the ordered list. """
 
   grouped_attributes = []
-  try:
-    for attribute in profiles_to_configure[profile]:
-      grouped_attributes.append(f'{profile}.{attribute}')
-  
-    ordered_configuration_list.append(grouped_attributes)
-  except KeyError:
-    print(f"{profile} is a nested attribute but there isn't any configuration data for it in the tables. If you are using a system defined/existing object then ignore this message. Otherwise, add the configuration data to your document and try again.")
+  for attribute in profiles_to_configure[profile]:
+    grouped_attributes.append(f'{profile}.{attribute}')
+  ordered_configuration_list.append(grouped_attributes)
   
 def is_nested_attribute(attribute):
   """ Returns True if the attribute is a proper object in the API. """
@@ -510,6 +578,55 @@ def add_addresses_to_dhcp_pool(profiles):
           else:
             address_name = f'address{number}'
           profile[f'ip_dhcp_pool_cfg__{attribute}'][address_name] = address
+  
+  return profiles
+
+def add_lease_to_dhcp_pool(profiles):
+  """ DHCP leases require var1 to var3 to be pushed together or else the attribute will be an incomplete command and will not push. """
+
+  pool_names = TABLE_COLUMNS['ip_dhcp_pool_cfg.pool_name']
+  base_name = 'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__lease.var'
+  var_names = [f"{base_name}{num}" for num in ['1','2','3']]
+  for var_name in var_names:
+    if var_name not in TABLE_COLUMNS:
+      TABLE_COLUMNS[var_name] = [0 for _ in pool_names]
+  for index,table_column in enumerate([TABLE_COLUMNS[var_names[0]],TABLE_COLUMNS[var_names[1]],TABLE_COLUMNS[var_names[2]]]):
+    new_column = []
+    for var in table_column:
+      if var == '':
+        new_column.append(0)
+      else:
+        new_column.append(int(var))
+    TABLE_COLUMNS[var_names[index]] = new_column
+  for var1,var2,var3,profile in zip(TABLE_COLUMNS[var_names[0]],TABLE_COLUMNS[var_names[1]],TABLE_COLUMNS[var_names[2]],profiles):
+    profile['ip_dhcp_pool_cfg__lease'] = {'var1':var1, 'var2':var2, 'var3':var3}
+  return profiles 
+
+def add_dns_server_addresses(profiles):
+  """ There can be up to three DNS servers added to a controller. Since the feature is also an identifier for the name server,
+      the processing happens here. """
+
+  dns_addresses = TABLE_COLUMNS['ip_name_server.address']
+  
+  for dns_address,profile in zip(dns_addresses,profiles):
+    addresses = dns_address.replace(' ','').split(',')
+    if len(addresses) > 3:
+      print('Only three DNS servers can be defined per controller. Using first three IPs provided...')
+      addresses = addresses[:3]
+    original = True
+    new_profile = profile.copy()
+    for address in addresses:
+      if is_valid_ip_address(address):
+        if original:
+          profile['address'] = address
+          original = False
+        else:
+          new_profile['address'] = address
+          profiles.append(new_profile)
+          new_profile = profile.copy()
+      else:
+        print(f'Invalid DNS IP address:{address}. Fix and try again...')
+        exit()
   
   return profiles
 
@@ -896,6 +1013,30 @@ def add_acls_to_role(full_attribute_name,profiles):
     for acl in acls:
       acl_type,pname = acl.split(' ')
       profile['role__acl'].append({'pname':pname,'acl_type':acl_type}) 
+
+def add_auth_servers_to_server_group(profiles):
+  """ There are special options for adding the authentication servers to the group. Adding all for example requires
+      a boolean object to be added to the array. """
+
+  attribute_name = 'server_group_prof.auth_server.name'
+  # if not all, just add array attributes to the auth_server_group.
+  if attribute_name in TABLE_COLUMNS:
+    server_names = TABLE_COLUMNS[attribute_name]
+    for server_name,profile in zip(server_names,profiles):
+      profile['auth_server'] = []
+      servers = server_name.replace(' ','').split(',')
+      if len(servers) == 1:
+        if servers[0] == 'All':
+          profile['auth_server'].append({'all':True})
+      elif servers == '':
+        continue
+      else:
+        for server in servers:
+          if is_valid_string_or_number(attribute_name,server):
+            profile['auth_server'].append({'name':server})
+          else:
+            print('In add_servers_to_server_group: Invalid server name')
+            exit()
 
 def add_vlan_name_association(profiles,ordered_list):
   """ Make the VLAN name to ID associations if the IDs exist and have the same node information. """
@@ -1321,19 +1462,18 @@ def inventory_devices_in_network():
   response = get_hierarchy()
   
   if response.status_code == 200:
-    devices = {}
     hierarchy = response.json()
-    populate_devices_dict(hierarchy, devices,'')
-    return devices
+    populate_devices_dict(hierarchy, DEVICE_DICTIONARY,'')
+    return DEVICE_DICTIONARY
   else:
     return {}
 
 def populate_devices_dict(hierarchy, devices_dict,current_node):
   """ Recursively build a device to MAC dictionary from the hierarchy given. """
 
+  if hierarchy['name'] != '/':
+    current_node += f'/{hierarchy["name"]}'
   if hierarchy['device_count'] > 0 and len(hierarchy['devices']) == 0:
-    if hierarchy['name'] != '/':
-      current_node += f'/{hierarchy["name"]}'
     for childnode in hierarchy['childnodes']:
       populate_devices_dict(childnode,devices_dict,current_node)
   elif hierarchy['device_count'] > 0 and len(hierarchy['devices']) > 0:
@@ -1371,7 +1511,7 @@ def get_column_errors():
               type = 'integer'
             else:
               type = 'string'
-              if datum in data_structures.BOOLEAN_DICT:
+              if datum in data_structures.BOOLEAN_DICT and datum != 'True' and datum != 'False':
                 datum = data_structures.BOOLEAN_DICT[datum]
             if datum == '':
               continue
@@ -1919,26 +2059,27 @@ def sanitize_white_spaces(text):
 def add_mac_auth_info_to_tables_columns():
   """ MAC Auth is set to either True or False in the columns. Use the ESSID information to make default
       MAC authentication profile names and AAA MAC auth profile parameters."""
-
-  profile_names = []
-  mac_auth_profile_names = []
-  mac_auth_column = TABLE_COLUMNS.pop('mac_auth_profile.profile-name')
-  if 'aaa_prof.profile-name' in TABLE_COLUMNS:
-    profile_names = TABLE_COLUMNS['aaa_prof.profile-name']
-  elif 'ssid_prof.profile-name' in TABLE_COLUMNS:
-    profile_names = TABLE_COLUMNS['ssid_prof.profile-name']
-    TABLE_COLUMNS['aaa_prof.profile-name'] = profile_names.copy()
-  else:
-    print('Either SSID profile and/or AAA profiles must be present for MAC Auth to be configured.')
-    exit()
-  for truth_value,profile_name in zip(mac_auth_column,profile_names):
-    truthy = truth_value.split('%')[0]
-    if truthy == 'True':
-      mac_auth_profile_names.append(profile_name)
+  
+  if 'mac_auth_profile.profile-name' in TABLE_COLUMNS:
+    profile_names = []
+    mac_auth_profile_names = []
+    mac_auth_column = TABLE_COLUMNS.pop('mac_auth_profile.profile-name')
+    if 'aaa_prof.profile-name' in TABLE_COLUMNS:
+      profile_names = TABLE_COLUMNS['aaa_prof.profile-name']
+    elif 'ssid_prof.profile-name' in TABLE_COLUMNS:
+      profile_names = TABLE_COLUMNS['ssid_prof.profile-name']
+      TABLE_COLUMNS['aaa_prof.profile-name'] = profile_names.copy()
     else:
-      mac_auth_profile_names.append('')
-  TABLE_COLUMNS['mac_auth_profile.profile-name'] = mac_auth_profile_names
-  TABLE_COLUMNS['aaa_prof.mac_auth_profile.profile-name'] = [name.split('%')[0] for name in mac_auth_profile_names] 
+      print('Either SSID profile and/or AAA profiles must be present for MAC Auth to be configured.')
+      exit()
+    for truth_value,profile_name in zip(mac_auth_column,profile_names):
+      truthy = truth_value.split('%')[0]
+      if truthy == 'True':
+        mac_auth_profile_names.append(profile_name)
+      else:
+        mac_auth_profile_names.append('')
+    TABLE_COLUMNS['mac_auth_profile.profile-name'] = mac_auth_profile_names
+    TABLE_COLUMNS['aaa_prof.mac_auth_profile.profile-name'] = [name.split('%')[0] for name in mac_auth_profile_names] 
 
 def is_object_in_api(attribute):
   """ Returns true for attributes that are objects in the API i.e. is a key in the 'definitions' object. """
@@ -2014,7 +2155,12 @@ def updated_build_ordered_configuration_list(profiles_to_configure):
 SPECIAL_COLUMNS = {
                    'reg_domain_prof.channel_width.width':add_wide_5ghz_channels,
                    'role.role__acl.pname':add_acls_to_role_profiles,
+                   'server_group_prof.auth_server.name':add_auth_servers_to_server_group,
                    'acl_sess.acl_sess__v4policy.ace':build_session_acl_objects,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dns.address1': add_addresses_to_dhcp_pool,
-                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__def_rtr.address': add_addresses_to_dhcp_pool
+                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__def_rtr.address': add_addresses_to_dhcp_pool,
+                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__lease.var1': add_lease_to_dhcp_pool,
+                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__lease.var2': add_lease_to_dhcp_pool,
+                   'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__lease.var3': add_lease_to_dhcp_pool,
+                   'ip_name_server.address': add_dns_server_addresses
                    }
