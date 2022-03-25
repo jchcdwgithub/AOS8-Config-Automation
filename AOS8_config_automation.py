@@ -316,9 +316,12 @@ def rec_build_ordered_config_list(current_profile, all_profiles, order_config_li
       if attr_name in data_structures.NESTED_DICT and current_profile != 'vlan_id':
         attr_name = data_structures.NESTED_DICT[attr_name][0]
       rec_build_ordered_config_list(attr_name, all_profiles, order_config_list, added)
-    
-  added.add(current_profile)
-  return add_profile_to_ordered_configuration_list(current_profile, all_profiles, order_config_list)
+
+  if current_profile not in added:  
+    added.add(current_profile)
+    return add_profile_to_ordered_configuration_list(current_profile, all_profiles, order_config_list)
+  else:
+    return order_config_list
           
 def build_ordered_configuration_list(profiles_to_configure):
   """ Find objects that are dependent on each other in the TABLE_COLUMNS dictionary and add object attributes to be configured. """
@@ -1893,18 +1896,16 @@ def add_dependency_to_profiles_to_be_configured(current_profile,other_profile,pr
   """ Adds the dynamic profiles to profiles to be configured. """
 
   other_prof_name = ''
-  if other_profile in data_structures.DEPENDENCY_DICT:
-    other_prof_name = data_structures.DEPENDENCY_DICT[other_profile]
-  else:
-    other_prof_name = other_profile
+  for property in get_profile_properties(current_profile):
+    if property in data_structures.NESTED_DICT:
+      if other_profile in data_structures.NESTED_DICT[property]:
+        other_prof_name = property
+    elif other_profile == property:
+      other_prof_name = property
+
   other_profile_identifier = get_nested_object_identifier(f"{current_profile}.{other_prof_name}")
 
-  if other_profile_identifier in data_structures.DEPENDENCY_DICT.keys():
-    other_prof_name += '.' + data_structures.DEPENDENCY_DICT[other_profile_identifier]
-  else:
-    other_profile_type = get_attribute_type(f'{current_profile}.{other_prof_name}')
-    if other_profile_type == 'object' or other_profile_type == 'array':
-      other_prof_name += '.' + other_profile_identifier
+  other_prof_name += '.' + other_profile_identifier
 
   if other_prof_name not in profiles_to_be_configured[current_profile]:
     profiles_to_be_configured[current_profile].append(other_prof_name)  
@@ -1915,10 +1916,12 @@ def profile_is_an_attribute_of_current_profile(current_profile,other_profile):
   
   current_profile_properties = get_profile_properties(current_profile)
 
-  if other_profile in data_structures.DEPENDENCY_DICT.keys():
-    return data_structures.DEPENDENCY_DICT[other_profile] in current_profile_properties
-  else:
-    return other_profile in current_profile_properties
+  for property in current_profile_properties:
+    if property in data_structures.NESTED_DICT:
+      return other_profile in data_structures.NESTED_DICT[property]
+    elif other_profile == property:
+      return True
+  return False
 
 def add_dependency_to_table_columns_dict(current_profile,other_profile):
   """ Adds entries to the TABLE_COLUMNS dictionary if the two profiles are dependent. """
@@ -1928,12 +1931,7 @@ def add_dependency_to_table_columns_dict(current_profile,other_profile):
   if current_profile != '' and other_profile_identifier != '':
     current_profile_names = TABLE_COLUMNS[current_profile_identifier]
     other_profile_names = TABLE_COLUMNS[other_profile_identifier]
-    dynamic_profile_name = ''
-    if other_profile in data_structures.DEPENDENCY_DICT.keys():
-      identifier = get_nested_object_identifier(f"{current_profile}.{data_structures.DEPENDENCY_DICT[other_profile]}") 
-      dynamic_profile_name = f'{current_profile}.{data_structures.DEPENDENCY_DICT[other_profile]}.{identifier}'
-    else:
-      dynamic_profile_name = f"{current_profile}.{other_profile_identifier}"
+    dynamic_profile_name = get_dynamic_profile_name(current_profile, other_profile) 
     if dynamic_profile_name not in TABLE_COLUMNS:
       for profile_name in current_profile_names:
         if profile_name in other_profile_names:
@@ -1947,6 +1945,22 @@ def add_dependency_to_table_columns_dict(current_profile,other_profile):
             TABLE_COLUMNS[dynamic_profile_name].append('')
           else:
             TABLE_COLUMNS[dynamic_profile_name] = ['']
+
+def get_dynamic_profile_name(current_profile,other_profile):
+  """ Returns the attribute to be added between the two dependent profiles. """
+
+  dynamic_profile_name = ''
+  
+  for property in get_profile_properties(current_profile):
+    if property in data_structures.NESTED_DICT:
+      if other_profile in data_structures.NESTED_DICT[property]:
+        other_profile_identifier = get_nested_object_identifier(f"{current_profile}.{property}")
+        dynamic_profile_name = f"{current_profile}.{property}.{other_profile_identifier}"
+        return dynamic_profile_name
+    elif property == other_profile:
+      other_profile_identifier = get_nested_object_identifier(f"{current_profile}.{property}")
+      dynamic_profile_name = f"{current_profile}.{property}.{other_profile_identifier}"
+      return dynamic_profile_name
 
 def get_nested_object_identifier(full_attribute_name):
   """ The identifier for the API object is not necessarily the same identifier for the API object nested inside another object. """
