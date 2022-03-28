@@ -2,8 +2,7 @@ import urllib3
 import requests
 import json
 
-CONTROLLER_IP = ''
-BASE_URL = f"https://{CONTROLLER_IP}:4343/v1/"
+BASE_URL = ''
 DEFAULT_PATH = ''
 API_ROOT = 'configuration/object/'
 

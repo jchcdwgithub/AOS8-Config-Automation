@@ -48,8 +48,8 @@ def main():
     
     login_success = False
     while(not login_success):
-        api.CONTROLLER_IP = address
-        sec_tokens = CA.get_security_tokens(username,password)
+        api.BASE_URL = f"https://{address}:4343/v1/"
+        sec_tokens = api.get_security_tokens(username,password)
         if 'UIDARUBA' not in sec_tokens:
             print('Failed to login. Check username and password.')
             username = input('Username: ')
@@ -58,7 +58,7 @@ def main():
             login_success = True
 
     api.UIDARUBA = sec_tokens['UIDARUBA']
-    api.X_CSRF_TOKEN = sec_tokens['X_CSRF_TOKEN']
+    api.X_CSRF_TOKEN = sec_tokens['X-CSRF-TOKEN']
 
     if not args.file is None:
         filename = args.file
@@ -93,6 +93,7 @@ def main():
 
     CA.remove_column_headers_from_columns_table()
     CA.add_mac_auth_info_to_tables_columns()
+    CA.add_dot1x_profile_attributes()
     profiles = CA.get_profiles_to_be_configured()
     CA.build_profiles_dependencies(profiles)
     generated = CA.make_ordered_config_list(profiles)

@@ -913,6 +913,53 @@ def add_auth_servers_to_server_group(profiles):
             print('In add_servers_to_server_group: Invalid server name')
             exit()
 
+def add_role_derivation_rules_to_server_group(profiles):
+  ''' Server derived roles need to be added as derivation rules in the server group profile. '''
+
+  derived_roles = TABLE_COLUMNS['server_group_prof.server_derived_role']
+  
+  for derived_role,profile in zip(derived_roles,profiles):
+    if derived_role == 'True':
+      profile['derivation_rules_vlan_role'] = [{'target':'role','value-of':True,'rule':'value-of','attribute':'role'}]
+  
+  return profiles
+
+def add_dot1x_profile_attributes():
+  """ Certain opmodes require specific dot1x profiles attributes to be added in the back end. """
+
+  enterprise = ['wpa3-aes-ccm-128','wpa3-aes-gcm-256','wpa2-aes']
+  #wpax-enterprise requires an eap method to be configured. Default is eap-peap and eap-mschapv2 for the inner/outer methods.
+  if 'ssid_prof.opmode' in TABLE_COLUMNS:
+    if not 'dot1x_auth_profile.profile-name' in TABLE_COLUMNS:
+      TABLE_COLUMNS['dot1x_auth_profile.profile-name'] = TABLE_COLUMNS['ssid_prof.profile-name'].copy()
+    opmodes = TABLE_COLUMNS['ssid_prof.opmode']
+    if 'dot1x_auth_profile.termination_eaptype' in TABLE_COLUMNS:
+      dot1x_outer_eap_types = TABLE_COLUMNS['dot1x_auth_profile.termination_eaptype']
+    else:
+      dot1x_outer_eap_types = ['EAP-PEAP' for _ in TABLE_COLUMNS['dot1x_auth_profile.profile-name']]
+    dot1x_inner_eap_types = []
+    dot1x_termination_eap = []
+    add_eap_columns = False
+    count = 0
+    
+    for opmode,outer_eap_type in zip(opmodes,dot1x_outer_eap_types):
+      if  opmode in enterprise:
+        if outer_eap_type != 'EAP-TLS':
+          dot1x_outer_eap_types[count] = 'EAP-PEAP'
+          dot1x_termination_eap.append('True')
+        dot1x_inner_eap_types.append('EAP-MSCHAPV2')
+        add_eap_columns = True
+      else:
+          dot1x_outer_eap_types[count] = ''
+          dot1x_inner_eap_types.append('')
+          dot1x_termination_eap.append('')
+      count += 1
+
+    if add_eap_columns:
+      TABLE_COLUMNS['dot1x_auth_profile.termination_eaptype'] = dot1x_outer_eap_types
+      TABLE_COLUMNS['dot1x_auth_profile.termination_innereaptype'] = dot1x_inner_eap_types
+      TABLE_COLUMNS['dot1x_auth_profile.termination_mode'] = dot1x_termination_eap
+
 def add_vlan_name_association(profiles,ordered_list):
   """ Make the VLAN name to ID associations if the IDs exist and have the same node information. """
   
@@ -1873,11 +1920,12 @@ SPECIAL_COLUMNS = {
                    'reg_domain_prof.channel_width.width':add_wide_5ghz_channels,
                    'role.role__acl.pname':add_acls_to_role_profiles,
                    'server_group_prof.auth_server.name':add_auth_servers_to_server_group,
+                   'server_group_prof.server_derived_role':add_role_derivation_rules_to_server_group,
                    'acl_sess.acl_sess__v4policy.ace':build_session_acl_objects,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__dns.address1': add_addresses_to_dhcp_pool,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__def_rtr.address': add_addresses_to_dhcp_pool,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__lease.var1': add_lease_to_dhcp_pool,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__lease.var2': add_lease_to_dhcp_pool,
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__lease.var3': add_lease_to_dhcp_pool,
-                   'ip_name_server.address': add_dns_server_addresses
+                   'ip_name_server.address': add_dns_server_addresses,
                    }
