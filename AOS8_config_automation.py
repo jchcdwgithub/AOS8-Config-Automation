@@ -1,143 +1,15 @@
-from curses.ascii import TAB
-from fnmatch import translate
-from msilib import Table
-from msilib.schema import Error
-from optparse import Values
-from pickle import OBJ
-import profile
-import string
-from tkinter import W
-from tkinter.font import names
-from turtle import pos
-from webbrowser import get
-from xml.sax.xmlreader import AttributesImpl
-import requests
-import ex_tokens 
-import json
 import re
 import math
-import urllib3
+import api
 import setup
 import data_structures
 from docx import Document
 from pprint import pprint
 
-CONTROLLER_IP = '192.168.1.241'
-BASE_URL = f"https://{CONTROLLER_IP}:4343/v1/"
-DEFAULT_PATH = '/md/ATC'
-API_ROOT = 'configuration/object/'
-
 API_REF = setup.get_API_JSON_files()
-
-CONFIG_HISTORY = []
-
 TABLE_COLUMNS = {}
 OBJECT_IDENTIFIERS = {}
-
 DEVICE_DICTIONARY = {}
-
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-#login/logout and security tokens
-def get_security_tokens(usrname, pw):
-    """ Internal function that returns the UIDARUBA and the CSRF token after a successful
-        authentication or the reason for authentication failure otherwise. """
-
-    UIDARUBA = ''
-    X_CSRF_TOKEN = ''
-    API_PATH = 'api/login'
-
-    URL = f'{BASE_URL}{API_PATH}'
-
-    payload = {'username': usrname, 'password': pw}
-    response = requests.post(URL, data=payload, verify=False)
-
-    if response.status_code == 200:
-        response_json = response.json()
-        UIDARUBA = response_json['_global_result']['UIDARUBA']
-        X_CSRF_TOKEN = response_json['_global_result']['X-CSRF-Token']
-        return {'UIDARUBA':UIDARUBA, 'X-CSRF-TOKEN':X_CSRF_TOKEN}
-    else:
-        STATUS_STR = response_json['_global_result']['status_str']
-        return {'status_str': STATUS_STR, }
-
-def write_tokens_to_external_file(tokens):
-    """ Takes a dictionary of security tokens and writes them to a temporary external file named ex_tokens.py """
-
-    UID = tokens['UIDARUBA']
-    X_CSRF_TOKEN = tokens['X-CSRF-TOKEN']
-
-    to_file = f'UIDARUBA="{UID}"\nX_CSRF_TOKEN="{X_CSRF_TOKEN}"'
-
-    try:
-        external_file = open('ex_tokens.py', 'w')
-        external_file.write(to_file)
-        external_file.close()
-    except IOError:
-        print('Could not create ex_tokens.py')
-
-def logout():
-    """ Logout of the API and end the session. """
-
-    API_PATH = 'api/logout'
-
-    URL = f'{BASE_URL}{API_PATH}'
-    
-    response = requests.post(URL, verfiy=False)
-
-    if response.status_code != 200:
-        STATUS_STR = response.json()['_global_result']['status_str']
-        return {'status_str': STATUS_STR}
-    else:
-        return {'status_str': 'successfully logged out'}
-
-
-#nodes and hierarchy
-def add_node(node_path):
-    """ Adds a node to the hierarchy given the node path as a string"""
-
-    API_PATH =  'configuration_node'
-
-    return call_api(API_PATH,config_path=node_path,data={node_path},post=True)
-
-def get_hierarchy():
-    """ Returns the configuration hierarchy"""
-
-    API_PATH = 'node_hierarchy'
-
-    URL = build_url(API_PATH,config_path='/md')
-
-    return make_request(URL)
-
-def get_objects():
-    """ Gets the list of objects available in the mobility master domain. WARNING this returns a lot of information. """
-
-    URL = add_uid_to_url('')
-    
-    response = make_request(URL)
-
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return {'status_code':response.status_code,'status_str':response.reason}
-
-def make_request(url, data={}, post=False):
-    """ Makes the get/post request based on the parameters given. If data is given, a JSON payload will be constructed
-        along with the necessary headers and cookies. """
-
-    cookies = dict(SESSION = ex_tokens.UIDARUBA)
-    headers = {'x-csrf-token':ex_tokens.X_CSRF_TOKEN}
-    if data != {}:
-        headers['ContentType'] = 'application/json'
-    if post:
-        response = requests.post(url,data=data,headers=headers,cookies=cookies,verify=False)
-    else:
-        response = requests.get(url,headers=headers,cookies=cookies,verify=False)
-    
-    if response.status_code != 200:
-        return {'status_code':response.status_code, 'status_str':response.reason}
-    else:
-        return response
 
 def build_hierarchy(full_path):
   """ Given a path i.e /md/HQ/DC or HQ/DC, create all the nodes in the path after /md. """
@@ -181,7 +53,7 @@ def push_profiles_to_network(api_endpoints, profiles):
           proceed = input('Must commit all chnages to current node to push configuration to other nodes. Commit changes to current node? (y/n)')
           if proceed == 'y':
             print(f"Saving configuration...")
-            response = write_mem(path=current_node)
+            response = api.write_mem(path=current_node)
             if response.status_code != 200:
               print(f"Encountered problem when trying to write memory: HTTP Status Code: {response.status_code}. Aborting...")
               exit()
@@ -194,7 +66,7 @@ def push_profiles_to_network(api_endpoints, profiles):
       pprint(profile)
       proceed = input("Proceed? (y/n)")
       if proceed == 'y':
-        response = call_api(api_endpoint,config_path=node,data=profile,post=True)
+        response = api.call_api(api_endpoint,config_path=node,data=profile,post=True)
         if (response.status_code == 200 and response.json()['_global_result']['status'] != 0) or response.status_code != 200:
           if response.status_code != 200:
             print(f"Something went wrong while trying to communicate with the MM. HTTP Status Code: {response.status_code}. Exiting...")
@@ -208,7 +80,7 @@ def push_profiles_to_network(api_endpoints, profiles):
         print('Continuing in test environment...')
         #exit()
     print(f"Saving configurations before moving on to the next set of profiles...")
-    response = write_mem(path=node)
+    response = api.write_mem(path=node)
     if response.status_code != 200:
       print(f"Encountered problem when trying to write memory. HTTP Status Code: {response.status_code}. Aborting...")
       #exit()
@@ -231,7 +103,7 @@ def build_profiles_from_ordered_list(ordered_profiles):
 
         for profile_name in profile_names:
           if len(profile_name.split('%')) < 2:
-            node = DEFAULT_PATH
+            node = api.DEFAULT_PATH
             if profile_name != '':
               if '_prof' in profile_type or '_group' in profile_type:
                 profile_name += f'_{profile_type}'
@@ -1462,7 +1334,7 @@ def extract_numbers_from_attribute(attribute):
 def inventory_devices_in_network():
   """ Perform a query of the hierarchy and search for devices in the network. Return a dictionary of device name to MAC. """
 
-  response = get_hierarchy()
+  response = api.get_hierarchy()
   
   if response.status_code == 200:
     hierarchy = response.json()
@@ -1579,37 +1451,6 @@ def get_profile_names(profile_name_col, suffix=""):
 
   return [name.text+suffix for name in profile_name_col]
 
-def configure_profiles(api_endpoint,profiles,path=DEFAULT_PATH):
-  """ Configures a group of profiles based on the profiles passed in the profiles paramater. Returns an
-      array of responses. """
-
-  response_history = []
-
-  print("Pushing Configuration to the network...")
-
-  for profile in profiles:
-    response = call_api(api_endpoint,data=profile,config_path=path,post=True)
-    if response.status_code != 200:
-      response_history.append({'status_code':response.status_code, 'status_str':response.reason})
-    elif response.status_code == 200 and response.json()['_global_result']['status'] != 0:
-      response_history.append(response.json())
-      print(f'Failed to configure ssid: {profile["profile-name"]}, purging configuration and aborting.')
-      purge_pending_config(path=path)
-      for response in response_history:
-        pprint(response)
-      exit()
-    else:
-      response_history.append(response.json())
-
-  print("Successfully pushed configurations. Configurations pushed:")
-  for response in response_history:
-    pprint(response)
-  print("Committing configurations.")
-  write_mem(path='/md')
-  print("Successfully committed configuration.")
-
-  return response_history
-
 def create_table(columns):
     """ Returns a table created from the columns passed to it. """
 
@@ -1625,122 +1466,6 @@ def create_table(columns):
             cell.text = value
     
     return doc.tables
-
-# filter processing
-def sanitize_filter(filter):
-    """ Given a JSON filter, replace brackets, commas, etc. with AOS sanitized symbols. """
-
-    #replace quotes with %22
-    filter = filter.replace('"','%22')
-
-    #replace opening brackets with %5B
-    filter = filter.replace('[','%5B')
-
-    #replace opening curly brackets with %7B
-    filter = filter.replace('{','%7B')
-
-    #replace colons with %3A
-    filter = filter.replace(':','%3A')
-
-    #replace bling with %24
-    filter = filter.replace('$','%24')
-
-    #replace forward slashes with %2F
-    filter = filter.replace('/','%2F')
-
-    #replace comma with %2C
-    filter = filter.replace(',','%2C')
-
-    #replace closing curly brackets with %5D
-    filter = filter.replace(']','%5D')
-
-    #replace closing hard brackets with %7D
-    filter = filter.replace('}', '%7D')
-
-    return filter
-
-#URL path building
-def build_url(api_path,config_path,filter=[],type=''):
-    """ Takes an api path, config path and filter and returns the full URL along with the UID. """
-    url = f'{BASE_URL}{API_ROOT}{api_path}?config_path={config_path}'
-    if type != '':
-        url += f'&type="{type}"'
-
-    if filter != []:
-        url = add_filters_to_url(url,filter)
-        
-    url = add_uid_to_url(url)
-    return url 
-
-def add_filters_to_url(path, filter):
-    """ Takes an API path and filter and returns the URL with the filter sanitized and attached to the URL. """
-    filter_string = ''
-    filter_options = []
-
-    if filter != []:
-        filter_string = '[{"' + filter[0] + '":{"' + filter[1] + '":['
-        filter_options = filter[2:]
-    for filter_option in filter_options:
-        #add double quotes around strings otherwise don't
-        if type(filter_option) is int:
-            filter_string += str(filter_option) + ','
-        else:
-            filter_string += '"'+filter_option+'",'
-    
-    #remove last trailing comma
-    filter_string = filter_string[:-1]
-
-    filter_string += ']}}]'
-    filter_string = sanitize_filter(filter_string)
-    path = f'{path}&filter={filter_string}'
-    
-    return path
-
-def add_uid_to_url(url):
-    """ Adds the UIDARUBA to the provided url and returns the final url"""
-
-    if '?' in url:
-        url = f'{url}&UIDARUBA={ex_tokens.UIDARUBA}'
-    else:
-        url = f'{url}?UIDARUBA={ex_tokens.UIDARUBA}'
-
-    return url
-
-def call_api(api_url,config_path=DEFAULT_PATH, data={},filter=[],post=False):
-    """ Builds the URL using the API_URL and any other data passed along. """
-    URL = build_url(api_url,config_path=config_path,filter=filter)
-    if data != {}:
-        payload = json.dumps(data)
-    if post:
-        return make_request(URL,data=payload,post=True)
-    else:
-        return make_request(URL)
-
-def configure_multiple_objects(config_objects,path=DEFAULT_PATH):
-  """ Configure multiple objects. The syntax is:
-    { '_list': [ { 'OBJECT1' : [ {'ATTR1':'VALUE'},{'ATTR2':'VALUE'} ], 'OBJECT2': ... """
-
-  API_PATH = ''
-  return call_api(API_PATH,config_path=path,data=config_objects,post=True)
-
-#commit or purge pending changes
-def write_mem(path=DEFAULT_PATH):
-    """ Saves pending configurations under specified path """
-
-    url = build_url('write_memory',config_path=path)
-    url = add_uid_to_url(url)
-
-    return make_request(url,post=True)
-
-def purge_pending_config(path=DEFAULT_PATH):
-    """ Purges any pending configuration. Body contains:
-    {
-         "node-path": "string"
-    }"""
-
-    URL = build_url('configuration_purge_pending',config_path=path)
-    payload = json.dumps({"node-path":path})
-    return make_request(URL,data=payload,post=True)
 
 #external document handling
 def get_table_titles(document):
@@ -2143,28 +1868,6 @@ def get_object_properties(object):
       return ref['definitions'][object]['properties']
   
   return []
-
-def updated_build_ordered_configuration_list(profiles_to_configure):
-  """ Find objects that are dependent on each other in the TABLE_COLUMNS dictionary and add object attributes to be configured. """
-
-  ordered_configuration_list = []
-  added_objects = set()
-
-  for profile in profiles_to_configure:
-    for attribute in profiles_to_configure[profile]:
-      attr_name = attribute.split('.')[0]
-      if attribute_is_api_object(attr_name):
-        if attr_name not in profiles_to_configure:
-          attr_name = get_dependency_object_name(attr_name)
-        if attr_name not in added_objects:
-          add_profile_to_ordered_configuration_list(attr_name,profiles_to_configure,ordered_configuration_list)
-          added_objects.add(attr_name)
-    if profile not in added_objects:
-      add_profile_to_ordered_configuration_list(profile,profiles_to_configure,ordered_configuration_list)
-      added_objects.add(profile)
-  
-  return ordered_configuration_list
-  
 
 SPECIAL_COLUMNS = {
                    'reg_domain_prof.channel_width.width':add_wide_5ghz_channels,
