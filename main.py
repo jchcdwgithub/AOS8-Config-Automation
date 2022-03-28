@@ -1,5 +1,4 @@
 import argparse
-import sys
 import api
 import AOS8_config_automation as CA
 from docx import Document
@@ -39,8 +38,13 @@ def main():
     if not args.node is None:
         api.DEFAULT_PATH = args.node
     else:
-        print('Default node not set. Setting default configuration node to /md')
-        api.DEFAULT_PATH = '/md'
+        print('Default node not set.')
+        set_default_node = input('Set default node value? (y/n)')
+        if set_default_node == 'y':
+            api.DEFAULT_PATH = input('Default node: ')
+        else:
+            print('Setting default node to the hierarchy root (/md)...')
+            api.DEFAULT_PATH = '/md'
     
     login_success = False
     while(not login_success):
