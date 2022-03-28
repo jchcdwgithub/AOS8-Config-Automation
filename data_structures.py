@@ -123,7 +123,7 @@ COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.pro
                "CP Welcome Page":['cp_auth_profile.cp_welcome_location.welcome-page'],
                "CP Login Page":['cp_auth_profile.cp_login_location.login-page'],
                "CP Server Group":['cp_auth_profile.cp_server_group'],
-               "CP Default Role":['cp_auth_profile.cp_default_role.cp-default-role'],
+               "CP Default Role":['cp_auth_profile.cp_default_role.default-role'],
                "CP User Logon":['cp_auth_profile.allow_user'],
                "CP Whitelist":['cp_auth_profile.cp_white_list.white-list'],
                "Netdestination":['netdst.dstname'],

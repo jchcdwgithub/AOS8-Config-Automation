@@ -943,7 +943,7 @@ def add_dot1x_profile_attributes():
     count = 0
     
     for opmode,outer_eap_type in zip(opmodes,dot1x_outer_eap_types):
-      if  opmode in enterprise:
+      if  data_structures.BOOLEAN_DICT[opmode] in enterprise:
         if outer_eap_type != 'EAP-TLS':
           dot1x_outer_eap_types[count] = 'EAP-PEAP'
           dot1x_termination_eap.append('True')

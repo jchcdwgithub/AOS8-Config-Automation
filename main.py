@@ -39,7 +39,7 @@ def main():
         api.DEFAULT_PATH = args.node
     else:
         print('Default node not set.')
-        set_default_node = input('Set default node value? (y/n)')
+        set_default_node = input('Set default node value? (y/n): ')
         if set_default_node == 'y':
             api.DEFAULT_PATH = input('Default node: ')
         else:
@@ -72,10 +72,9 @@ def main():
     file_valid = False
     while(not file_valid):
         try:
-            with open(filename) as configuration_doc:
-                tables = Document(configuration_doc).tables
-                CA.build_tables_columns_dict(tables)
-                file_valid = True
+            tables = Document(filename).tables
+            CA.build_tables_columns_dict(tables)
+            file_valid = True
         except (FileExistsError,FileNotFoundError):
             print('Invalid file or path to file.')
             input('File: ')
@@ -86,7 +85,7 @@ def main():
     for error in errors:
         print(error)
     
-    abort = input('Fix errors? Program will exit. (y/n)')
+    abort = input('Fix errors? Program will exit. (y/n): ')
     if abort == 'y':
         print('Exiting...')
         exit()
