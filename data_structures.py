@@ -7,7 +7,7 @@ COL_TO_ATTR = {"RF Profile":["ap_g_radio_prof.profile-name","ap_a_radio_prof.pro
                "MGMT Int DHCP":['int_mgmt.int_mgmt_dhcp'],
                "MGMT Int Netmask":['int_mgmt.int_mgmt_ip.ipmask'],
                "VLAN ID":['vlan_id.id'],
-               "Option 82":['vlan_id.option-82'],
+               "VLAN Option 82":['vlan_id.option-82'],
                "VLAN Description":['vlan_id.vlan_id__descr.descr'],
                "PortChannel":['int_pc.id'],
                "PC Interfaces":['int_pc.int_pc_add_gig.slot/module/port'],
@@ -177,7 +177,11 @@ BOOLEAN_DICT = {'Beacon':'ba',
                 'EAP-PEAP':'eap-peap',
                 'EAP-TLS':'eap-tls',
                 'EAP-MSCHAPV2':'eap-mschapv2',
-                'EAP-GTC':'eap-gtc'}
+                'EAP-GTC':'eap-gtc',
+                'Full':'full',
+                'Half':'half',
+                'Auto':'auto',
+                }
 
 DEPENDENCY_DICT = {'ap_g_radio_prof':'dot11g_prof', 
                    'ap_a_radio_prof':'dot11a_prof',
