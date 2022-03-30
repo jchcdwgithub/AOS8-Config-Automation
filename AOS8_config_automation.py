@@ -1,12 +1,11 @@
 import re
 import math
 import api
-import setup
 import data_structures
 from docx import Document
 from pprint import pprint
 
-API_REF = setup.get_API_JSON_files()
+API_REF = api.get_API_JSON_files()
 TABLE_COLUMNS = {}
 OBJECT_IDENTIFIERS = {}
 DEVICE_DICTIONARY = {}
