@@ -194,27 +194,6 @@ def rec_build_ordered_config_list(current_profile, all_profiles, order_config_li
   else:
     return order_config_list
           
-def build_ordered_configuration_list(profiles_to_configure):
-  """ Find objects that are dependent on each other in the TABLE_COLUMNS dictionary and add object attributes to be configured. """
-
-  ordered_configuration_list = []
-  added_objects = set()
-
-  for profile in profiles_to_configure:
-    for attribute in profiles_to_configure[profile]:
-      attr_name = attribute.split('.')[0]
-      if attribute_is_api_object(attr_name):
-        if attr_name not in profiles_to_configure:
-          attr_name = get_dependency_object_name(attr_name)
-        if attr_name not in added_objects:
-          add_profile_to_ordered_configuration_list(profile,profiles_to_configure,ordered_configuration_list,inner_profile=attr_name,added=added_objects)
-          added_objects.add(attr_name)
-    if profile not in added_objects:
-      add_profile_to_ordered_configuration_list(profile,profiles_to_configure,ordered_configuration_list)
-      added_objects.add(profile)
-  
-  return ordered_configuration_list
-
 def add_profile_to_ordered_configuration_list(profile,profiles_to_configure,ordered_configuration_list):
   """ Adds the profile and all its attributes to be configured to the ordered list. """
 
@@ -1409,7 +1388,7 @@ def get_column_errors():
 
   errors = []
   for table_column in TABLE_COLUMNS:
-    if table_column in SPECIAL_COLUMNS:
+    if table_column in CUSTOM_API_NAMES:
       continue
     elif get_attribute_type(table_column) != 'boolean': 
       column_title = TABLE_COLUMNS[table_column][0]
@@ -1659,7 +1638,7 @@ def build_profiles_dependencies(profiles_to_be_configured):
     copy = profiles_to_be_configured.copy()
     copy.pop(profile)
     for other_profile in copy:
-      if profile_is_an_attribute_of_current_profile(profile,other_profile):
+      if profile_is_an_attribute_of_current_profile(profile,other_profile): 
         add_dependency_to_table_columns_dict(profile,other_profile)
         add_dependency_to_profiles_to_be_configured(profile,other_profile,profiles_to_be_configured)
 
@@ -1686,36 +1665,63 @@ def profile_is_an_attribute_of_current_profile(current_profile,other_profile):
   """ Returns True if other_profile is an attribute of current_profile. """
   
   current_profile_properties = get_profile_properties(current_profile)
-
+  is_attribute = False
   for property in current_profile_properties:
     if property in data_structures.NESTED_DICT:
-      return other_profile in data_structures.NESTED_DICT[property]
+      if other_profile in data_structures.NESTED_DICT[property]:
+        is_attribute = True
     elif other_profile == property:
-      return True
-  return False
+      is_attribute = True
+  return is_attribute
 
 def add_dependency_to_table_columns_dict(current_profile,other_profile):
   """ Adds entries to the TABLE_COLUMNS dictionary if the two profiles are dependent. """
 
   current_profile_identifier = OBJECT_IDENTIFIERS[current_profile]
   other_profile_identifier = OBJECT_IDENTIFIERS[other_profile]
-  if current_profile != '' and other_profile_identifier != '':
+  if current_profile_identifier != '' and other_profile_identifier != '':
     current_profile_names = TABLE_COLUMNS[current_profile_identifier]
     other_profile_names = TABLE_COLUMNS[other_profile_identifier]
     dynamic_profile_name = get_dynamic_profile_name(current_profile, other_profile) 
     if dynamic_profile_name not in TABLE_COLUMNS:
       for profile_name in current_profile_names:
         if profile_name in other_profile_names:
-          name_without_node_info = profile_name.split('%')[0]
-          if dynamic_profile_name in TABLE_COLUMNS.keys():
-            TABLE_COLUMNS[dynamic_profile_name].append(f'{name_without_node_info}_{other_profile}')
+          profile_name_with_node = profile_name
+          other_profile_name_with_node = other_profile_names[other_profile_names.index(profile_name)]
+          if profiles_share_node_hierarchy(profile_name_with_node,other_profile_name_with_node):
+            name_without_node_info = profile_name.split('%')[0]
+            if dynamic_profile_name in TABLE_COLUMNS.keys():
+              TABLE_COLUMNS[dynamic_profile_name].append(f'{name_without_node_info}_{other_profile}')
+            else:
+              TABLE_COLUMNS[dynamic_profile_name] = [f'{name_without_node_info}_{other_profile}'] 
           else:
-            TABLE_COLUMNS[dynamic_profile_name] = [f'{name_without_node_info}_{other_profile}'] 
-        else:
-          if dynamic_profile_name in TABLE_COLUMNS.keys():
-            TABLE_COLUMNS[dynamic_profile_name].append('')
-          else:
-            TABLE_COLUMNS[dynamic_profile_name] = ['']
+            if dynamic_profile_name in TABLE_COLUMNS.keys():
+              TABLE_COLUMNS[dynamic_profile_name].append('')
+            else:
+              TABLE_COLUMNS[dynamic_profile_name] = ['']
+
+def profiles_share_node_hierarchy(current_profile_name,other_profile_name):
+  """ Returns True if the other_profile_name node is a sub-node of the current_profile_name node. """
+  
+  current_names = current_profile_name.split('%')
+  other_names = other_profile_name.split('%')
+  if len(current_names) == 2:
+    current_profile_node = current_names[1]
+  else:
+    current_profile_node = api.DEFAULT_PATH
+  if len(other_names) == 2:
+    other_profile_node = other_names[1]
+  else:
+    other_profile_node = api.DEFAULT_PATH
+  
+  current_profile_node_structure = current_profile_node.split('/')
+  other_profile_node_structure = other_profile_node.split('/')
+
+  for current_node,other_node in zip(current_profile_node_structure,other_profile_node_structure):
+    if current_node != other_node:
+      return False
+  
+  return True
 
 def get_dynamic_profile_name(current_profile,other_profile):
   """ Returns the attribute to be added between the two dependent profiles. """
@@ -1928,3 +1934,5 @@ SPECIAL_COLUMNS = {
                    'ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__lease.var3': add_lease_to_dhcp_pool,
                    'ip_name_server.address': add_dns_server_addresses,
                    }
+
+CUSTOM_API_NAMES = ['reg_domain_prof.channel_width.width']

@@ -1,11 +1,11 @@
 from inspect import GEN_CREATED
 from re import I, fullmatch
 import AOS8_config_automation as CA
-import setup
 import pytest
+import api
 from docx import Document
 
-API_FILES_TEST = setup.get_API_JSON_files()
+API_FILES_TEST = api.get_API_JSON_files()
 
 def test_build_hierarchy_builds_all_paths():
     """ The build hierarchy function correctly returns all intermediate paths. """
@@ -490,6 +490,7 @@ def test_add_dependencies_to_table_columns_dict_adds_dependent_profiles():
         ['A Rates Allowed', '12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54']
     ]
     CA.add_entries_to_object_identifiers()
+    api.DEFAULT_PATH = '/md/ATC'
     CA.build_tables_columns_dict(CA.create_table(columns))
     CA.remove_column_headers_from_columns_table()
     profiles = CA.get_profiles_to_be_configured()
@@ -515,7 +516,6 @@ def test_add_dependencies_to_table_columns_dict_adds_dependent_profiles():
                 "ap_group.profile-name":["CGR","DEP","KFD","PWK","SIG","Test"],
                 "ap_group.dot11g_prof.profile-name":["CGR_ap_g_radio_prof","DEP_ap_g_radio_prof","KFD_ap_g_radio_prof","PWK_ap_g_radio_prof","SIG_ap_g_radio_prof","Test_ap_g_radio_prof"],
                 "ap_group.dot11a_prof.profile-name":["CGR_ap_a_radio_prof","DEP_ap_a_radio_prof","KFD_ap_a_radio_prof","PWK_ap_a_radio_prof","SIG_ap_a_radio_prof","Test_ap_a_radio_prof"],
-                "ap_group.virtual_ap.profile-name":['','','','','',''],
                 "ap_group.reg_domain_prof.profile-name":["CGR_reg_domain_prof","DEP_reg_domain_prof","KFD_reg_domain_prof","PWK_reg_domain_prof","SIG_reg_domain_prof","Test_reg_domain_prof"]}
 
     assert expected == CA.TABLE_COLUMNS
@@ -539,6 +539,7 @@ def test_add_dependencies_to_table_columns_dict_adds_new_profiles_to_profiles_to
         ['A Rates Allowed', '12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54','12,18,24,36,48,54']
     ]
     CA.add_entries_to_object_identifiers()
+    api.DEFAULT_PATH = '/md/ATC'
     CA.build_tables_columns_dict(CA.create_table(columns))
     CA.remove_column_headers_from_columns_table()
     profiles = CA.get_profiles_to_be_configured()
@@ -580,11 +581,6 @@ def test_build_ordered_configuration_list_builds_list_correctly():
                 ["reg_domain_prof.profile-name",
                 "reg_domain_prof.valid_11b_channel.valid-11g-channel",
                 "reg_domain_prof.valid_11a_channel.valid-11a-channel"],
-                ["ap_group.profile-name",
-                "ap_group.dot11g_prof.profile-name",
-                "ap_group.dot11a_prof.profile-name",
-                "ap_group.reg_domain_prof.profile-name",
-                "ap_group.virtual_ap.profile-name"],
                 ["ssid_prof.profile-name",
                  "ssid_prof.essid.essid",
                 "ssid_prof.g_basic_rates",
@@ -592,10 +588,15 @@ def test_build_ordered_configuration_list_builds_list_correctly():
                 "ssid_prof.a_basic_rates",
                 "ssid_prof.a_tx_rates"],
                 ["virtual_ap.profile-name",
-                "virtual_ap.ssid_prof.profile-name"]
+                "virtual_ap.ssid_prof.profile-name"],
+                ["ap_group.profile-name",
+                "ap_group.dot11g_prof.profile-name",
+                "ap_group.dot11a_prof.profile-name",
+                "ap_group.reg_domain_prof.profile-name",
+                "ap_group.virtual_ap.profile-name"]
                 ]
 
-    generated = CA.build_ordered_configuration_list(profiles)
+    generated = CA.make_ordered_config_list(profiles)
 
     assert expected == generated
 
@@ -1180,16 +1181,13 @@ def test_add_addresses_to_dhcp_pool_adds_dns_addresses_correctly():
 
 def test_add_addresses_to_dhcp_pool_adds_dft_rtr_addresses_correctly():
 
-    doc = Document()
-    table = doc.add_table(cols=1,rows=2)
-    cells = table.columns[0].cells
-    cells[0].text = 'DHCP Pool Default Router'
-    cells[1].text = '192.168.1.21, 192.168.2.22, 192.168.3.33'
+
+    cols = [['DHCP Pool Default Router', '192.168.1.21, 192.168.2.22, 192.168.3.33']]
+    CA.build_tables_columns_dict(CA.create_table(cols))
+    CA.remove_column_headers_from_columns_table()
 
     expected = {'pool-name':'some-name','ip_dhcp_pool_cfg__def_rtr':{'address':'192.168.1.21','address2':'192.168.2.22','address3':'192.168.3.33'}}
     
-
-
     generated = CA.add_attributes_to_profiles('ip_dhcp_pool_cfg.ip_dhcp_pool_cfg__def_rtr.address',[],[{'pool-name':'some-name'}])
 
     assert expected == generated[0]
@@ -1226,7 +1224,7 @@ def test_add_vlan_name_id_association_adds_name_association_correctly():
     CA.remove_column_headers_from_columns_table()
     profiles = CA.get_profiles_to_be_configured()
     CA.build_profiles_dependencies(profiles)
-    ordered_list = CA.build_ordered_configuration_list(profiles)
+    ordered_list = CA.make_ordered_config_list(profiles)
     generated = CA.build_profiles_from_ordered_list(ordered_list)
 
     expected = [[{'name':'BYOD','node':'/md/America/West'}],[{'id':20,'node':'/md/America/West'}],[{'name':'BYOD','node':'/md/America/West', 'vlan-ids':'20'}]]
@@ -1535,3 +1533,21 @@ def test_remove_empty_string_objects_removes_empty_objects_in_array():
     generated = CA.remove_empty_string_objects(profiles)
     
     assert expected == generated
+
+def test_profiles_share_node_hierarchy_function_returns_true_for_shared_nodes():
+
+    current_profile_names = 'name1%/md/America'
+    other_profile_names = 'name1%/md/America/East'
+
+    Result = CA.profiles_share_node_hierarchy(current_profile_names,other_profile_names)
+
+    assert Result == True
+
+def test_profiles_share_node_hierarchy_returns_false_for_non_shared_nodes():
+
+    current_profile_name = 'name1%/md/America'
+    other_profile_name = 'name1%/md/Europe/France'
+
+    Result = CA.profiles_share_node_hierarchy(current_profile_name,other_profile_name)
+
+    assert Result == False
