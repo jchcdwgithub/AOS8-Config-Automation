@@ -211,3 +211,25 @@ NESTED_DICT = {'id':['vlan_id'],
                'wired_aaa_prof':['aaa_prof'],
                'auth_server':['rad_server']
                }
+
+objects_of_interest = ['rad_server', 'server_group_prof', 'aaa_prof', 'mac_auth_prof', 'reg_domain_prof', 'ap_sys_prof', 
+                       'ap_group', 'int_loop', 'ip_dhcp_pool_cfg', 'ip_name_server', 'cp_auth_profile', 'dot1x_auth_prof',
+                       'int_gig', 'int_vlan', 'netdst', 'ntp_server_info', 'am_scan_prof', 'arm_prof', 'ap_a_radio_prof',
+                       'ap_g_radio_prof', 'ht_radio_prof', 'snmp_ser_host_snmpv2c', 'role', 'vlan_id', 'vlan_range', 'vlan_name_id',
+                       'vrrp', 'wdb_rap_add', 'ht_ssid_prof', 'ssid_prof', 'virtual_ap', 'tg', 'mesh_ht_ssid_prof', 
+                       'ap_mesh_domain_prof', 'ap_mesh_radio_prof', 'ap_provisioning_prof', 'ag_service_prof',
+                       ]
+
+cli_to_api_index = {'aaa authentication-server radius': [1, 7, 8, 27, 30, 28, 34, 5, 6, 3, 4, 21, 12, 13, 14, 26, 9, 24, 25, 10, 16, 15, 11],
+                    'aaa server-group': [36, 53,], 
+                    'aaa profile': [55, 60, 57, 83, 61, 62, 56, 58, 57, 68, 81, 69, 74, 73,],
+                    'ap-regulatory-domain-profile': [86, 94, 87, 91, 92, 89, 90, 88],
+                    'ap system-profile': [96, 187, 99, 191, 113, 115, 192, 188, 208, 104, 153, 151, 102, 106, 117, 112, 114, 157,184, 110, 100, 121, 122, 128, 126, 127, 125, 120, 119, 158, 97, 103, 105],
+                    'ap-group' : [210, 222, 238, 244, 212, 224, 214, 225, 216, 217, 218, 219, 220, 228, 229, 231, 232, 230, 226, 227, 221, ],
+                    'interface loopback' : [246, 247],
+                    'ip dhcp pool': [249, 277, 258, 279, 280, 281, 268, 284, 282, 288, 285],
+                    'ip name-server': [297],
+                    'aaa authentication captive-portal': [299, 307, 325, 331, 301, 300, 322, 314, 311, 303, 328, 302, 319, 330, 320, 315, 324],
+}
+
+ 

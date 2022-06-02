@@ -1921,6 +1921,46 @@ def get_object_properties(object):
   
   return []
 
+def make_name(current_name, dict):
+    if "properties" in dict:
+        names = []
+        for attr in dict["properties"]:
+            if dict["properties"][attr]['type'] == 'array':
+              prop_dict = dict["properties"][attr]["items"]
+            else:
+              prop_dict = dict["properties"][attr]
+            names.append(make_name(f"{current_name}.{attr}",prop_dict))
+        return names
+    else:
+        return current_name
+
+def get_api_object_names(object_name):
+    names = []
+    for api_ref in API_REF:
+        if object_name in api_ref["definitions"]:
+            names = make_name(object_name, api_ref["definitions"][object_name])
+    flattened_names = []
+    for name in names:
+        if type(name) is list:
+            for sub_name in name:
+                flattened_names.append(sub_name)
+        else:
+            flattened_names.append(name)
+    return flattened_names
+
+def write_api_attributes_to_output_file(outfile='api_attr.txt'):
+  """ Gathers the attributes of the objects found in data_structures.objects_of_interest and outputs them to a file. """
+
+  object_names = {}
+  for object_name in data_structures.objects_of_interest:
+      object_names[object_name] = get_api_object_names(object_name)
+
+  with open(outfile, 'w') as api_outfile:
+      for object_name in object_names:
+          for object_attr in object_names[object_name]:
+              api_outfile.write(f"{object_attr}\n")
+          api_outfile.write("!\n")
+
 SPECIAL_COLUMNS = {
                    'reg_domain_prof.channel_width.width':add_wide_5ghz_channels,
                    'role.role__acl.pname':add_acls_to_role_profiles,
