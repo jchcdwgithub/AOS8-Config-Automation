@@ -1961,6 +1961,57 @@ def write_api_attributes_to_output_file(outfile='api_attr.txt'):
               api_outfile.write(f"{object_attr}\n")
           api_outfile.write("!\n")
 
+def associate_cli_api_headers():
+  """ Takes an api template and a cli template and uses the cli_to_api dictionary in data_structures to associate cli and api headers. """
+
+  api_lines = None
+  cli_lines = None
+  with open('api_attr.txt') as api_f:
+      api_lines = api_f.readlines()
+  with open('cli_attr.txt') as cli_f:
+      cli_lines = cli_f.readlines()
+  cli_objects = []
+  current_object = []
+  for line in cli_lines:
+      stripped_line = line.strip()
+      if stripped_line != '!':
+          current_object.append(stripped_line)
+      else:
+          cli_objects.append(current_object)
+          current_object = []
+  with open('test_assoc.txt', 'w') as test_f:
+      cli_object_index = 0
+      for key in data_structures.cli_to_api_index:    
+          current = 0 
+          cli_object = cli_objects[cli_object_index]
+          while current < len(data_structures.cli_to_api_index[key]):
+              api_index = data_structures.cli_to_api_index[key][current]
+              current_line = f"'{cli_object[current]}':['{api_lines[api_index-1].strip()}'],\n"
+              test_f.write(current_line)
+              current += 1        
+          cli_object_index += 1
+
+def find_and_output_repeated_cli_headers():
+  """ Repeated cli headers need to be handled specially. Output to repeated_attr.txt """
+
+  cli_lines = None
+  with open('cli_attr.txt') as cli_f:
+      cli_lines = cli_f.readlines()
+
+  repeated_attr = []
+  with open('repeated_attr.txt', 'w') as repeated_f:
+      unique_attr = []
+      for cli_line in cli_lines:
+          if cli_line != '!\n':
+              if cli_line in unique_attr:
+                  repeated_line = f"'{cli_line.strip()}'\n"
+                  if not repeated_line in repeated_attr:
+                      repeated_attr.append(repeated_line)
+              else:
+                  unique_attr.append(cli_line)
+      for repeated in repeated_attr:
+          repeated_f.write(repeated)
+
 SPECIAL_COLUMNS = {
                    'reg_domain_prof.channel_width.width':add_wide_5ghz_channels,
                    'role.role__acl.pname':add_acls_to_role_profiles,
