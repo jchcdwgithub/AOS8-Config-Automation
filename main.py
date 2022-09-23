@@ -79,17 +79,6 @@ def main():
             print('Invalid file or path to file.')
             input('File: ')
     
-    
-    errors = CA.get_column_errors()
-    print('Potential errors in configuration tables:')
-    for error in errors:
-        print(error)
-    
-    abort = input('Fix errors? Program will exit. (y/n): ')
-    if abort == 'y':
-        print('Exiting...')
-        exit()
-
     CA.remove_column_headers_from_columns_table()
     CA.add_mac_auth_info_to_tables_columns()
     CA.add_dot1x_profile_attributes()
