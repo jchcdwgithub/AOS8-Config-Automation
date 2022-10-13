@@ -132,6 +132,7 @@ dmypy.json
 #local api tester
 ex_tokens.py
 local_runner.py
-*.txt
-*.txt*
-*~
+api_attr.txt
+cli_attr.txt
+repeated_attr.txt
+test_assoc.txt
